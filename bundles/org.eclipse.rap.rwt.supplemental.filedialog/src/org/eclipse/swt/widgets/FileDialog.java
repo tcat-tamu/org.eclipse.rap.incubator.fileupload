@@ -713,7 +713,7 @@ public class FileDialog extends Dialog {
     }
     
     public synchronized void updateProgress (String processId, int progressPercent) {
-      metrics.put( processId, Integer.valueOf( progressPercent ) );
+      metrics.put( processId, new Integer( progressPercent ) );
       updateTotalProgress();
     }
 
@@ -762,7 +762,7 @@ public class FileDialog extends Dialog {
         if (filter != null) {
           String[] types = filter.split(";");
           for (int j = 0; j < types.length; j++) {
-            String ext = types[j].replace( "*", "" );
+            String ext = types[j].replaceAll( "*", "" );
             if (ext.equals(".") || filename.endsWith(ext)) {
               valid = true;
             }

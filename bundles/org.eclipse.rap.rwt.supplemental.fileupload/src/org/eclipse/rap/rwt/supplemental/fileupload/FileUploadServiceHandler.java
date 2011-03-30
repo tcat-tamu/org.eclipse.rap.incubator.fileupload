@@ -35,7 +35,6 @@ import org.eclipse.rap.rwt.supplemental.fileupload.internal.FileUploadStorage;
 import org.eclipse.rap.rwt.supplemental.fileupload.internal.FileUploadStorageItem;
 import org.eclipse.rap.rwt.supplemental.fileupload.internal.WidgetProgressHandler;
 import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.internal.util.URLHelper;
 import org.eclipse.rwt.service.IServiceHandler;
 import org.eclipse.swt.widgets.Widget;
 
@@ -53,7 +52,6 @@ import org.eclipse.swt.widgets.Widget;
 public class FileUploadServiceHandler implements IServiceHandler {
 
   private static final String REQUEST_PROCESS_ID = "processId";
-  private static final String REQUEST_WIDGET_ID = "widgetId";
   
   /**
    * Holds configuration data for the upload widget.
@@ -76,7 +74,7 @@ public class FileUploadServiceHandler implements IServiceHandler {
    * Returns a unique id for this service handler class.
    */
   private String getServiceHandlerId() {
-    StringBuilder id = new StringBuilder(FileUploadServiceHandler.class.getName());
+    StringBuffer id = new StringBuffer(FileUploadServiceHandler.class.getName());
     id.append( hashCode() );
     return id.toString();
   }
@@ -233,13 +231,16 @@ public class FileUploadServiceHandler implements IServiceHandler {
    */
   public String getUrl(String processId) {
     final StringBuffer url = new StringBuffer();
-    url.append(URLHelper.getURLString(false));
-
-    URLHelper.appendFirstParam(url, REQUEST_PARAM, getServiceHandlerId());
-    URLHelper.appendParam(url, REQUEST_PROCESS_ID, processId);
+    url.append( RWT.getRequest().getContextPath() );
+    url.append( RWT.getRequest().getServletPath() );
+    url.append( "?" );
+    url.append( IServiceHandler.REQUEST_PARAM ).append( "=" ).append(getServiceHandlerId());
+    url.append( "&" );
+    url.append( REQUEST_PROCESS_ID ).append( "=" ).append(processId);
 
     // convert to relative URL
-    final int firstSlash = url.indexOf( "/" , url.indexOf( "//" ) + 2 ); // first slash after double slash of "http://"
+    // first slash after double slash of "http://"
+    final int firstSlash = url.indexOf( "/" , url.indexOf( "//" ) + 2 );
     url.delete( 0, firstSlash ); // Result is sth like "/rap?custom_service_handler..."
     return RWT.getResponse().encodeURL(url.toString());
   }
@@ -252,6 +253,7 @@ public class FileUploadServiceHandler implements IServiceHandler {
   }
 
   public void cancel( String processId ) {
+    //TODO implement a cancel operation
   }
 
 }
