@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2002-2011 Innoopract Informationssysteme GmbH and
+ * Copyright (c) 2002,2011 Innoopract Informationssysteme GmbH and
  * Texas Engineering Experiment Station
  * The Texas A&M University System
  * All Rights Reserved. 
@@ -19,28 +19,39 @@ package org.eclipse.rap.rwt.supplemental.fileupload;
 import org.apache.commons.fileupload.FileUploadBase;
 
 /**
- * Provides a configuration mechanism for the file upload. Note that this
- * configuration is shared for all upload widgets.
+ * Provides a configuration mechanism for the file upload.
+ * 
+ * @since 1.4
  */
 public interface IFileUploadConfiguration {
 
   /**
-   *@see FileUploadBase#setFileSizeMax(long)
+   * Sets the max file size in bytes allowed for an upload.
+   * 
+   * @param fileSizeMax - the maximum file size allowed
+   * @since 1.4
    */
-  public void setFileMaxSize( long fileSizeMax );
+  public void setFileMaxSize( long maxFileSize );
 
   /**
-   *@see FileUploadBase#getFileSizeMax()
+   * Returns the max file size in bytes allowed for an upload.
+   * 
+   * @since 1.4
    */
   public long getFileSizeMax();
 
   /**
-   *@see FileUploadBase#setSizeMax(long)
+   * Sets the max size in bytes allowed for a complete request.
+   * 
+   * @param maxRequestSize the size in bytes
+   * @since 1.4
    */
-  public void setSizeMax( long sizeMax );
+  public void setSizeMax( long maxRequestSize );
 
   /**
-   *@see FileUploadBase#getSizeMax()
+   * Returns the max size in bytes allowed for a complete request.
+   * 
+   * @since 1.4
    */
   public long getSizeMax();
 }

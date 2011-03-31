@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2002-2007 Critical Software S.A. and
+ * Copyright (c) 2002,2007 Critical Software S.A. and
  * Texas Engineering Experiment Station
  * The Texas A&M University System
  * All Rights Reserved.
@@ -18,140 +18,82 @@
  ******************************************************************************/
 package org.eclipse.rap.rwt.supplemental.fileupload.event;
 
-import org.eclipse.rwt.Adaptable;
-import org.eclipse.swt.events.TypedEvent;
-import org.eclipse.swt.widgets.Widget;
-
 /**
- * Represents an Upload Event.
- *
- * @author tjarodrigues
- * @version $Revision: 1.1 $
+ * Instances of this class are used to notify listeners about the progress of a
+ * file upload.
+ * 
+ * @see FileUploadListener
+ * @since 1.4
  */
-public class FileUploadEvent extends TypedEvent {
-  
-  private static final long serialVersionUID = 1L;
-  /**
-   * Hopefully, this isn't occupied by another custom event type
-   */
-  private static final int UPLOAD_FINISHED = 101;
-  private static final int UPLOAD_IN_PROGRESS = 102;
-  private static final int UPLOAD_EXCEPTION = 103;
-  
-  private static final Class LISTENER = FileUploadListener.class;
-  private final boolean finished;
-  private final long uploadedParcial;
-  private final long uploadedTotal;
-  private final Exception uploadException;
+public class FileUploadEvent {
 
-  
+  private final String uploadProcessId;
+  private final long bytesRead;
+  private final long totalBytes;
+  private final FileUploadException uploadException;
+
   /**
-   * Returns an exception that occurred during upload during
-   * processing the file on the server side.
+   * Returns the process id of the upload to which this event pertains.
+   * 
+   * @return the upload process id
+   * @since 1.4
    */
-  public Exception getUploadException() {
+  public String getUploadProcessId() {
+    return uploadProcessId;
+  }
+
+  /**
+   * Returns an exception if one occurred during the upload processing on the
+   * server side.
+   * 
+   * @return an upload exception
+   * @since 1.4
+   */
+  public FileUploadException getUploadException() {
     return uploadException;
   }
 
   /**
-   * Checks if the Upload has finished.
+   * Returns the number of bytes read thusfar in the upload process.
    * 
-   * @return <code>True</code> if the Upload has finished, <code>False</code>
-   *         otherwise.
+   * @return the amount of data uploaded.
+   * @since 1.4
    */
-  public final boolean isFinished() {
-    return finished;
+  public final long getBytesRead() {
+    return this.bytesRead;
   }
 
   /**
-   * Gets the partial amount of data uploaded.
-   *
-   * @return The partial amount of data uploaded.
-   */
-  public final long getUploadedParcial() {
-    return this.uploadedParcial;
-  }
-
-  /**
-   * Gets the total file size.
-   *
+   * Returns the total number of bytes expected for the file being uploaded.
+   * 
    * @return The total file size.
+   * @since 1.4
    */
-  public final long getUploadedTotal() {
-    return this.uploadedTotal;
+  public final long getTotalBytes() {
+    return this.totalBytes;
   }
 
   /**
-   * Creates a new instance of the Upload Event.
-   *
-   * @param finished Indicates if the upload is finished.
-   * @param uploadedParcial The partial amount of data uploaded.
-   * @param uploadedTotal The total file size.
-   * @param widget The sender of the event, must not be null
+   * Creates an upload event that contains progress information about an upload
+   * process. Any exception specified is wrapped in a FileUploadException.
+   * 
+   * @param uploadedProcessId - the process id of the upload to which this event
+   *          pertains
+   * @param uploadedParcial - the amount of data uploaded thusfar
+   * @param uploadedTotal - the total number of bytes expected for the uploaded
+   *          file
+   * @param uploadException - an exception regarding upload failure, may be
+   *          <code>null</code>
+   * @since 1.4
    */
-  public FileUploadEvent( final Widget widget,
-                      final boolean finished,
-                      final long uploadedParcial,
-                      final long uploadedTotal )
+  public FileUploadEvent( String uploadProcessId,
+                          long uploadedParcial,
+                          long uploadedTotal,
+                          Exception uploadException )
   {
-    super( widget, finished
-                           ? UPLOAD_FINISHED
-                           : UPLOAD_IN_PROGRESS );
-    this.finished = finished;
-    this.uploadedParcial = uploadedParcial;
-    this.uploadedTotal = uploadedTotal;
-    this.uploadException = null;
-  }
-  
-  public FileUploadEvent( final Widget widget, final Exception uploadException ) {
-    super(widget, UPLOAD_EXCEPTION);
-    this.finished = true;
-    this.uploadedParcial = -1;
-    this.uploadedTotal = -1;
-    this.uploadException = uploadException;
-  }
-
-  protected void dispatchToObserver( final Object listener ) {
-    switch( getID() ) {
-      case UPLOAD_IN_PROGRESS:
-        ( ( FileUploadListener )listener ).uploadInProgress( this );
-      break;
-      case UPLOAD_FINISHED:
-        ( ( FileUploadListener )listener ).uploadFinished( this );
-      break;
-      case UPLOAD_EXCEPTION:
-        ( ( FileUploadListener )listener ).uploadException( this );
-      break;
-      default:
-        throw new IllegalStateException( "Invalid event handler type." );
-    }
-  }
-
-  protected Class getListenerType() {
-    return LISTENER;
-  }
-
-  protected boolean allowProcessing() {
-    return true;
-  }
-
-  public static void addListener( final Adaptable adaptable, 
-                                  final FileUploadListener listener )
-  {
-    addListener( adaptable, LISTENER, listener );
-  }
-
-  public static void removeListener( final Adaptable adaptable, 
-                                     final FileUploadListener listener )
-  {
-    removeListener( adaptable, LISTENER, listener );
-  }
-  
-  public static boolean hasListener( final Adaptable adaptable ) {
-    return hasListener( adaptable, LISTENER );
-  }
-  
-  public static Object[] getListeners( final Adaptable adaptable ) {
-    return getListener( adaptable, LISTENER );
+    this.uploadProcessId = uploadProcessId;
+    this.bytesRead = uploadedParcial;
+    this.totalBytes = uploadedTotal;
+    this.uploadException = new FileUploadException( uploadProcessId, uploadException );
   }
 }

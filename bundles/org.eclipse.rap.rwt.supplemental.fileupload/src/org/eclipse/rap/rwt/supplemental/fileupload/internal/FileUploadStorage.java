@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2002-2011 Innoopract Informationssysteme GmbH and
+ * Copyright (c) 2002,2011 Innoopract Informationssysteme GmbH and
  * Texas Engineering Experiment Station
  * The Texas A&M University System
  * All Rights Reserved. 
@@ -22,14 +22,6 @@ import java.util.Map;
 
 import org.eclipse.rwt.SessionSingletonBase;
 
-
-/**
- * This session singleton is used to communicate between service handler and rap
- * application and to exchange a reference to the uploaded file. To support multiple
- * file uploads a key must be used to get and store items. This key must be unique as
- * it is used as a hash map key.
- * @author stefan.roeck
- */
 public class FileUploadStorage extends SessionSingletonBase {
 
   private Map items;

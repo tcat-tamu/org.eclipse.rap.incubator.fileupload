@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2002-2011 Innoopract Informationssysteme GmbH and
+ * Copyright (c) 2002,2011 Innoopract Informationssysteme GmbH and
  * Texas Engineering Experiment Station
  * The Texas A&M University System
  * All Rights Reserved. 
@@ -23,16 +23,6 @@ import java.io.InputStream;
 
 import org.apache.commons.fileupload.disk.DiskFileItem;
 
-
-/**
- * This Pojo is used to store a file reference and a progress listener.
- * It is used for communication between service handler and rap application.
- * Due to the asynchronous nature of ServiceHandler-requests and access from
- * the UIThread to instances of this class, all members are access
- * synchronized.
- * 
- * @author stefan.roeck
- */
 public class FileUploadStorageItem {
   private DiskFileItem fileItem;
   private File file;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2002-2007 Critical Software S.A. and
+ * Copyright (c) 2002,2007 Critical Software S.A. and
  * Texas Engineering Experiment Station
  * The Texas A&M University System
  * All Rights Reserved. 
@@ -18,38 +18,42 @@
  ******************************************************************************/
 package org.eclipse.rap.rwt.supplemental.fileupload.event;
 
-import java.util.EventListener;
+import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadServiceHandler;
 
 
 /**
- * Use a UploadListener to get notified when a file upload has 
- * finished.
- * 
- * @author tjarodrigues
- * @version $Revision: 1.1 $
+ * Listener interface for obtaining progress about particular upload processes.
+ * Instances of this class may be registered using an instanceof FileUploadServiceHandler.
+ * @see FileUploadEvent
+ * @see FileUploadServiceHandler#addListener(FileUploadListener,String)
+ * @see FileUploadServiceHandler#removeListener(FileUploadListener,String)        
+ * @since 1.4
  */
-public interface FileUploadListener extends EventListener{
+public interface FileUploadListener {
 
   /**
-   * Is called, when uploading a file has been finished sucessfully.
-   * @param uploadEvent The Upload Event to be fired. 
-   * {@link FileUploadEvent#getSource()} returns the upload
-   * widget which triggered the event. All other fields are empty
+   * Called when a file upload has finished sucessfully.
+   * @param uploadEvent - event that contains information about the uploaded file. 
+   * @see FileUploadEvent 
+   * @since 1.4
    */
-  public void uploadFinished( final FileUploadEvent uploadEvent );
+  public void uploadFinished( FileUploadEvent uploadEvent );
   
   
   /**
-   * Is called when the upload is in progress. You may use the
-   * {@link FileUploadEvent} to get details on the progress.
+   * Called when new information about an in-progress upload is available.
+   * @param uploadEvent - event that contains information about the uploaded file.
+   * @see FileUploadEvent
+   * @since 1.4
    */
-  public void uploadInProgress( final FileUploadEvent uploadEvent );
+  public void uploadInProgress( FileUploadEvent uploadEvent );
 
 
   /**
-   * Signals that an exception has ocurred while receiving the
-   * file to be uploaded. The exception can be retrieved
-   * using {@link FileUploadEvent#getUploadException()}.
+   * Called when an exception has ocurred during an upload process. 
+   * The exception can be retrieved using {@link FileUploadEvent#getUploadException()}.
+   * @see FileUploadEvent
+   * @since 1.4
    */
-  public void uploadException( final FileUploadEvent uploadEvent );
+  public void uploadException( FileUploadEvent uploadEvent );
 }
