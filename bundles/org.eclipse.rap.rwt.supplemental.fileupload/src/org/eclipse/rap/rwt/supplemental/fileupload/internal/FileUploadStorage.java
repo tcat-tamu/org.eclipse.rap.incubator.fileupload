@@ -1,7 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2002,2011 Innoopract Informationssysteme GmbH and
- * Texas Engineering Experiment Station
- * The Texas A&M University System
+ * Copyright (c) 2002,2011 Innoopract Informationssysteme GmbH and others.
  * All Rights Reserved. 
  * 
  * This program and the accompanying materials are made available

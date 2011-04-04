@@ -1,7 +1,8 @@
 /*******************************************************************************
- * Copyright (c) 2011 Texas Engineering Experiment Station
+ * Copyright (c) 2011 Texas Center for Applied Technology
+ * Texas Engineering Experiment Station
  * The Texas A&M University System
- * All Rights Reserved. 
+ * All Rights Reserved.
  * 
  * This program and the accompanying materials are made available
  * under the terms of the Eclipse Public License v1.0 which accompanies this

@@ -1,5 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2011 Texas Engineering Experiment Station
+ * Copyright (c) 2011 Texas Center for Applied Technology
+ * Texas Engineering Experiment Station
  * The Texas A&M University System
  * All Rights Reserved. 
  * 
@@ -64,14 +65,17 @@ public class FileUploadProgressHandler {
     if( procListeners != null && procListeners.size() > 0) {
       final long bytesRead = fileUploadStorageitem.getBytesRead();
       final long contentLength = fileUploadStorageitem.getContentLength();
+      String contentType = fileUploadStorageitem.getContentType();
       for( int i = 0; i < procListeners.size(); i++ ) {
         FileUploadListener listener = ( FileUploadListener )procListeners.get( i );
         Exception uploadException = fileUploadStorageitem.getException();
         final FileUploadEvent evt = new FileUploadEvent( uploadProcessId,
                                                          bytesRead,
                                                          contentLength,
+                                                         contentType,
                                                          uploadException );
-        boolean finished = bytesRead == contentLength;
+        boolean finished = bytesRead == contentLength &&
+                           uploadException == null;
         if( uploadException != null ) {
           listener.uploadException( evt );
         } else if( finished ) {

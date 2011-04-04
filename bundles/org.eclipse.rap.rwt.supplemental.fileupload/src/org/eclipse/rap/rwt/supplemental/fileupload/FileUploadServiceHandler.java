@@ -1,7 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2002,2011 Innoopract Informationssysteme GmbH and
- * Texas Engineering Experiment Station
- * The Texas A&M University System
+ * Copyright (c) 2002,2011 Innoopract Informationssysteme GmbH and others.
  * All Rights Reserved. 
  * 
  * This program and the accompanying materials are made available
@@ -24,16 +22,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.eclipse.rap.rwt.supplemental.fileupload.event.FileUploadListener;
 import org.eclipse.rap.rwt.supplemental.fileupload.internal.FileUploadConfiguration;
+import org.eclipse.rap.rwt.supplemental.fileupload.internal.FileUploadProgressHandler;
 import org.eclipse.rap.rwt.supplemental.fileupload.internal.FileUploadStorage;
 import org.eclipse.rap.rwt.supplemental.fileupload.internal.FileUploadStorageItem;
-import org.eclipse.rap.rwt.supplemental.fileupload.internal.FileUploadProgressHandler;
 import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.service.IServiceHandler;
 
@@ -245,9 +242,20 @@ public class FileUploadServiceHandler implements IServiceHandler {
       final ProgressListener listener = new ProgressListener() {
 
         public void update( long aBytesRead, long aContentLength, int anItem ) {
-          fileUploadStorageitem.updateProgress( aBytesRead, aContentLength );
-          progressHandler.updateProgress( fileUploadStorageitem,
+//        Note: Apache fileupload 1.2 will throw an exception after the upload is finished.
+//        https://issues.apache.org/jira/browse/FILEUPLOAD-145
+//        So we handle the file size violation as best we can from here.
+          long fileSizeMax = getConfiguration().getFileSizeMax();
+          if (fileSizeMax != -1 && aContentLength > fileSizeMax) {
+            handleException( fileUploadStorageitem, 
+                             uploadProcessId, 
+                             new RuntimeException("File exceeds maximum allowed size.") );
+          }
+          else {
+            fileUploadStorageitem.updateProgress( aBytesRead, aContentLength );
+            progressHandler.updateProgress( fileUploadStorageitem,
                                           uploadProcessId );
+          }
         }
       };
       // Upload servlet allows to set upload listener
@@ -267,12 +275,21 @@ public class FileUploadServiceHandler implements IServiceHandler {
             fileUploadStorageitem.setFileItem( fileItem );
           }
         }
-      } catch( final FileUploadException e ) {
-        fileUploadStorageitem.setException( e );
       } catch( final Exception e ) {
-        fileUploadStorageitem.setException( e );
+//        Note: Apache fileupload 1.2 will throw an exception after the upload is finished.
+//        https://issues.apache.org/jira/browse/FILEUPLOAD-145
+        handleException(fileUploadStorageitem,uploadProcessId,e);
       }
     }
+  }
+  
+  private void handleException ( FileUploadStorageItem fileUploadStorageitem, 
+                                 String uploadProcessId, 
+                                 Exception e ) {
+    fileUploadStorageitem.setException( e );
+    progressHandler.updateProgress( fileUploadStorageitem,
+                                    uploadProcessId );
+    cancel(uploadProcessId);
   }
 
   /**
@@ -281,8 +298,9 @@ public class FileUploadServiceHandler implements IServiceHandler {
    * @param upload The upload handler to which the config is applied.
    */
   private void applyConfiguration( ServletFileUpload upload ) {
-    upload.setFileSizeMax( getConfiguration().getFileSizeMax() );
-    upload.setSizeMax( getConfiguration().getSizeMax() );
+    IFileUploadConfiguration configuration = getConfiguration();
+    upload.setFileSizeMax( configuration.getFileSizeMax() );
+    upload.setSizeMax( configuration.getSizeMax() );
   }
 
   /**
@@ -330,6 +348,13 @@ public class FileUploadServiceHandler implements IServiceHandler {
    * @since 1.4
    */
   public void cancel( String processId ) {
-    // TODO implement a cancel operation
+    ///handling to actually stop the upload in still needed.
+    progressHandler.clearListeners( processId );
+    FileUploadStorageItem fileUploadStorageItem = fileUploadStorage.getUploadStorageItem( processId );
+    // Reset storage item to clear values from last upload process
+    if (fileUploadStorageItem != null) {
+      fileUploadStorageItem.reset();
+    }
+    fileUploadStorage.setUploadStorageItem( processId, null );
   }
 }

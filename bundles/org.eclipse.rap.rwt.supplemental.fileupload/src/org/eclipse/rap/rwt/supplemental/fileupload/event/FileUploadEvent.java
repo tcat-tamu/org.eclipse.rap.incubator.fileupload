@@ -1,7 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2002,2007 Critical Software S.A. and
- * Texas Engineering Experiment Station
- * The Texas A&M University System
+ * Copyright (c) 2002,2011 Critical Software S.A. and others.
  * All Rights Reserved.
  *  
  * This program and the accompanying materials
@@ -31,6 +29,34 @@ public class FileUploadEvent {
   private final long bytesRead;
   private final long totalBytes;
   private final FileUploadException uploadException;
+  private final String contentType;
+  
+  /**
+   * Creates an upload event that contains progress information about an upload
+   * process. Any exception specified is wrapped in a FileUploadException.
+   * 
+   * @param uploadedProcessId - the process id of the upload to which this event
+   *          pertains
+   * @param uploadedParcial - the amount of data uploaded thusfar
+   * @param uploadedTotal - the total number of bytes expected for the uploaded
+   *          file
+   * @param contentType 
+   * @param uploadException - an exception regarding upload failure, may be
+   *          <code>null</code>
+   * @since 1.4
+   */
+  public FileUploadEvent( String uploadProcessId,
+                          long uploadedParcial,
+                          long uploadedTotal,
+                          String contentType, 
+                          Exception uploadException )
+  {
+    this.uploadProcessId = uploadProcessId;
+    this.bytesRead = uploadedParcial;
+    this.totalBytes = uploadedTotal;
+    this.contentType = contentType;
+    this.uploadException = new FileUploadException( uploadProcessId, uploadException );
+  }
 
   /**
    * Returns the process id of the upload to which this event pertains.
@@ -56,7 +82,7 @@ public class FileUploadEvent {
   /**
    * Returns the number of bytes read thusfar in the upload process.
    * 
-   * @return the amount of data uploaded.
+   * @return the amount of data uploaded
    * @since 1.4
    */
   public final long getBytesRead() {
@@ -66,34 +92,21 @@ public class FileUploadEvent {
   /**
    * Returns the total number of bytes expected for the file being uploaded.
    * 
-   * @return The total file size.
+   * @return he total file size
    * @since 1.4
    */
   public final long getTotalBytes() {
     return this.totalBytes;
   }
-
+  
   /**
-   * Creates an upload event that contains progress information about an upload
-   * process. Any exception specified is wrapped in a FileUploadException.
+   * Returns the content type of the file being uploaded.
    * 
-   * @param uploadedProcessId - the process id of the upload to which this event
-   *          pertains
-   * @param uploadedParcial - the amount of data uploaded thusfar
-   * @param uploadedTotal - the total number of bytes expected for the uploaded
-   *          file
-   * @param uploadException - an exception regarding upload failure, may be
-   *          <code>null</code>
+   * @return the content type
    * @since 1.4
    */
-  public FileUploadEvent( String uploadProcessId,
-                          long uploadedParcial,
-                          long uploadedTotal,
-                          Exception uploadException )
-  {
-    this.uploadProcessId = uploadProcessId;
-    this.bytesRead = uploadedParcial;
-    this.totalBytes = uploadedTotal;
-    this.uploadException = new FileUploadException( uploadProcessId, uploadException );
+  public String getContentType() {
+    return contentType;
   }
+
 }

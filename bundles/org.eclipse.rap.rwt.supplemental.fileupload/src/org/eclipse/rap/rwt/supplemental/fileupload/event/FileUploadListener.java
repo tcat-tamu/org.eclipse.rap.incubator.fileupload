@@ -1,7 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2002,2007 Critical Software S.A. and
- * Texas Engineering Experiment Station
- * The Texas A&M University System
+ * Copyright (c) 2002,2011 Critical Software S.A. and others.
  * All Rights Reserved. 
  * 
  * This program and the accompanying materials
