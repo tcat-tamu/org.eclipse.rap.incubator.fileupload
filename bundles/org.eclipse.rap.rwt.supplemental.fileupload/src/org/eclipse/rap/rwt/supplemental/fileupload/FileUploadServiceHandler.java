@@ -56,10 +56,11 @@ public class FileUploadServiceHandler implements IServiceHandler {
   private final String serviceHandlerId;
   private final FileUploadStorage fileUploadStorage;
   private final FileUploadProgressHandler progressHandler;
+  private boolean disposed;
 
   /**
    * Creates and registers a new service handler for file uploads.
-   * 
+   * Instances of this service handler must be disposed to prevent a registration leak.
    * @since 1.4
    */
   public FileUploadServiceHandler() {
@@ -86,7 +87,17 @@ public class FileUploadServiceHandler implements IServiceHandler {
    * @since 1.4
    */
   public void dispose() {
+    disposed = true;
     RWT.getServiceManager().unregisterServiceHandler( serviceHandlerId );
+  }
+  
+  /**
+   * Checks if this service handler is disposed.
+   * @return <code>true</code> if handler is disposed, else <code>false</code>
+   * @since 1.4
+   */
+  public boolean isDisposed() {
+    return disposed;
   }
 
   /**
