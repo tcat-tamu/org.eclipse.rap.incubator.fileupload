@@ -300,7 +300,6 @@ public class FileUploadServiceHandler implements IServiceHandler {
     fileUploadStorageitem.setException( e );
     progressHandler.updateProgress( fileUploadStorageitem,
                                     uploadProcessId );
-    cancel(uploadProcessId);
   }
 
   /**
