@@ -4,9 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -198,5 +196,6 @@ public class FileUploadServiceHandlerTest extends RAPTestCase {
     // Corner case: test with default/unsupported contenttype
     runFileUpload( "application/x-www-form-urlencoded", content, true );
   }
-  // TODO listener tests to come soon
+  // TODO listener tests
+  // TODO configuration tests (i.e., max file size, etc.
 }
