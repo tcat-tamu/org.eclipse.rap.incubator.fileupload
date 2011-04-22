@@ -219,8 +219,8 @@ public class FileUploadServiceHandler implements IServiceHandler {
 // Note: Apache fileupload 1.2 will throw an exception after the upload is finished.
 // https://issues.apache.org/jira/browse/FILEUPLOAD-145
 // So we handle the file size violation as best we can from here.
-          long fileSizeMax = getConfiguration().getFileSizeMax();
-          if( fileSizeMax != -1 && aContentLength > fileSizeMax ) {
+          long maxFileSize = getConfiguration().getMaxFileSize();
+          if( maxFileSize != -1 && aContentLength > maxFileSize ) {
             handleException( copyOfStorageItem,
                              copyOfStorageId,
                              new RuntimeException( "File exceeds maximum allowed size." ) );
@@ -270,8 +270,8 @@ public class FileUploadServiceHandler implements IServiceHandler {
    */
   private void applyConfiguration( ServletFileUpload upload ) {
     IFileUploadConfiguration configuration = getConfiguration();
-    upload.setFileSizeMax( configuration.getFileSizeMax() );
-    upload.setSizeMax( configuration.getSizeMax() );
+    upload.setFileSizeMax( configuration.getMaxFileSize() );
+    upload.setSizeMax( configuration.getMaxRequestSize() );
   }
 
   /**

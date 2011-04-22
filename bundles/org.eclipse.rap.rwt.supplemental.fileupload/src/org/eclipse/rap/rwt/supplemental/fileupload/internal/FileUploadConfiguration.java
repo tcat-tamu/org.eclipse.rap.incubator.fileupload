@@ -17,22 +17,22 @@ import org.eclipse.rap.rwt.supplemental.fileupload.IFileUploadConfiguration;
 
 public class FileUploadConfiguration implements IFileUploadConfiguration {
 
-  private long fileSizeMax = -1;
-  private long sizeMax = -1;
+  private long maxFileSize = -1;
+  private long maxRequestSize = -1;
 
-  public synchronized long getFileSizeMax() {
-    return fileSizeMax;
+  public synchronized long getMaxFileSize() {
+    return maxFileSize;
   }
 
-  public synchronized long getSizeMax() {
-    return sizeMax;
+  public synchronized void setMaxFileSize( long maxFileSize ) {
+    this.maxFileSize = maxFileSize;
   }
 
-  public synchronized void setFileMaxSize( long fileSizeMax ) {
-    this.fileSizeMax = fileSizeMax;
+  public synchronized long getMaxRequestSize() {
+    return maxRequestSize;
   }
 
-  public synchronized void setSizeMax( long sizeMax ) {
-    this.sizeMax = sizeMax;
+  public synchronized void setMaxRequestSize( long maxRequestSize ) {
+    this.maxRequestSize = maxRequestSize;
   }
 }
