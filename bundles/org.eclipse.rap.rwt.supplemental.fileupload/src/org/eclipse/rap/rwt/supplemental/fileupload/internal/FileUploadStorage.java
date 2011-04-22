@@ -29,7 +29,7 @@ public class FileUploadStorage extends SessionSingletonBase {
   /**
    * Sets a {@link FileUploadStorageItem} or removes an existing one, if the item is null.
    */
-  public void setUploadStorageItem(final String key, final FileUploadStorageItem item) {
+  public void setUploadStorageItem( String key, FileUploadStorageItem item ) {
     if( item == null ) {
       items.remove( key );
     } else {
@@ -41,7 +41,7 @@ public class FileUploadStorage extends SessionSingletonBase {
    * Returns a {@link FileUploadStorageItem} for the given key or null, if not existant
    * in map.
    */
-  public FileUploadStorageItem getUploadStorageItem(final String key) {
+  public FileUploadStorageItem getUploadStorageItem( String key ) {
     return ( FileUploadStorageItem )items.get( key );
   }
   

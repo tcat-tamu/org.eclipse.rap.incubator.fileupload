@@ -20,6 +20,7 @@ import org.apache.commons.fileupload.disk.DiskFileItem;
 
 
 public class FileUploadStorageItem {
+
   private DiskFileItem fileItem;
   private File file;
   private String contentType;
@@ -27,49 +28,50 @@ public class FileUploadStorageItem {
   private long bytesRead;
   private long contentLength;
   private Exception exception;
-  
+
   public FileUploadStorageItem() {
     reset();
   }
-  
+
   public synchronized InputStream getFileInputStream() throws IOException {
-    InputStream fileStream = null; 
-    if (fileItem != null)
+    InputStream fileStream = null;
+    if( fileItem != null )
       return this.fileItem.getInputStream();
     return fileStream;
   }
-  
-  public synchronized File getFile () throws Exception {
-    if (fileItem != null && file == null) {
+
+  public synchronized File getFile() throws Exception {
+    if( fileItem != null && file == null ) {
       File parent = fileItem.getStoreLocation();
-      if (parent == null) {
-        parent = File.createTempFile( String.valueOf(hashCode()) , uploadProcessId );
-      }
-      else {
-        parent = File.createTempFile( String.valueOf(hashCode()) , uploadProcessId, parent.getParentFile() );
+      if( parent == null ) {
+        parent = File.createTempFile( String.valueOf( hashCode() ), uploadProcessId );
+      } else {
+        parent = File.createTempFile( String.valueOf( hashCode() ),
+                                      uploadProcessId,
+                                      parent.getParentFile() );
       }
       parent.delete();
       parent.mkdirs();
       parent.deleteOnExit();
-      if (parent.exists() && parent.isDirectory()) {
-        String clientFileName = new File(fileItem.getName()).getName();
-        file = new File(parent,clientFileName);
+      if( parent.exists() && parent.isDirectory() ) {
+        String clientFileName = new File( fileItem.getName() ).getName();
+        file = new File( parent, clientFileName );
         file.deleteOnExit();
         fileItem.write( file );
       }
     }
     return file;
   }
-  
+
   public synchronized void setFileItem( DiskFileItem item ) {
     fileItem = item;
     setContentType( fileItem.getContentType() );
   }
-  
+
   private synchronized void setContentType( String contentType ) {
     this.contentType = contentType;
   }
-  
+
   public synchronized String getContentType() {
     return this.contentType;
   }
@@ -77,12 +79,12 @@ public class FileUploadStorageItem {
   public synchronized void setUploadProcessId( String uploadProcessId ) {
     this.uploadProcessId = uploadProcessId;
   }
-  
+
   public synchronized String getUploadProcessId() {
     return this.uploadProcessId;
   }
-  
-  public synchronized void updateProgress( long bytesRead, long contentLength) {
+
+  public synchronized void updateProgress( long bytesRead, long contentLength ) {
     this.bytesRead = bytesRead;
     this.contentLength = contentLength;
   }
@@ -90,7 +92,7 @@ public class FileUploadStorageItem {
   public synchronized long getBytesRead() {
     return bytesRead;
   }
-  
+
   public synchronized long getContentLength() {
     return contentLength;
   }
@@ -107,7 +109,7 @@ public class FileUploadStorageItem {
   public synchronized void setException( Exception e ) {
     this.exception = e;
   }
-  
+
   public synchronized Exception getException() {
     return exception;
   }

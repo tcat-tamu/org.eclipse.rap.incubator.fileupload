@@ -17,38 +17,37 @@ import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadServiceHandler;
 
 
 /**
- * Listener interface for obtaining progress about particular upload processes.
- * Instances of this class may be registered using an instanceof FileUploadServiceHandler.
+ * Listener interface for obtaining progress about particular upload processes. Instances of this
+ * class may be registered using an instanceof FileUploadServiceHandler.
+ * 
  * @see FileUploadEvent
  * @see FileUploadServiceHandler#addListener(FileUploadListener,String)
- * @see FileUploadServiceHandler#removeListener(FileUploadListener,String)        
+ * @see FileUploadServiceHandler#removeListener(FileUploadListener,String)
  * @since 1.4
  */
 public interface FileUploadListener {
 
   /**
    * Called when a file upload has finished sucessfully.
-   * @param uploadEvent - event that contains information about the uploaded file. 
-   * @see FileUploadEvent 
-   * @since 1.4
-   */
-  public void uploadFinished( FileUploadEvent uploadEvent );
-  
-  
-  /**
-   * Called when new information about an in-progress upload is available.
+   * 
    * @param uploadEvent - event that contains information about the uploaded file.
    * @see FileUploadEvent
-   * @since 1.4
+   */
+  public void uploadFinished( FileUploadEvent uploadEvent );
+
+  /**
+   * Called when new information about an in-progress upload is available.
+   * 
+   * @param uploadEvent - event that contains information about the uploaded file.
+   * @see FileUploadEvent
    */
   public void uploadInProgress( FileUploadEvent uploadEvent );
 
-
   /**
-   * Called when an exception has ocurred during an upload process. 
-   * The exception can be retrieved using {@link FileUploadEvent#getUploadException()}.
+   * Called when an exception has ocurred during an upload process. The exception can be retrieved
+   * using {@link FileUploadEvent#getUploadException()}.
+   * 
    * @see FileUploadEvent
-   * @since 1.4
    */
   public void uploadException( FileUploadEvent uploadEvent );
 }

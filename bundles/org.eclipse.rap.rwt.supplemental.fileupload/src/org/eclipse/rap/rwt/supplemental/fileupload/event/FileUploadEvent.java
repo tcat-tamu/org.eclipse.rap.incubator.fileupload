@@ -41,7 +41,6 @@ public class FileUploadEvent {
    * @param contentType 
    * @param uploadException - an exception regarding upload failure, may be
    *          <code>null</code>
-   * @since 1.4
    */
   public FileUploadEvent( String uploadProcessId,
                           long uploadedParcial,
@@ -60,7 +59,6 @@ public class FileUploadEvent {
    * Returns the process id of the upload to which this event pertains.
    * 
    * @return the upload process id
-   * @since 1.4
    */
   public String getUploadProcessId() {
     return uploadProcessId;
@@ -71,7 +69,6 @@ public class FileUploadEvent {
    * server side.
    * 
    * @return an upload exception
-   * @since 1.4
    */
   public FileUploadException getUploadException() {
     return uploadException;
@@ -81,7 +78,6 @@ public class FileUploadEvent {
    * Returns the number of bytes read thusfar in the upload process.
    * 
    * @return the amount of data uploaded
-   * @since 1.4
    */
   public final long getBytesRead() {
     return this.bytesRead;
@@ -91,7 +87,6 @@ public class FileUploadEvent {
    * Returns the total number of bytes expected for the file being uploaded.
    * 
    * @return he total file size
-   * @since 1.4
    */
   public final long getTotalBytes() {
     return this.totalBytes;
@@ -101,10 +96,8 @@ public class FileUploadEvent {
    * Returns the content type of the file being uploaded.
    * 
    * @return the content type
-   * @since 1.4
    */
   public String getContentType() {
     return contentType;
   }
-
 }

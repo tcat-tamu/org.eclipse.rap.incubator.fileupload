@@ -24,29 +24,23 @@ public interface IFileUploadConfiguration {
    * Sets the max file size in bytes allowed for an upload.
    * 
    * @param fileSizeMax - the maximum file size allowed
-   * @since 1.4
    */
-  public void setFileMaxSize( long maxFileSize );
+  void setFileMaxSize( long maxFileSize );
 
   /**
    * Returns the max file size in bytes allowed for an upload.
-   * 
-   * @since 1.4
    */
-  public long getFileSizeMax();
+  long getFileSizeMax();
 
   /**
    * Sets the max size in bytes allowed for a complete request.
    * 
    * @param maxRequestSize the size in bytes
-   * @since 1.4
    */
-  public void setSizeMax( long maxRequestSize );
+  void setSizeMax( long maxRequestSize );
 
   /**
    * Returns the max size in bytes allowed for a complete request.
-   * 
-   * @since 1.4
    */
-  public long getSizeMax();
+  long getSizeMax();
 }

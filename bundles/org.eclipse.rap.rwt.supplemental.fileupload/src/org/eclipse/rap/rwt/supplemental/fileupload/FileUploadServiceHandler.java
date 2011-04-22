@@ -34,23 +34,17 @@ import org.eclipse.rwt.service.IServiceHandler;
 
 
 /**
- * Handles file uploads and upload progress updates. Instances of this class
- * must be disposed to prevent a registration leak.
+ * Handles file uploads and upload progress updates. Instances of this class must be disposed to
+ * prevent a registration leak.
  * <p>
- * Implementation note: uploaded files are currently stored in the
- * java.io.tmpdir.
+ * Implementation note: uploaded files are currently stored in the java.io.tmpdir.
+ * </p>
  * 
  * @since 1.4
  */
 public class FileUploadServiceHandler implements IServiceHandler {
 
-  /**
-   * Parameter key for upload process ID.
-   */
-  private static final String REQUEST_PROCESS_ID = "processId";
-  /**
-   * Holds configuration data for the uploads.
-   */
+  private static final String PARAMETER_UPLOAD_PROCESS_ID = "processId";
   private final IFileUploadConfiguration uploadConfiguration;
   private final String serviceHandlerId;
   private final FileUploadStorage fileUploadStorage;
@@ -58,9 +52,8 @@ public class FileUploadServiceHandler implements IServiceHandler {
   private boolean disposed;
 
   /**
-   * Creates and registers a new service handler for file uploads.
-   * Instances of this service handler must be disposed to prevent a registration leak.
-   * @since 1.4
+   * Creates and registers a new service handler for file uploads. Instances of this service handler
+   * must be disposed to prevent a registration leak.
    */
   public FileUploadServiceHandler() {
     serviceHandlerId = getServiceHandlerId();
@@ -80,63 +73,51 @@ public class FileUploadServiceHandler implements IServiceHandler {
   }
 
   /**
-   * Unregisters this service handler. This method must be called to release the
-   * service handler registration.
-   * 
-   * @since 1.4
+   * Unregisters this service handler. This method must be called to release the service handler
+   * registration.
    */
   public void dispose() {
     disposed = true;
     RWT.getServiceManager().unregisterServiceHandler( serviceHandlerId );
   }
-  
+
   /**
    * Checks if this service handler is disposed.
+   * 
    * @return <code>true</code> if handler is disposed, else <code>false</code>
-   * @since 1.4
    */
   public boolean isDisposed() {
     return disposed;
   }
 
   /**
-   * Requests to this service handler without a valid session id are ignored for
-   * security reasons.
-   * 
-   * @since 1.4
+   * Requests to this service handler without a valid session id are ignored for security reasons.
    */
   public void service() throws IOException, ServletException {
-    final HttpServletRequest request = RWT.getRequest();
-    final String uploadProcessId = request.getParameter( REQUEST_PROCESS_ID );
-    final HttpSession session = request.getSession( false );
-    if( session != null
-        && uploadProcessId != null
-        && !"".equals( uploadProcessId ) )
-    {
-      FileUploadStorageItem fileUploadStorageItem = fileUploadStorage.getUploadStorageItem( uploadProcessId );
-      if( fileUploadStorageItem == null ) {
-        fileUploadStorageItem = new FileUploadStorageItem();
-        fileUploadStorageItem.setUploadProcessId( uploadProcessId );
-        fileUploadStorage.setUploadStorageItem( uploadProcessId,
-                                                fileUploadStorageItem );
+    HttpServletRequest request = RWT.getRequest();
+    String uploadProcessId = request.getParameter( PARAMETER_UPLOAD_PROCESS_ID );
+    HttpSession session = request.getSession( false );
+    if( session != null && uploadProcessId != null && !"".equals( uploadProcessId ) ) {
+      FileUploadStorageItem storageItem = fileUploadStorage.getUploadStorageItem( uploadProcessId );
+      if( storageItem == null ) {
+        storageItem = new FileUploadStorageItem();
+        storageItem.setUploadProcessId( uploadProcessId );
+        fileUploadStorage.setUploadStorageItem( uploadProcessId, storageItem );
       }
       if( ServletFileUpload.isMultipartContent( request ) ) {
         // Handle post-request which contains the file to upload
-        handleFileUpload( request, fileUploadStorageItem, uploadProcessId );
+        handleFileUpload( request, storageItem, uploadProcessId );
       }
     }
   }
 
   /**
-   * Adds a listener on a specific upload process. Duplicate registrations have
-   * no effect.
+   * Adds a listener on a specific upload process. Duplicate registrations have no effect.
    * 
    * @param listener - the listener instance to register
-   * @param processId - the id of the upload process that the listener will be
-   *          notified about
+   * @param processId - the id of the upload process that the listener will be notified about
    * @see FileUploadListener
-   * @see FileUploadServiceHandler#removeListener(FileUploadListener,String)         
-   * @since 1.4
+   * @see FileUploadServiceHandler#removeListener(FileUploadListener,String)
    */
   public void addListener( FileUploadListener listener, String processId ) {
     progressHandler.addListener( listener, processId );
@@ -146,11 +127,9 @@ public class FileUploadServiceHandler implements IServiceHandler {
    * Removes a listener on a specific upload process.
    * 
    * @param listener - the listener instance to unregister
-   * @param processId - the id of the upload process that the listener was
-   *          registered with
-   * @see FileUploadListener         
+   * @param processId - the id of the upload process that the listener was registered with
+   * @see FileUploadListener
    * @see FileUploadServiceHandler#addListener(FileUploadListener,String)
-   * @since 1.4
    */
   public void removeListener( FileUploadListener listener, String processId ) {
     progressHandler.removeListener( listener, processId );
@@ -161,28 +140,21 @@ public class FileUploadServiceHandler implements IServiceHandler {
    * 
    * @param processId - the id of the upload process
    * @return - the number of bytes read from the upload stream
-   * @since 1.4
    */
   public long getBytesRead( String processId ) {
-    final FileUploadStorageItem uploadStorageItem = fileUploadStorage.getUploadStorageItem( processId );
-    return uploadStorageItem != null
-                                    ? uploadStorageItem.getBytesRead()
-                                    : 0L;
+    FileUploadStorageItem storageItem = fileUploadStorage.getUploadStorageItem( processId );
+    return storageItem != null ? storageItem.getBytesRead() : 0L;
   }
 
   /**
-   * Returns the total number of bytes expected for the uploaded file for the
-   * given process id.
+   * Returns the total number of bytes expected for the uploaded file for the given process id.
    * 
    * @param processId - the id of the upload process
    * @return - the total number of bytes expected from the upload stream
-   * @since 1.4
    */
   public long getContentLength( String processId ) {
-    final FileUploadStorageItem uploadStorageItem = fileUploadStorage.getUploadStorageItem( processId );
-    return uploadStorageItem != null
-                                    ? uploadStorageItem.getContentLength()
-                                    : 0L;
+    FileUploadStorageItem storageItem = fileUploadStorage.getUploadStorageItem( processId );
+    return storageItem != null ? storageItem.getContentLength() : 0L;
   }
 
   /**
@@ -190,13 +162,10 @@ public class FileUploadServiceHandler implements IServiceHandler {
    * 
    * @param processId - the id of the upload process
    * @return - an exception
-   * @since 1.4
    */
   public Exception getException( String processId ) {
-    final FileUploadStorageItem uploadStorageItem = fileUploadStorage.getUploadStorageItem( processId );
-    return uploadStorageItem != null
-                                    ? uploadStorageItem.getException()
-                                    : null;
+    FileUploadStorageItem storageItem = fileUploadStorage.getUploadStorageItem( processId );
+    return storageItem != null ? storageItem.getException() : null;
   }
 
   /**
@@ -204,67 +173,60 @@ public class FileUploadServiceHandler implements IServiceHandler {
    * 
    * @param processId - the id of the upload process
    * @return - the location on disk of the uploaded file
-   * @since 1.4
    */
   public File getUploadedFile( String processId ) throws Exception {
-    final FileUploadStorageItem uploadStorageItem = fileUploadStorage.getUploadStorageItem( processId );
-    File upload = null;
-    if( uploadStorageItem != null ) {
-      upload = uploadStorageItem.getFile();
+    FileUploadStorageItem storageItem = fileUploadStorage.getUploadStorageItem( processId );
+    File result = null;
+    if( storageItem != null ) {
+      result = storageItem.getFile();
     }
-    return upload;
+    return result;
   }
 
   /**
-   * Treats the request as a post request which contains the file to be
-   * uploaded. Uses the apache commons fileupload library to extract the file
-   * from the request, attaches a {@link FileUploadProgressHandler} to get notified
-   * about the progress and writes the file content to the given
-   * {@link FileUploadStorageItem}
+   * Treats the request as a post request which contains the file to be uploaded. Uses the apache
+   * commons fileupload library to extract the file from the request, attaches a
+   * {@link FileUploadProgressHandler} to get notified about the progress and writes the file
+   * content to the given {@link FileUploadStorageItem}
    * 
    * @param request Request object, must not be null
-   * @param fileUploadStorageitem Object where the file content is set to. If
-   *          null, nothing happens.
-   * @param uploadProcessId Each upload action has a unique process identifier
-   *          to match subsequent polling calls to get the progress correctly to
-   *          the uploaded file.
+   * @param storageItem Object where the file content is set to. If null, nothing happens.
+   * @param uploadProcessId Each upload action has a unique process identifier to match subsequent
+   *          polling calls to get the progress correctly to the uploaded file.
    */
   private void handleFileUpload( HttpServletRequest request,
-                                 final FileUploadStorageItem fileUploadStorageitem,
-                                 final String uploadProcessId )
+                                 FileUploadStorageItem storageItem,
+                                 String uploadProcessId )
   {
     // Ignore upload requests which have no valid processId
-    if( fileUploadStorageitem != null
-        && uploadProcessId != null
-        && !"".equals( uploadProcessId ) )
-    {
+    if( storageItem != null && uploadProcessId != null && !"".equals( uploadProcessId ) ) {
       // Reset storage item to clear values from last upload process
-      fileUploadStorageitem.reset();
+      storageItem.reset();
       // Create file upload factory and upload servlet
       // You could use new DiskFileItemFactory(threshold, location)
       // to configure a custom in-memory threshold and storage location.
       // By default the upload files are stored in the java.io.tmpdir
-      final DiskFileItemFactory factory = new DiskFileItemFactory();
-      final ServletFileUpload upload = new ServletFileUpload( factory );
+      DiskFileItemFactory factory = new DiskFileItemFactory();
+      ServletFileUpload upload = new ServletFileUpload( factory );
       // apply configuration params
       applyConfiguration( upload );
       // Create a file upload progress listener
-      final ProgressListener listener = new ProgressListener() {
+      final FileUploadStorageItem copyOfStorageItem = storageItem;
+      final String copyOfStorageId = uploadProcessId;
+      ProgressListener listener = new ProgressListener() {
 
         public void update( long aBytesRead, long aContentLength, int anItem ) {
-//        Note: Apache fileupload 1.2 will throw an exception after the upload is finished.
-//        https://issues.apache.org/jira/browse/FILEUPLOAD-145
-//        So we handle the file size violation as best we can from here.
+// Note: Apache fileupload 1.2 will throw an exception after the upload is finished.
+// https://issues.apache.org/jira/browse/FILEUPLOAD-145
+// So we handle the file size violation as best we can from here.
           long fileSizeMax = getConfiguration().getFileSizeMax();
-          if (fileSizeMax != -1 && aContentLength > fileSizeMax) {
-            handleException( fileUploadStorageitem, 
-                             uploadProcessId, 
-                             new RuntimeException("File exceeds maximum allowed size.") );
-          }
-          else {
-            fileUploadStorageitem.updateProgress( aBytesRead, aContentLength );
-            progressHandler.updateProgress( fileUploadStorageitem,
-                                          uploadProcessId );
+          if( fileSizeMax != -1 && aContentLength > fileSizeMax ) {
+            handleException( copyOfStorageItem,
+                             copyOfStorageId,
+                             new RuntimeException( "File exceeds maximum allowed size." ) );
+          } else {
+            copyOfStorageItem.updateProgress( aBytesRead, aContentLength );
+            progressHandler.updateProgress( copyOfStorageItem, copyOfStorageId );
           }
         }
       };
@@ -272,7 +234,7 @@ public class FileUploadServiceHandler implements IServiceHandler {
       upload.setProgressListener( listener );
       DiskFileItem fileItem = null;
       try {
-        final List uploadedItems = upload.parseRequest( request );
+        List uploadedItems = upload.parseRequest( request );
         // Only one file upload at once is supported. If there are multiple
         // files, take
         // the first one and ignore other
@@ -282,23 +244,23 @@ public class FileUploadServiceHandler implements IServiceHandler {
           // empty office xp documents
           // which have a file size of 0.
           if( !fileItem.isFormField() ) {
-            fileUploadStorageitem.setFileItem( fileItem );
+            storageItem.setFileItem( fileItem );
           }
         }
-      } catch( final Exception e ) {
-//        Note: Apache fileupload 1.2 will throw an exception after the upload is finished.
-//        https://issues.apache.org/jira/browse/FILEUPLOAD-145
-        handleException(fileUploadStorageitem,uploadProcessId,e);
+      } catch( Exception e ) {
+// Note: Apache fileupload 1.2 will throw an exception after the upload is finished.
+// https://issues.apache.org/jira/browse/FILEUPLOAD-145
+        handleException( storageItem, uploadProcessId, e );
       }
     }
   }
-  
-  private void handleException ( FileUploadStorageItem fileUploadStorageitem, 
-                                 String uploadProcessId, 
-                                 Exception e ) {
-    fileUploadStorageitem.setException( e );
-    progressHandler.updateProgress( fileUploadStorageitem,
-                                    uploadProcessId );
+
+  private void handleException( FileUploadStorageItem storageItem,
+                                String uploadProcessId,
+                                Exception exception )
+  {
+    storageItem.setException( exception );
+    progressHandler.updateProgress( storageItem, uploadProcessId );
   }
 
   /**
@@ -313,29 +275,25 @@ public class FileUploadServiceHandler implements IServiceHandler {
   }
 
   /**
-   * Builds an encoded url for the given upload process id which points to this
-   * service handler.
+   * Builds an encoded url for the given upload process id which points to this service handler.
    * 
    * @param processId - the id of the upload process
    * @return an encoded url that points to this service handler
-   * @since 1.4
    */
   public String getUrl( String processId ) {
-    final StringBuffer url = new StringBuffer();
+    StringBuffer url = new StringBuffer();
     url.append( RWT.getRequest().getContextPath() );
     url.append( RWT.getRequest().getServletPath() );
     url.append( "?" );
-    url.append( IServiceHandler.REQUEST_PARAM )
-      .append( "=" )
-      .append( getServiceHandlerId() );
+    url.append( IServiceHandler.REQUEST_PARAM ).append( "=" ).append( getServiceHandlerId() );
     url.append( "&" );
-    url.append( REQUEST_PROCESS_ID ).append( "=" ).append( processId );
+    url.append( PARAMETER_UPLOAD_PROCESS_ID ).append( "=" ).append( processId );
     // convert to relative URL
     // first slash after double slash of "http://"
-    final int firstSlash = url.indexOf( "/", url.indexOf( "//" ) + 2 );
-    if (firstSlash != -1) {
+    int firstSlash = url.indexOf( "/", url.indexOf( "//" ) + 2 );
+    if( firstSlash != -1 ) {
       url.delete( 0, firstSlash ); // Result is sth like
-                                 // "/rap?custom_service_handler..."
+      // "/rap?custom_service_handler..."
     }
     return RWT.getResponse().encodeURL( url.toString() );
   }
@@ -344,7 +302,6 @@ public class FileUploadServiceHandler implements IServiceHandler {
    * Returns a configuration facade.
    * 
    * @return the upload configuation used by this service handler
-   * @since 1.4
    */
   public IFileUploadConfiguration getConfiguration() {
     return uploadConfiguration;
@@ -354,15 +311,14 @@ public class FileUploadServiceHandler implements IServiceHandler {
    * Cancels an upload process.
    * 
    * @param processId - the id of the upload process to cancel.
-   * @since 1.4
    */
   public void cancel( String processId ) {
-    ///handling to actually stop the upload in still needed.
+    // Handling to actually stop the upload in still needed.
     progressHandler.clearListeners( processId );
-    FileUploadStorageItem fileUploadStorageItem = fileUploadStorage.getUploadStorageItem( processId );
+    FileUploadStorageItem storageItem = fileUploadStorage.getUploadStorageItem( processId );
     // Reset storage item to clear values from last upload process
-    if (fileUploadStorageItem != null) {
-      fileUploadStorageItem.reset();
+    if( storageItem != null ) {
+      storageItem.reset();
     }
     fileUploadStorage.setUploadStorageItem( processId, null );
   }

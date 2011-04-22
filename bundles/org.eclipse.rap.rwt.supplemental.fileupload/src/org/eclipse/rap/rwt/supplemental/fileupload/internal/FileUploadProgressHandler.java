@@ -31,9 +31,7 @@ public class FileUploadProgressHandler {
     listeners = new HashMap();
   }
 
-  public synchronized void addListener( FileUploadListener listener,
-                                        String processId )
-  {
+  public synchronized void addListener( FileUploadListener listener, String processId ) {
     List listenerList = ( List )listeners.get( processId );
     if( listenerList == null ) {
       listenerList = new ArrayList();
@@ -44,9 +42,7 @@ public class FileUploadProgressHandler {
     }
   }
 
-  public synchronized void removeListener( FileUploadListener listener,
-                                           String processId )
-  {
+  public synchronized void removeListener( FileUploadListener listener, String processId ) {
     List listenerList = ( List )listeners.get( processId );
     if( listenerList != null ) {
       listenerList.remove( listener );
@@ -57,24 +53,23 @@ public class FileUploadProgressHandler {
     listeners.remove( processId );
   }
 
-  public synchronized void updateProgress( final FileUploadStorageItem fileUploadStorageitem,
-                                           final String uploadProcessId )
+  public synchronized void updateProgress( FileUploadStorageItem fileUploadStorageitem,
+                                           String uploadProcessId )
   {
     List procListeners = ( List )listeners.get( uploadProcessId );
-    if( procListeners != null && procListeners.size() > 0) {
-      final long bytesRead = fileUploadStorageitem.getBytesRead();
-      final long contentLength = fileUploadStorageitem.getContentLength();
+    if( procListeners != null && procListeners.size() > 0 ) {
+      long bytesRead = fileUploadStorageitem.getBytesRead();
+      long contentLength = fileUploadStorageitem.getContentLength();
       String contentType = fileUploadStorageitem.getContentType();
       for( int i = 0; i < procListeners.size(); i++ ) {
         FileUploadListener listener = ( FileUploadListener )procListeners.get( i );
         Exception uploadException = fileUploadStorageitem.getException();
-        final FileUploadEvent evt = new FileUploadEvent( uploadProcessId,
-                                                         bytesRead,
-                                                         contentLength,
-                                                         contentType,
-                                                         uploadException );
-        boolean finished = bytesRead == contentLength &&
-                           uploadException == null;
+        FileUploadEvent evt = new FileUploadEvent( uploadProcessId,
+                                                   bytesRead,
+                                                   contentLength,
+                                                   contentType,
+                                                   uploadException );
+        boolean finished = bytesRead == contentLength && uploadException == null;
         if( uploadException != null ) {
           listener.uploadException( evt );
         } else if( finished ) {

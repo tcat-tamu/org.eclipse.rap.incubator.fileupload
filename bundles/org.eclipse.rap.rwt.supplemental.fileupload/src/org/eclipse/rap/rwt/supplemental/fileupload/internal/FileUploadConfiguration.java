@@ -28,11 +28,11 @@ public class FileUploadConfiguration implements IFileUploadConfiguration {
     return sizeMax;
   }
 
-  public synchronized void setFileMaxSize( final long fileSizeMax ) {
+  public synchronized void setFileMaxSize( long fileSizeMax ) {
     this.fileSizeMax = fileSizeMax;
   }
 
-  public synchronized void setSizeMax( final long sizeMax ) {
+  public synchronized void setSizeMax( long sizeMax ) {
     this.sizeMax = sizeMax;
   }
 }

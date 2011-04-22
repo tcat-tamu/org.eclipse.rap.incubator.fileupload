@@ -29,7 +29,6 @@ public class FileUploadException extends RuntimeException {
    * 
    * @param uploadProcessId - the upload process id
    * @param nestedException - the nested exception that caused the failure
-   * @since 1.4
    */
   public FileUploadException( String uploadProcessId, Exception nestedException ) {
     super( "Upload with process id: " + uploadProcessId + " failed.", nestedException );
@@ -40,7 +39,6 @@ public class FileUploadException extends RuntimeException {
    * Returns the upload process id to which this exception pertains.
    * 
    * @return the upload process id
-   * @since 1.4
    */
   public String getUploadProcessId() {
     return uploadProcessId;
