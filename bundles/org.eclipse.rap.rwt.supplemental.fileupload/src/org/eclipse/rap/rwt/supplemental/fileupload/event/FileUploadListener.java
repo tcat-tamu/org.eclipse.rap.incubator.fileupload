@@ -1,18 +1,15 @@
 /*******************************************************************************
- * Copyright (c) 2002,2011 Critical Software S.A. and others.
- * All Rights Reserved. 
- * 
- * This program and the accompanying materials
+ * Copyright (c) 2002, 2011 Critical Software S.A. and others.
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     Tiago Rodrigues (Critical Software S.A.) - initial implementation
- *     Joel Oliveira (Critical Software S.A.) - initial commit
- *     Austin Riddle (Texas Center for Applied Technology) - 
- *                   migration to support compatibility with varied upload 
- *                   widget implementations
+ * 
+ * Contributors: 
+ *    Tiago Rodrigues (Critical Software S.A.) - initial implementation
+ *    Joel Oliveira (Critical Software S.A.) - initial commit
+ *    Austin Riddle (Texas Center for Applied Technology) - migration to support
+ *                  compatibility with varied upload widget implementations
  ******************************************************************************/
 package org.eclipse.rap.rwt.supplemental.fileupload.event;
 

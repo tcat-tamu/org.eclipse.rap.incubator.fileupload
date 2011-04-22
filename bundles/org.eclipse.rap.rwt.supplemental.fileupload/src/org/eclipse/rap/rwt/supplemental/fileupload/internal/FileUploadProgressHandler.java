@@ -2,16 +2,14 @@
  * Copyright (c) 2011 Texas Center for Applied Technology
  * Texas Engineering Experiment Station
  * The Texas A&M University System
- * All Rights Reserved. 
- * 
- * This program and the accompanying materials are made available
- * under the terms of the Eclipse Public License v1.0 which accompanies this
- * distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors: 
- *    Austin Riddle (Texas Center for Applied Technology) - 
- *                   initial api and implementation
- * 
+ *    Austin Riddle (Texas Center for Applied Technology) - migration to support
+ *                  compatibility with varied upload widget implementations
  ******************************************************************************/
 package org.eclipse.rap.rwt.supplemental.fileupload.internal;
 
@@ -22,6 +20,7 @@ import java.util.Map;
 
 import org.eclipse.rap.rwt.supplemental.fileupload.event.FileUploadEvent;
 import org.eclipse.rap.rwt.supplemental.fileupload.event.FileUploadListener;
+
 
 public class FileUploadProgressHandler {
 
