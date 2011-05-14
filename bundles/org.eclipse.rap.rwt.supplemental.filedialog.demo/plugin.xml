@@ -14,7 +14,7 @@
       <branding
             defaultEntrypointId="org.eclipse.rap.rwt.supplemental.filedialog.demo.EntryPoint"
             id="org.eclipse.rap.rwt.supplemental.filedialog.demo.EntryPoint.branding"
-            servletName="rap"
+            servletName="filedialog"
             title="File Dialog Demo">
       </branding>
    </extension>

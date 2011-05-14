@@ -22,9 +22,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadServiceHandler;
-import org.eclipse.rap.rwt.supplemental.fileupload.event.FileUploadEvent;
-import org.eclipse.rap.rwt.supplemental.fileupload.event.FileUploadListener;
+import org.eclipse.rap.rwt.supplemental.fileupload.DiskFileUploadReceiver;
+import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
+import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadEvent;
+import org.eclipse.rap.rwt.supplemental.fileupload.IFileUploadListener;
+import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadReceiver;
 import org.eclipse.rwt.graphics.Graphics;
 import org.eclipse.rwt.lifecycle.UICallBack;
 import org.eclipse.rwt.widgets.FileUpload;
@@ -88,7 +90,6 @@ public class FileDialog extends Dialog {
   private java.util.List uploadPanels;
   private Button okButton;
   private ProgressBar totalProgressBar;
-  private FileUploadServiceHandler serviceHandler;
   private Combo filterSelector;
   private Button addFileSelectorBtn;
   private Composite scrollChild;
@@ -187,7 +188,6 @@ public class FileDialog extends Dialog {
    * @return index the file extension filter index
    * @see #getFilterExtensions
    * @see #getFilterNames
-   * @since 3.4
    */
   public int getFilterIndex() {
     return filterIndex;
@@ -220,7 +220,6 @@ public class FileDialog extends Dialog {
    * the user for file overwrite if the selected file already exists.
    * 
    * @return true if the dialog will prompt for file overwrite, false otherwise
-   * @since 3.4
    */
   public boolean getOverwrite() {
     return overwrite;
@@ -265,7 +264,6 @@ public class FileDialog extends Dialog {
    * @param index the file extension filter index
    * @see #setFilterExtensions
    * @see #setFilterNames
-   * @since 3.4
    */
   public void setFilterIndex( int index ) {
     filterIndex = index;
@@ -310,7 +308,6 @@ public class FileDialog extends Dialog {
    * 
    * @param overwrite true if the dialog will prompt for file overwrite, false
    *          otherwise
-   * @since 3.4
    */
   public void setOverwrite( boolean overwrite ) {
     this.overwrite = overwrite;
@@ -321,7 +318,6 @@ public class FileDialog extends Dialog {
    * 
    * @param autoUpload <code>true</code> to set the dialog to autoupload as
    *          files are selected, else <code>false</code>
-   * @since 1.4
    */
   public void setAutoUpload( boolean autoUpload ) {
     this.autoUpload = autoUpload;
@@ -333,7 +329,6 @@ public class FileDialog extends Dialog {
    * 
    * @return <code>true</code> if the dialog is configured to auto upload files,
    *         else <code>false</code>
-   * @since 1.4
    */
   public boolean isAutoUpload() {
     return autoUpload;
@@ -350,7 +345,6 @@ public class FileDialog extends Dialog {
   }
 
   private void initializeDefaults() {
-    serviceHandler = new FileUploadServiceHandler();
     uploadPanels = new ArrayList();
   }
 
@@ -445,7 +439,6 @@ public class FileDialog extends Dialog {
   private void createSingleSelector( Composite main ) {
     UploadPanel uploadPanel = new UploadPanel( main, UploadPanel.FULL );
     uploadPanel.setValidationHandler( validationHandler );
-    uploadPanel.setUploadHandler( serviceHandler );
     uploadPanel.setLayoutData( new GridData( SWT.FILL, SWT.FILL, true, true ) );
     uploadPanel.setProgressCollector( progressCollector );
     uploadPanel.setAutoUpload( isAutoUpload() );
@@ -515,7 +508,6 @@ public class FileDialog extends Dialog {
                                                                | UploadPanel.PROGRESS
                                                                | UploadPanel.REMOVEABLE );
     uploadPanel.setValidationHandler( validationHandler );
-    uploadPanel.setUploadHandler( serviceHandler );
     uploadPanel.setLayoutData( new GridData( SWT.FILL, SWT.FILL, true, true ) );
     uploadPanel.setProgressCollector( progressCollector );
     uploadPanel.setAutoUpload( isAutoUpload() );
@@ -646,8 +638,12 @@ public class FileDialog extends Dialog {
           fileNames = new String[ uploadPanels.size() ];
           fileName = null;
           for( int i = 0; i < uploadPanels.size(); i++ ) {
-            fileNames[ i ] = ( ( UploadPanel )uploadPanels.get( i ) ).getUploadedFile()
-              .getAbsolutePath();
+            UploadPanel uploadPanel = ( UploadPanel )uploadPanels.get( i );
+            File uploadedFile = uploadPanel.getUploadedFile();
+            // TODO [rst] Understand if file can be null
+            if( uploadedFile != null ) {
+              fileNames[ i ] = uploadedFile.getAbsolutePath();
+            }
             if( fileName == null || fileName.length() == 0 )
               fileName = fileNames[ 0 ];
           }
@@ -672,10 +668,6 @@ public class FileDialog extends Dialog {
   }
 
   private void cleanup() {
-    if( serviceHandler != null ) {
-      serviceHandler.dispose();
-      serviceHandler = null;
-    }
     UICallBack.deactivate( FileDialog.class.getName() + hashCode() );
   }
 
@@ -690,8 +682,8 @@ public class FileDialog extends Dialog {
       reset();
     }
 
-    public synchronized void updateProgress( String processId, int progressPercent ) {
-      metrics.put( processId, new Integer( progressPercent ) );
+    public synchronized void updateProgress( FileUploadHandler handler, int progressPercent ) {
+      metrics.put( handler, new Integer( progressPercent ) );
       updateTotalProgress();
     }
 
@@ -702,8 +694,9 @@ public class FileDialog extends Dialog {
         int percent = ( int )Math.floor( totalProgress / maxProgress * 100 );
         totalProgressBar.setSelection( percent );
         totalProgressBar.setToolTipText( "Total upload progress: " + percent + "%" );
-        if( maxProgress == totalProgress )
+        if( maxProgress == totalProgress ) {
           updateEnablement();
+        }
       }
     }
 
@@ -757,29 +750,31 @@ public class FileDialog extends Dialog {
       updateEnablement();
     }
   }
-  private static class UploadPanel extends Composite implements FileUploadListener {
 
-    public static int COMPACT = 1;
-    public static int FULL = 2;
-    public static int REMOVEABLE = 4;
-    public static int PROGRESS = 8;
+  private static class UploadPanel extends Composite implements IFileUploadListener {
+
+    public static final int COMPACT = 1;
+    public static final int FULL = 2;
+    public static final int REMOVEABLE = 4;
+    public static final int PROGRESS = 8;
     private final int panelStyle;
+    private final FileUploadHandler handler;
     private FileUpload browseBtn;
     private Text fileText;
     private ProgressBar progressBar;
     private Label progressLabel;
     private Button removeBtn;
     private boolean inProgress;
-    private FileUploadServiceHandler serviceHandler;
     private ValidationHandler validationHandler;
     private ProgressCollector progressCollector;
-    private String processId;
     private File uploadedFile;
     private boolean autoUpload;
 
     public UploadPanel( Composite parent, int style ) {
       super( parent, checkStyle( style ) );
       panelStyle = style;
+      FileUploadReceiver receiver = new DiskFileUploadReceiver();
+      handler = new FileUploadHandler( receiver );
       createChildren();
     }
 
@@ -806,24 +801,15 @@ public class FileDialog extends Dialog {
 
     public void startUpload() {
       inProgress = true;
-      serviceHandler.cancel( processId );
-      StringBuffer sb = new StringBuffer();
-      sb.append( hashCode() );
-      sb.append( System.currentTimeMillis() );
-      processId = sb.toString();
-      String url = serviceHandler.getUrl( processId );
-      serviceHandler.addListener( this, processId );
+      String url = handler.getUploadUrl();
+      handler.addUploadListener( this );
       browseBtn.submit( url );
     }
 
     public void dispose() {
-      serviceHandler.removeListener( this, processId );
-      serviceHandler.cancel( processId );
+      handler.removeUploadListener( this );
+      handler.dispose();
       super.dispose();
-    }
-
-    public void setUploadHandler( FileUploadServiceHandler serviceHandler ) {
-      this.serviceHandler = serviceHandler;
     }
 
     public void setValidationHandler( ValidationHandler validationHandler ) {
@@ -891,7 +877,7 @@ public class FileDialog extends Dialog {
 
           public void widgetSelected( SelectionEvent e ) {
             validationHandler.uploadRemoved( UploadPanel.this );
-            progressCollector.updateProgress( processId, 0 );
+            progressCollector.updateProgress( handler, 0 );
           }
         } );
       }
@@ -952,55 +938,46 @@ public class FileDialog extends Dialog {
       }
     }
 
-    public void uploadFinished( final FileUploadEvent uploadEvent ) {
+    public void uploadProgress( final FileUploadEvent uploadEvent ) {
       browseBtn.getDisplay().asyncExec( new Runnable() {
-
+        
         public void run() {
-          int percent = 100;
-          try {
-            uploadedFile = serviceHandler.getUploadedFile( processId );
-          } catch( Exception e ) {
-            // MessageBox mesg = new MessageBox( getShell(), SWT.OK |
-            // SWT.ICON_ERROR );
-            // mesg.setMessage( "Error accessing uploaded file." );
-            // mesg.setText("Error");
-            // mesg.open();
-            e.printStackTrace();
-            percent = 0;
-          }
-          if( progressBar != null && !progressBar.isDisposed() ) {
-            progressBar.setSelection( percent );
-            progressBar.setToolTipText( "Upload progress: " + percent + "%" );
-            progressLabel.setText( percent + "%" );
-          }
-          progressCollector.updateProgress( processId, percent );
-        }
-      } );
-    }
-
-    public void uploadInProgress( final FileUploadEvent uploadEvent ) {
-      browseBtn.getDisplay().asyncExec( new Runnable() {
-
-        public void run() {
-          double fraction = uploadEvent.getBytesRead() / ( double )uploadEvent.getTotalBytes();
+          double fraction = uploadEvent.getBytesRead() / ( double )uploadEvent.getContentLength();
           int percent = ( int )Math.floor( fraction * 100 );
           if( progressBar != null && !progressBar.isDisposed() ) {
             progressBar.setSelection( percent );
             progressBar.setToolTipText( "Upload progress: " + percent + "%" );
             progressLabel.setText( percent + "%" );
           }
-          progressCollector.updateProgress( processId, percent );
+          progressCollector.updateProgress( handler, percent );
         }
       } );
     }
 
-    public void uploadException( final FileUploadEvent uploadEvent ) {
+    public void uploadFinished( final FileUploadEvent uploadEvent ) {
+      DiskFileUploadReceiver receiver = ( DiskFileUploadReceiver )handler.getReceiver();
+      uploadedFile = receiver.getTargetFile();
+      browseBtn.getDisplay().asyncExec( new Runnable() {
+
+        public void run() {
+          int percent = 100;
+          if( progressBar != null && !progressBar.isDisposed() ) {
+            progressBar.setSelection( percent );
+            progressBar.setToolTipText( "Upload progress: " + percent + "%" );
+            progressLabel.setText( percent + "%" );
+          }
+          progressCollector.updateProgress( handler, percent );
+        }
+      } );
+    }
+
+    public void uploadFailed( final FileUploadEvent uploadEvent ) {
       browseBtn.getDisplay().asyncExec( new Runnable() {
 
         public void run() {
           if( progressBar != null && !progressBar.isDisposed() ) {
             progressBar.setState( SWT.ERROR );
-            progressBar.setToolTipText( uploadEvent.getUploadException().getMessage() );
+            progressBar.setToolTipText( uploadEvent.getException().getMessage() );
           }
         }
       } );
