@@ -65,7 +65,7 @@ public final class FileUploadServiceHandler implements IServiceHandler {
     url.append( "&" );
     url.append( PARAMETER_TOKEN ).append( "=" ).append( token );
     int relativeIndex = url.lastIndexOf( "/" );
-    if (relativeIndex > -1) {
+    if( relativeIndex > -1 ) {
       url.delete( 0, relativeIndex + 1 );
     }
     return RWT.getResponse().encodeURL( url.toString() );
