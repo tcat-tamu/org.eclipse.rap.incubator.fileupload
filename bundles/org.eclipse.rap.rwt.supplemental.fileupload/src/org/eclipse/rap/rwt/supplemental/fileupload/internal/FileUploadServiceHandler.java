@@ -64,11 +64,9 @@ public final class FileUploadServiceHandler implements IServiceHandler {
     url.append( IServiceHandler.REQUEST_PARAM ).append( "=" ).append( SERVICE_HANDLER_ID );
     url.append( "&" );
     url.append( PARAMETER_TOKEN ).append( "=" ).append( token );
-    // TODO [rst] Why don't we use the absolute URL?
-    // Convert to relative URL, e.g. http://host.port/rap?... -> /rap?...
-    int firstSingleSlash = url.indexOf( "/", url.indexOf( "//" ) + 2 );
-    if( firstSingleSlash != -1 ) {
-      url.delete( 0, firstSingleSlash );
+    int relativeIndex = url.lastIndexOf( "/" );
+    if (relativeIndex > -1) {
+      url.delete( 0, relativeIndex + 1 );
     }
     return RWT.getResponse().encodeURL( url.toString() );
   }
