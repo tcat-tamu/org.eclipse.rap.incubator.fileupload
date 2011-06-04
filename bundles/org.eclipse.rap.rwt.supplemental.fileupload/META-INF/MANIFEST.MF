@@ -13,3 +13,4 @@ Import-Package: javax.servlet;version="[2.3.0,3.0.0]",
  javax.servlet.http;version="[2.3.0,3.0.0]"
 Export-Package: org.eclipse.rap.rwt.supplemental.fileupload,
  org.eclipse.rap.rwt.supplemental.fileupload.internal;x-friends:="org.eclipse.rap.services.supplimental.fileupload.test"
+Bundle-Localization: plugin
