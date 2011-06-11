@@ -1,11 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2000,2011 IBM Corporation and 
- * Texas Center for Applied Technology
- * Texas Engineering Experiment Station
- * The Texas A&M University System
- * All rights reserved. 
- * 
- * This program and the accompanying materials
+ * Copyright (c) 2000,2011 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
@@ -19,22 +14,16 @@ package org.eclipse.swt.widgets;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.eclipse.rap.rwt.supplemental.fileupload.DiskFileUploadReceiver;
-import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
-import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadEvent;
-import org.eclipse.rap.rwt.supplemental.fileupload.IFileUploadListener;
-import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadReceiver;
 import org.eclipse.rwt.graphics.Graphics;
 import org.eclipse.rwt.lifecycle.UICallBack;
-import org.eclipse.rwt.widgets.FileUpload;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
@@ -45,6 +34,10 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.internal.filedialog.ExtensionValidationStrategy;
+import org.eclipse.swt.widgets.internal.filedialog.ProgressCollector;
+import org.eclipse.swt.widgets.internal.filedialog.UploadPanel;
+import org.eclipse.swt.widgets.internal.filedialog.ValidationHandler;
 
 /**
  * Instances of this class allow the user to navigate the file system and select
@@ -73,7 +66,7 @@ import org.eclipse.swt.layout.GridLayout;
  *      information</a>
  */
 public class FileDialog extends Dialog {
-
+  
   // RAP implementation fields taken from JFace
   private final static int HORIZONTAL_DIALOG_UNIT_PER_CHAR = 4;
   private final static int BUTTON_WIDTH = 61;
@@ -82,8 +75,8 @@ public class FileDialog extends Dialog {
   String[] filterExtensions = new String[ 0 ];
   String[] fileNames = new String[ 0 ];
   String filterPath = "";
-  String fileName = "";
-  int filterIndex = 0;
+  String fileName;
+  int filterIndex;
   boolean overwrite = false;
   // RAP implementation fields
   private Shell shell;
@@ -95,10 +88,11 @@ public class FileDialog extends Dialog {
   private Composite scrollChild;
   private Composite uploadsWrapper;
   private ScrolledComposite uploadScroller;
-  private ValidationHandler validationHandler;
   private boolean autoUpload;
-  private ProgressCollector progressCollector;
   private boolean uploadLocked;
+  private ProgressCollector progressCollector;
+  private ValidationHandler validationHandler;
+  private Image addImage;
 
   /**
    * Constructs a new instance of this class given only its parent.
@@ -346,6 +340,18 @@ public class FileDialog extends Dialog {
 
   private void initializeDefaults() {
     uploadPanels = new ArrayList();
+    uploadLocked = false;
+    // [ar] - add a strategy for content type?
+    ExtensionValidationStrategy validationStrategy = 
+      new ExtensionValidationStrategy( filterExtensions, filterIndex );
+    validationHandler = new ValidationHandler() {
+      public void updateEnablement() {
+        FileDialog.this.updateEnablement();
+      }
+    };
+    validationHandler.addValidationStrategy( validationStrategy );
+    progressCollector = new ProgressCollector( validationHandler );
+    validationHandler.setNumUploads( uploadPanels.size() );
   }
 
   private void createShell() {
@@ -359,10 +365,24 @@ public class FileDialog extends Dialog {
         handleShellClose();
       }
     } );
+    // shell.addControlListener( new ControlAdapter() {
+    // public void controlResized( ControlEvent e ) {
+    // Point prefSize = shell.computeSize( SWT.DEFAULT, SWT.DEFAULT );
+    // Point initialPrefSize = (Point)shell.getData( "initialPrefSize" );
+    // if (initialPrefSize == null) {
+    // shell.setData( "initialPrefSize", prefSize );
+    // }
+    // if (!prefSize.equals( initialPrefSize )) {
+    // layoutAndCenterShell();
+    // shell.removeControlListener( this );
+    // }
+    // }
+    // });
   }
 
   private void layoutAndCenterShell() {
     Point prefSize = shell.computeSize( SWT.DEFAULT, SWT.DEFAULT );
+    Point size = shell.getSize();
     shell.setSize( prefSize );
     try {
       Field parentField = getClass().getSuperclass().getDeclaredField( "parent" );
@@ -410,8 +430,6 @@ public class FileDialog extends Dialog {
     layout.marginWidth = 0;
     layout.marginHeight = 0;
     main.setLayout( layout );
-    validationHandler = new ValidationHandler();
-    progressCollector = new ProgressCollector();
     if( allowMultiple() ) {
       createMultiSelector( main );
     } else {
@@ -433,6 +451,7 @@ public class FileDialog extends Dialog {
     totalProgressBar.setLayoutData( new GridData( SWT.FILL, SWT.FILL, true, false ) );
     totalProgressBar.setToolTipText( "Total upload progress" );
     totalProgressBar.setMaximum( 100 );
+    progressCollector.setProgressBar( totalProgressBar );
     return main;
   }
 
@@ -443,6 +462,7 @@ public class FileDialog extends Dialog {
     uploadPanel.setProgressCollector( progressCollector );
     uploadPanel.setAutoUpload( isAutoUpload() );
     uploadPanels.add( uploadPanel );
+    validationHandler.setNumUploads( uploadPanels.size() );
   }
 
   private void createMultiSelector( Composite main ) {
@@ -474,7 +494,10 @@ public class FileDialog extends Dialog {
 
   private void createAddSelectorBtn( Composite parent ) {
     addFileSelectorBtn = new Button( parent, SWT.PUSH );
-    addFileSelectorBtn.setText( "+" );
+    if (addImage == null) {
+      addImage = new Image(addFileSelectorBtn.getDisplay(), UploadPanel.class.getResourceAsStream( "add_obj.gif" ));
+    }
+    addFileSelectorBtn.setImage( addImage );
     addFileSelectorBtn.setToolTipText( "Add more files" );
     addFileSelectorBtn.setLayoutData( new GridData( SWT.FILL, SWT.FILL, false, false ) );
     addFileSelectorBtn.addSelectionListener( new SelectionAdapter() {
@@ -504,14 +527,31 @@ public class FileDialog extends Dialog {
    * Only use for the SWT.MULTI case.
    */
   private UploadPanel addUploadPanel() {
-    UploadPanel uploadPanel = new UploadPanel( uploadsWrapper, UploadPanel.COMPACT
-                                                               | UploadPanel.PROGRESS
-                                                               | UploadPanel.REMOVEABLE );
+    final UploadPanel uploadPanel = new UploadPanel( uploadsWrapper, UploadPanel.COMPACT
+                                                                     | UploadPanel.PROGRESS
+                                                                     | UploadPanel.REMOVEABLE );
+    uploadPanel.addDisposeListener( new DisposeListener() {
+
+      public void widgetDisposed( DisposeEvent event ) {
+        Display.getCurrent().asyncExec( new Runnable() {
+          public void run() {
+            if (!uploadsWrapper.isDisposed()) {
+              uploadPanels.remove( uploadPanel );
+              validationHandler.setNumUploads( uploadPanels.size() );
+              resizeUploads();
+              progressCollector.updateTotalProgress();
+              updateEnablement();
+            }
+          }
+        });
+      }
+    } );
     uploadPanel.setValidationHandler( validationHandler );
     uploadPanel.setLayoutData( new GridData( SWT.FILL, SWT.FILL, true, true ) );
     uploadPanel.setProgressCollector( progressCollector );
     uploadPanel.setAutoUpload( isAutoUpload() );
     uploadPanels.add( uploadPanel );
+    validationHandler.setNumUploads( uploadPanels.size() );
     resizeUploads();
     updateEnablement();
     return uploadPanel;
@@ -632,22 +672,23 @@ public class FileDialog extends Dialog {
         okButton.setEnabled( false );
       } else if( uploadPanels.size() > 0 ) {
         boolean enabled = true;
-        if( uploadLocked && progressCollector.isFinished() ) {
-          okButton.setText( okText );
-          okButton.setEnabled( true );
-          fileNames = new String[ uploadPanels.size() ];
-          fileName = null;
-          for( int i = 0; i < uploadPanels.size(); i++ ) {
-            UploadPanel uploadPanel = ( UploadPanel )uploadPanels.get( i );
-            File uploadedFile = uploadPanel.getUploadedFile();
-            // TODO [rst] Understand if file can be null
-            if( uploadedFile != null ) {
-              fileNames[ i ] = uploadedFile.getAbsolutePath();
+        if( uploadLocked ) {
+          if( progressCollector.isFinished() ) {
+            okButton.setText( okText );
+            fileNames = new String[ uploadPanels.size() ];
+            fileName = null;
+            for( int i = 0; i < uploadPanels.size(); i++ ) {
+              UploadPanel uploadPanel = ( UploadPanel )uploadPanels.get( i );
+              File uploadedFile = uploadPanel.getUploadedFile();
+              // TODO [rst] Understand if file can be null
+              if( uploadedFile != null ) {
+                fileNames[ i ] = uploadedFile.getAbsolutePath();
+              }
+              if( fileName == null || fileName.length() == 0 )
+                fileName = fileNames[ 0 ];
             }
-            if( fileName == null || fileName.length() == 0 )
-              fileName = fileNames[ 0 ];
+            shell.close();
           }
-          shell.close();
         } else {
           okButton.setText( okText );
           for( int i = 0; i < uploadPanels.size(); i++ ) {
@@ -669,318 +710,13 @@ public class FileDialog extends Dialog {
 
   private void cleanup() {
     UICallBack.deactivate( FileDialog.class.getName() + hashCode() );
+    if (addImage != null) {
+      addImage.dispose();
+      addImage = null;
+    }
   }
 
   private void handleShellClose() {
     cleanup();
-  }
-  private class ProgressCollector {
-
-    Map metrics;
-
-    public ProgressCollector() {
-      reset();
-    }
-
-    public synchronized void updateProgress( FileUploadHandler handler, int progressPercent ) {
-      metrics.put( handler, new Integer( progressPercent ) );
-      updateTotalProgress();
-    }
-
-    public void updateTotalProgress() {
-      if( totalProgressBar != null && !totalProgressBar.isDisposed() ) {
-        double maxProgress = uploadPanels.size() * 100;
-        int totalProgress = calculateTotalProgress();
-        int percent = ( int )Math.floor( totalProgress / maxProgress * 100 );
-        totalProgressBar.setSelection( percent );
-        totalProgressBar.setToolTipText( "Total upload progress: " + percent + "%" );
-        if( maxProgress == totalProgress ) {
-          updateEnablement();
-        }
-      }
-    }
-
-    private int calculateTotalProgress() {
-      Object[] progressTallies = metrics.values().toArray();
-      int totalProgress = 0;
-      for( int i = 0; i < metrics.size(); i++ ) {
-        totalProgress += ( ( Integer )progressTallies[ i ] ).intValue();
-      }
-      return totalProgress;
-    }
-
-    public boolean isFinished() {
-      int totalProgress = calculateTotalProgress();
-      int maxProgress = uploadPanels.size() * 100;
-      return totalProgress == maxProgress;
-    }
-
-    public void reset() {
-      metrics = new HashMap();
-      if( totalProgressBar != null && !totalProgressBar.isDisposed() )
-        totalProgressBar.setMinimum( 0 );
-    }
-  }
-  private class ValidationHandler {
-
-    public boolean validate( String filename ) {
-      boolean valid = true;
-      if( filterExtensions != null && filename.length() > 0 ) {
-        valid = false;
-        String filter = filterExtensions[ getFilterIndex() ];
-        if( filter != null ) {
-          String[] types = filter.split( ";" );
-          for( int j = 0; j < types.length; j++ ) {
-            String ext = types[ j ].replaceAll( "\\*", "" );
-            if( ext.equals( "." ) || filename.endsWith( ext ) ) {
-              valid = true;
-            }
-          }
-        }
-      }
-      updateEnablement();
-      return valid;
-    }
-
-    public void uploadRemoved( UploadPanel uploadPanel ) {
-      uploadPanel.dispose();
-      uploadPanels.remove( uploadPanel );
-      resizeUploads();
-      progressCollector.updateTotalProgress();
-      updateEnablement();
-    }
-  }
-
-  private static class UploadPanel extends Composite implements IFileUploadListener {
-
-    public static final int COMPACT = 1;
-    public static final int FULL = 2;
-    public static final int REMOVEABLE = 4;
-    public static final int PROGRESS = 8;
-    private final int panelStyle;
-    private final FileUploadHandler handler;
-    private FileUpload browseBtn;
-    private Text fileText;
-    private ProgressBar progressBar;
-    private Label progressLabel;
-    private Button removeBtn;
-    private boolean inProgress;
-    private ValidationHandler validationHandler;
-    private ProgressCollector progressCollector;
-    private File uploadedFile;
-    private boolean autoUpload;
-
-    public UploadPanel( Composite parent, int style ) {
-      super( parent, checkStyle( style ) );
-      panelStyle = style;
-      FileUploadReceiver receiver = new DiskFileUploadReceiver();
-      handler = new FileUploadHandler( receiver );
-      createChildren();
-    }
-
-    public void setEnabled( boolean enabled ) {
-      super.setEnabled( enabled );
-      browseBtn.setEnabled( enabled );
-      fileText.setEnabled( enabled );
-      if( removeBtn != null ) {
-        removeBtn.setEnabled( enabled );
-      }
-    }
-
-    public boolean isFinished() {
-      return false;
-    }
-
-    public String getSelectedFilename() {
-      return fileText.getText();
-    }
-
-    public File getUploadedFile() {
-      return uploadedFile;
-    }
-
-    public void startUpload() {
-      inProgress = true;
-      String url = handler.getUploadUrl();
-      handler.addUploadListener( this );
-      browseBtn.submit( url );
-    }
-
-    public void dispose() {
-      handler.removeUploadListener( this );
-      handler.dispose();
-      super.dispose();
-    }
-
-    public void setValidationHandler( ValidationHandler validationHandler ) {
-      this.validationHandler = validationHandler;
-    }
-
-    public void setProgressCollector( ProgressCollector progressCollector ) {
-      this.progressCollector = progressCollector;
-    }
-
-    public void setAutoUpload( boolean autoUpload ) {
-      this.autoUpload = autoUpload;
-    }
-
-    public boolean isStarted() {
-      return inProgress;
-    }
-
-    static int checkStyle( int style ) {
-      int mask = COMPACT | FULL | REMOVEABLE | PROGRESS;
-      return style & mask;
-    }
-
-    private boolean hasStyle( int testStyle ) {
-      return ( panelStyle & ( testStyle ) ) != 0;
-    }
-
-    private void createChildren() {
-      GridLayout layout = new GridLayout( 5, false );
-      layout.marginWidth = 0;
-      layout.marginHeight = 0;
-      setLayout( layout );
-      browseBtn = new FileUpload( this, SWT.NONE );
-      browseBtn.setText( "Browse" );
-      browseBtn.setToolTipText( "Browse to select a single file" );
-      browseBtn.addSelectionListener( new SelectionAdapter() {
-
-        public void widgetSelected( SelectionEvent event ) {
-          String filename = browseBtn.getFileName();
-          fileText.setText( filename );
-          validate();
-          if( autoUpload ) {
-            startUpload();
-          }
-        }
-      } );
-      fileText = new Text( this, SWT.BORDER );
-      fileText.setToolTipText( "Selected file" );
-      fileText.setEditable( false );
-      if( hasStyle( PROGRESS ) ) {
-        progressBar = new ProgressBar( this, SWT.HORIZONTAL | SWT.SMOOTH );
-        progressBar.setToolTipText( "Upload progress" );
-        progressBar.setMinimum( 0 );
-        progressBar.setMaximum( 100 );
-        progressLabel = new Label( this, SWT.NONE );
-        progressLabel.setText( progressBar.getSelection() + "%" );
-      }
-      if( hasStyle( REMOVEABLE ) ) {
-        removeBtn = new Button( this, SWT.PUSH );
-        Image removeIcon = Display.getCurrent().getSystemImage( SWT.ICON_CANCEL );
-        removeBtn.setImage( removeIcon );
-        removeBtn.setText( "X" );
-        removeBtn.setToolTipText( "Remove item" );
-        removeBtn.addSelectionListener( new SelectionAdapter() {
-
-          public void widgetSelected( SelectionEvent e ) {
-            validationHandler.uploadRemoved( UploadPanel.this );
-            progressCollector.updateProgress( handler, 0 );
-          }
-        } );
-      }
-      layoutChildren();
-    }
-
-    private void layoutChildren() {
-      if( hasStyle( COMPACT ) ) {
-        browseBtn.setLayoutData( new GridData( SWT.FILL, SWT.FILL, false, false ) );
-        GridData textLayoutData = new GridData( SWT.FILL, SWT.FILL, true, false );
-        textLayoutData.minimumWidth = 186;
-        fileText.setLayoutData( textLayoutData );
-        if( progressBar != null ) {
-          GridData progressLayoutData = new GridData( SWT.FILL, SWT.FILL, false, false );
-          progressLayoutData.minimumWidth = 48;
-          progressLayoutData.widthHint = 128;
-          progressBar.setLayoutData( progressLayoutData );
-          GridData lblLayoutData = new GridData( SWT.FILL, SWT.FILL, false, false );
-          float avgCharWidth = Graphics.getAvgCharWidth( progressLabel.getFont() );
-          lblLayoutData.minimumWidth = ( int )avgCharWidth * 6;
-          lblLayoutData.widthHint = ( int )avgCharWidth * 6;
-          progressLabel.setLayoutData( lblLayoutData );
-        }
-        if( removeBtn != null ) {
-          removeBtn.setLayoutData( new GridData( SWT.FILL, SWT.FILL, false, false ) );
-        }
-      } else {
-        browseBtn.setLayoutData( new GridData( SWT.FILL, SWT.FILL, false, false ) );
-        GridData textLayoutData = new GridData( SWT.FILL, SWT.FILL, true, false );
-        textLayoutData.minimumWidth = 186;
-        textLayoutData.horizontalSpan = 4;
-        fileText.setLayoutData( textLayoutData );
-        if( progressBar != null ) {
-          GridData progressLayoutData = new GridData( SWT.FILL, SWT.FILL, true, false );
-          progressLayoutData.horizontalSpan = 4;
-          progressBar.setLayoutData( progressLayoutData );
-          GridData lblLayoutData = new GridData( SWT.FILL, SWT.FILL, false, false );
-          float avgCharWidth = Graphics.getAvgCharWidth( progressLabel.getFont() );
-          lblLayoutData.minimumWidth = ( int )avgCharWidth * 6;
-          lblLayoutData.widthHint = ( int )avgCharWidth * 6;
-          progressLabel.setLayoutData( lblLayoutData );
-        }
-        if( removeBtn != null ) {
-          removeBtn.setLayoutData( new GridData( SWT.FILL, SWT.FILL, false, false ) );
-        }
-      }
-    }
-
-    public void validate() {
-      if( validationHandler == null || validationHandler.validate( fileText.getText() ) ) {
-        fileText.setToolTipText( "Selected file" );
-        // TODO replace this with something from theming
-        fileText.setBackground( null );
-      } else {
-        fileText.setToolTipText( "Warning: Selected file does not match filter" );
-        // TODO replace this with something from theming
-        fileText.setBackground( Display.getCurrent().getSystemColor( SWT.COLOR_YELLOW ) );
-      }
-    }
-
-    public void uploadProgress( final FileUploadEvent uploadEvent ) {
-      browseBtn.getDisplay().asyncExec( new Runnable() {
-        
-        public void run() {
-          double fraction = uploadEvent.getBytesRead() / ( double )uploadEvent.getContentLength();
-          int percent = ( int )Math.floor( fraction * 100 );
-          if( progressBar != null && !progressBar.isDisposed() ) {
-            progressBar.setSelection( percent );
-            progressBar.setToolTipText( "Upload progress: " + percent + "%" );
-            progressLabel.setText( percent + "%" );
-          }
-          progressCollector.updateProgress( handler, percent );
-        }
-      } );
-    }
-
-    public void uploadFinished( final FileUploadEvent uploadEvent ) {
-      DiskFileUploadReceiver receiver = ( DiskFileUploadReceiver )handler.getReceiver();
-      uploadedFile = receiver.getTargetFile();
-      browseBtn.getDisplay().asyncExec( new Runnable() {
-
-        public void run() {
-          int percent = 100;
-          if( progressBar != null && !progressBar.isDisposed() ) {
-            progressBar.setSelection( percent );
-            progressBar.setToolTipText( "Upload progress: " + percent + "%" );
-            progressLabel.setText( percent + "%" );
-          }
-          progressCollector.updateProgress( handler, percent );
-        }
-      } );
-    }
-
-    public void uploadFailed( final FileUploadEvent uploadEvent ) {
-      browseBtn.getDisplay().asyncExec( new Runnable() {
-
-        public void run() {
-          if( progressBar != null && !progressBar.isDisposed() ) {
-            progressBar.setState( SWT.ERROR );
-            progressBar.setToolTipText( uploadEvent.getException().getMessage() );
-          }
-        }
-      } );
-    }
   }
 }
