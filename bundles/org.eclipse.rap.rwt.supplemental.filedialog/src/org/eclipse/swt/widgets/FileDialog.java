@@ -12,7 +12,6 @@
 package org.eclipse.swt.widgets;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import org.eclipse.rwt.graphics.Graphics;
@@ -57,7 +56,7 @@ import org.eclipse.swt.widgets.internal.filedialog.ValidationHandler;
  * IMPORTANT: This class is intended to be subclassed <em>only</em> within the
  * SWT implementation.
  * </p>
- * 
+ *
  * @see <a href="http://www.eclipse.org/swt/snippets/#filedialog">FileDialog
  *      snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example:
@@ -96,7 +95,7 @@ public class FileDialog extends Dialog {
 
   /**
    * Constructs a new instance of this class given only its parent.
-   * 
+   *
    * @param parent a shell which will be the parent of the new instance
    * @exception IllegalArgumentException <ul>
    *              <li>ERROR_NULL_ARGUMENT - if the parent is null</li>
@@ -123,7 +122,7 @@ public class FileDialog extends Dialog {
    * constants. The class description lists the style constants that are
    * applicable to the class. Style bits are also inherited from superclasses.
    * </p>
-   * 
+   *
    * @param parent a shell which will be the parent of the new instance
    * @param style the style of dialog to construct
    * @exception IllegalArgumentException <ul>
@@ -137,19 +136,38 @@ public class FileDialog extends Dialog {
    *              </ul>
    */
   public FileDialog( Shell parent, int style ) {
-    super( parent, checkStyle( style ) );
-    shell = parent; // HACK save this for later
+    super( parent, checkStyle( parent, style ) );
     checkSubclass();
   }
 
-  private static int checkStyle( int style ) {
-    return style;
+  static int checkStyle( Shell parent, int style ) {
+    int result = style;
+    int mask = SWT.PRIMARY_MODAL | SWT.APPLICATION_MODAL | SWT.SYSTEM_MODAL;
+    if( ( result & SWT.SHEET ) != 0 ) {
+      result &= ~SWT.SHEET;
+      if( ( result & mask ) == 0 ) {
+        result |= parent == null ? SWT.APPLICATION_MODAL : SWT.PRIMARY_MODAL;
+      }
+    }
+    if( ( result & mask ) == 0 ) {
+      result |= SWT.APPLICATION_MODAL;
+    }
+    if( ( result & ( SWT.LEFT_TO_RIGHT ) ) == 0 ) {
+      if( parent != null ) {
+        if( ( parent.getStyle() & SWT.LEFT_TO_RIGHT ) != 0 ) {
+          result |= SWT.LEFT_TO_RIGHT;
+        }
+      }
+    }
+    // [if] Min button has no sense in RAP
+    result &= ~SWT.MIN;
+    return result;
   }
 
   /**
    * Returns the path of the first file that was selected in the dialog relative
    * to the filter path, or an empty string if no such file has been selected.
-   * 
+   *
    * @return the relative path of the file
    */
   public String getFileName() {
@@ -159,7 +177,7 @@ public class FileDialog extends Dialog {
   /**
    * Returns a (possibly empty) array with the paths of all files that were
    * selected in the dialog relative to the filter path.
-   * 
+   *
    * @return the relative paths of the files
    */
   public String[] getFileNames() {
@@ -169,7 +187,7 @@ public class FileDialog extends Dialog {
   /**
    * Returns the file extensions which the dialog will use to filter the files
    * it shows.
-   * 
+   *
    * @return the file extensions filter
    */
   public String[] getFilterExtensions() {
@@ -182,7 +200,7 @@ public class FileDialog extends Dialog {
    * <p>
    * This is an index into the FilterExtensions array and the FilterNames array.
    * </p>
-   * 
+   *
    * @return index the file extension filter index
    * @see #getFilterExtensions
    * @see #getFilterNames
@@ -194,7 +212,7 @@ public class FileDialog extends Dialog {
   /**
    * Returns the names that describe the filter extensions which the dialog will
    * use to filter the files it shows.
-   * 
+   *
    * @return the list of filter names
    */
   public String[] getFilterNames() {
@@ -205,7 +223,7 @@ public class FileDialog extends Dialog {
    * Returns the directory path that the dialog will use, or an empty string if
    * this is not set. File names in this path will appear in the dialog,
    * filtered according to the filter extensions.
-   * 
+   *
    * @return the directory path string
    * @see #setFilterExtensions
    */
@@ -216,7 +234,7 @@ public class FileDialog extends Dialog {
   /**
    * Returns the flag that the dialog will use to determine whether to prompt
    * the user for file overwrite if the selected file already exists.
-   * 
+   *
    * @return true if the dialog will prompt for file overwrite, false otherwise
    */
   public boolean getOverwrite() {
@@ -227,7 +245,7 @@ public class FileDialog extends Dialog {
    * Set the initial filename which the dialog will select by default when
    * opened to the argument, which may be null. The name will be prefixed with
    * the filter path when one is supplied.
-   * 
+   *
    * @param string the file name
    */
   public void setFileName( String string ) {
@@ -243,7 +261,7 @@ public class FileDialog extends Dialog {
    * matches all files. For filters with multiple extensions, use semicolon as a
    * separator, e.g. "*.jpg;*.png".
    * </p>
-   * 
+   *
    * @param extensions the file extension filter
    * @see #setFilterNames to specify the user-friendly names corresponding to
    *      the extensions
@@ -258,7 +276,7 @@ public class FileDialog extends Dialog {
    * <p>
    * This is an index into the FilterExtensions array and the FilterNames array.
    * </p>
-   * 
+   *
    * @param index the file extension filter index
    * @see #setFilterExtensions
    * @see #setFilterNames
@@ -275,7 +293,7 @@ public class FileDialog extends Dialog {
    * filter. The <code>names</code> array must be the same length as the
    * <code>extensions</code> array.
    * </p>
-   * 
+   *
    * @param names the list of filter names, or null for no filter names
    * @see #setFilterExtensions
    */
@@ -292,7 +310,7 @@ public class FileDialog extends Dialog {
    * Note that the path string is platform dependent. For convenience, either
    * '/' or '\' can be used as a path separator.
    * </p>
-   * 
+   *
    * @param string the directory path
    * @see #setFilterExtensions
    */
@@ -303,7 +321,7 @@ public class FileDialog extends Dialog {
   /**
    * Sets the flag that the dialog will use to determine whether to prompt the
    * user for file overwrite if the selected file already exists.
-   * 
+   *
    * @param overwrite true if the dialog will prompt for file overwrite, false
    *          otherwise
    */
@@ -313,7 +331,7 @@ public class FileDialog extends Dialog {
 
   /**
    * Sets the dialog to begin uploading immediately after files are selected.
-   * 
+   *
    * @param autoUpload <code>true</code> to set the dialog to autoupload as
    *          files are selected, else <code>false</code>
    */
@@ -324,7 +342,7 @@ public class FileDialog extends Dialog {
   /**
    * Returns the flag that the dialog will use to determine whether to
    * autoupload files.
-   * 
+   *
    * @return <code>true</code> if the dialog is configured to auto upload files,
    *         else <code>false</code>
    */
@@ -386,16 +404,11 @@ public class FileDialog extends Dialog {
 
   private void layoutAndCenterShell() {
     Point prefSize = shell.computeSize( SWT.DEFAULT, SWT.DEFAULT );
-    Point size = shell.getSize();
     shell.setSize( prefSize );
-    try {
-      Rectangle parentSize = getParent().getBounds();
-      int locationX = ( parentSize.width - prefSize.x ) / 2 + parentSize.x;
-      int locationY = ( parentSize.height - prefSize.y ) / 2 + parentSize.y;
-      shell.setLocation( locationX, locationY );
-    } catch( Exception e ) {
-      e.printStackTrace();
-    }
+    Rectangle parentSize = getParent().getBounds();
+    int locationX = ( parentSize.width - prefSize.x ) / 2 + parentSize.x;
+    int locationY = ( parentSize.height - prefSize.y ) / 2 + parentSize.y;
+    shell.setLocation( locationX, locationY );
   }
 
   private void openShell() {
@@ -519,8 +532,9 @@ public class FileDialog extends Dialog {
   private void resizeUploads() {
     int xHint = SWT.DEFAULT;
     int clientWidth = uploadScroller.getClientArea().width;
-    if( clientWidth > 0 )
+    if( clientWidth > 0 ) {
       xHint = clientWidth;
+    }
     Point wrapperSize = scrollChild.computeSize( xHint, SWT.DEFAULT );
     scrollChild.setSize( wrapperSize );
   }
@@ -575,8 +589,9 @@ public class FileDialog extends Dialog {
     }
     for( int i = 0; i < exts.length; i++ ) {
       StringBuffer sb = new StringBuffer();
-      if( names != null && i < names.length )
+      if( names != null && i < names.length ) {
         sb.append( names[ i ] ).append( " " );
+      }
       sb.append( "(" );
       sb.append( exts[ i ] );
       sb.append( ")" );
@@ -713,10 +728,6 @@ public class FileDialog extends Dialog {
 
   private void cleanup() {
     UICallBack.deactivate( FileDialog.class.getName() + hashCode() );
-    if( addImage != null ) {
-      addImage.dispose();
-      addImage = null;
-    }
   }
 
   private void handleShellClose() {
