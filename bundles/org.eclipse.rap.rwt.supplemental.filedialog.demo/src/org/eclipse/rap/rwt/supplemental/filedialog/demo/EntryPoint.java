@@ -36,7 +36,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 public class EntryPoint implements IEntryPoint{
-
+    
+    private static final int DEMO_STYLE = SWT.TITLE | SWT.RESIZE | SWT.MAX  | SWT.CLOSE | SWT.APPLICATION_MODAL;
 
     public int createUI(){
         Display display = PlatformUI.createDisplay();
@@ -88,7 +89,7 @@ public class EntryPoint implements IEntryPoint{
       addBtn.setLayoutData(factory.create());
       addBtn.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
-          FileDialog fd = new FileDialog(Display.getDefault().getActiveShell(), SWT.SHELL_TRIM | SWT.APPLICATION_MODAL);
+          FileDialog fd = new FileDialog(Display.getDefault().getActiveShell(), DEMO_STYLE);
           fd.setAutoUpload(autoBtn.getSelection());
           fd.setText("Upload Single File");
           fd.setFilterPath("C:/");
@@ -108,7 +109,7 @@ public class EntryPoint implements IEntryPoint{
       addMultiBtn.setLayoutData(factory.create());
       addMultiBtn.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
-          FileDialog fd = new FileDialog(Display.getDefault().getActiveShell(), SWT.SHELL_TRIM | SWT.MULTI | SWT.APPLICATION_MODAL);
+          FileDialog fd = new FileDialog(Display.getDefault().getActiveShell(), DEMO_STYLE | SWT.MULTI);
           fd.setAutoUpload(autoBtn.getSelection());
           fd.setText("Upload Multiple Files");
           fd.setFilterPath("C:/");
