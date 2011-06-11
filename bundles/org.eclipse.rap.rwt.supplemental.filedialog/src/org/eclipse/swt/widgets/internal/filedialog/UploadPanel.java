@@ -172,8 +172,7 @@ public class UploadPanel extends Composite implements IFileUploadListener {
       Image removeIcon = Display.getCurrent().getSystemImage( SWT.ICON_CANCEL );
       removeBtn.setImage( removeIcon );
       if( deleteImage == null ) {
-        deleteImage = new Image( removeBtn.getDisplay(),
-                                 UploadPanel.class.getResourceAsStream( "delete_obj.gif" ) );
+        deleteImage = Graphics.getImage( "resources/delete_obj.gif", getClass().getClassLoader() );
       }
       removeBtn.setImage( deleteImage );
       removeBtn.setToolTipText( "Remove item" );

@@ -66,7 +66,7 @@ import org.eclipse.swt.widgets.internal.filedialog.ValidationHandler;
  *      information</a>
  */
 public class FileDialog extends Dialog {
-  
+
   // RAP implementation fields taken from JFace
   private final static int HORIZONTAL_DIALOG_UNIT_PER_CHAR = 4;
   private final static int BUTTON_WIDTH = 61;
@@ -137,9 +137,13 @@ public class FileDialog extends Dialog {
    *              </ul>
    */
   public FileDialog( Shell parent, int style ) {
-    super( parent, style );
+    super( parent, checkStyle( style ) );
     shell = parent; // HACK save this for later
     checkSubclass();
+  }
+
+  private static int checkStyle( int style ) {
+    return style;
   }
 
   /**
@@ -342,9 +346,10 @@ public class FileDialog extends Dialog {
     uploadPanels = new ArrayList();
     uploadLocked = false;
     // [ar] - add a strategy for content type?
-    ExtensionValidationStrategy validationStrategy = 
-      new ExtensionValidationStrategy( filterExtensions, filterIndex );
+    ExtensionValidationStrategy validationStrategy = new ExtensionValidationStrategy( filterExtensions,
+                                                                                      filterIndex );
     validationHandler = new ValidationHandler() {
+
       public void updateEnablement() {
         FileDialog.this.updateEnablement();
       }
@@ -356,8 +361,7 @@ public class FileDialog extends Dialog {
 
   private void createShell() {
     // int style = SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL;
-    shell = new Shell( shell, getStyle() ); // HACK this.shell is holding the
-                                            // parent shell until now
+    shell = new Shell( getParent(), getStyle() );
     shell.setText( getText() );
     shell.addShellListener( new ShellAdapter() {
 
@@ -385,9 +389,7 @@ public class FileDialog extends Dialog {
     Point size = shell.getSize();
     shell.setSize( prefSize );
     try {
-      Field parentField = getClass().getSuperclass().getDeclaredField( "parent" );
-      parentField.setAccessible( true );
-      Rectangle parentSize = ( ( Shell )parentField.get( this ) ).getBounds();
+      Rectangle parentSize = getParent().getBounds();
       int locationX = ( parentSize.width - prefSize.x ) / 2 + parentSize.x;
       int locationY = ( parentSize.height - prefSize.y ) / 2 + parentSize.y;
       shell.setLocation( locationX, locationY );
@@ -494,8 +496,8 @@ public class FileDialog extends Dialog {
 
   private void createAddSelectorBtn( Composite parent ) {
     addFileSelectorBtn = new Button( parent, SWT.PUSH );
-    if (addImage == null) {
-      addImage = new Image(addFileSelectorBtn.getDisplay(), UploadPanel.class.getResourceAsStream( "add_obj.gif" ));
+    if( addImage == null ) {
+      addImage = Graphics.getImage( "resources/add_obj.gif", getClass().getClassLoader() );
     }
     addFileSelectorBtn.setImage( addImage );
     addFileSelectorBtn.setToolTipText( "Add more files" );
@@ -534,8 +536,9 @@ public class FileDialog extends Dialog {
 
       public void widgetDisposed( DisposeEvent event ) {
         Display.getCurrent().asyncExec( new Runnable() {
+
           public void run() {
-            if (!uploadsWrapper.isDisposed()) {
+            if( !uploadsWrapper.isDisposed() ) {
               uploadPanels.remove( uploadPanel );
               validationHandler.setNumUploads( uploadPanels.size() );
               resizeUploads();
@@ -543,7 +546,7 @@ public class FileDialog extends Dialog {
               updateEnablement();
             }
           }
-        });
+        } );
       }
     } );
     uploadPanel.setValidationHandler( validationHandler );
@@ -710,7 +713,7 @@ public class FileDialog extends Dialog {
 
   private void cleanup() {
     UICallBack.deactivate( FileDialog.class.getName() + hashCode() );
-    if (addImage != null) {
+    if( addImage != null ) {
       addImage.dispose();
       addImage = null;
     }
