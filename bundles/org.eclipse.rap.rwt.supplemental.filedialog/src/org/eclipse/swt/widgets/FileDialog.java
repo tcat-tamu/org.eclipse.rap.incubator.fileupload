@@ -510,7 +510,7 @@ public class FileDialog extends Dialog {
         progressCollector.updateTotalProgress();
         uploadScroller.setMinSize( scrollChild.computeSize( SWT.DEFAULT, SWT.DEFAULT ) );
         // [if] workaround for ScrolledComposite#showControl issue
-        // TODO: remove it when the bug is fixed
+        // TODO: remove it when the bug 349301 is fixed
         uploadPanel.setEnabled( false );
         uploadPanel.setVisible( false );
         uploadScroller.getDisplay().timerExec( 10, new Runnable() {
