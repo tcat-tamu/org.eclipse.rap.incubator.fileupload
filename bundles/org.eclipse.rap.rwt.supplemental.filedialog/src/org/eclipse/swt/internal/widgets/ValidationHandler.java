@@ -42,6 +42,7 @@ public abstract class ValidationHandler {
         validated = false;
       }
     }
+    updateEnablement();
     return validated;
   }
 
