@@ -18,8 +18,6 @@ package org.eclipse.swt.widgets.internal.filedialog;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.swt.widgets.FileDialog;
-
 public abstract class ValidationHandler {
 
   private List strategies;
