@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000,2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Austin Riddle (Texas Center for Applied Technology) - RAP implementation
+ *     EclipseSource - ongoing development
  *******************************************************************************/
 package org.eclipse.swt.widgets;
 
@@ -579,7 +580,6 @@ public class FileDialog extends Dialog {
     }
     filterCombo.select( getFilterIndex() );
     filterCombo.addSelectionListener( new SelectionAdapter() {
-
       public void widgetSelected( SelectionEvent e ) {
         setFilterIndex( filterCombo.getSelectionIndex() );
         for( int i = 0; i < uploadPanels.size(); i++ ) {
@@ -682,8 +682,9 @@ public class FileDialog extends Dialog {
               if( uploadedFile != null ) {
                 fileNames[ i ] = uploadedFile.getAbsolutePath();
               }
-              if( fileName == null || fileName.length() == 0 )
+              if( fileName == null || fileName.length() == 0 ) {
                 fileName = fileNames[ 0 ];
+              }
             }
             shell.close();
           }
