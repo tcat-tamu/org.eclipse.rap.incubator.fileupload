@@ -8,7 +8,7 @@
  * Contributors:
  *    EclipseSource - initial API and implementation
  ******************************************************************************/
-package org.eclipse.swt.widgets.internal.filedialog;
+package org.eclipse.swt.internal.widgets;
 
 public interface ValidationStrategy {
 

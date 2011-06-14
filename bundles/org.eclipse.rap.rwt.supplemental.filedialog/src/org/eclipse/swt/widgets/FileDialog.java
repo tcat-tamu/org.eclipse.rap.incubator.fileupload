@@ -30,12 +30,12 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.internal.widgets.ExtensionValidationStrategy;
+import org.eclipse.swt.internal.widgets.ProgressCollector;
+import org.eclipse.swt.internal.widgets.UploadPanel;
+import org.eclipse.swt.internal.widgets.ValidationHandler;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.internal.filedialog.ExtensionValidationStrategy;
-import org.eclipse.swt.widgets.internal.filedialog.ProgressCollector;
-import org.eclipse.swt.widgets.internal.filedialog.UploadPanel;
-import org.eclipse.swt.widgets.internal.filedialog.ValidationHandler;
 
 /**
  * Instances of this class allow the user to navigate the file system and select

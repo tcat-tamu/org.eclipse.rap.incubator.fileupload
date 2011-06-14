@@ -13,7 +13,7 @@
  *     Austin Riddle (Texas Center for Applied Technology) -
  *       initial API and implementation
  *******************************************************************************/
-package org.eclipse.swt.widgets.internal.filedialog;
+package org.eclipse.swt.internal.widgets;
 
 import java.util.ArrayList;
 import java.util.List;
