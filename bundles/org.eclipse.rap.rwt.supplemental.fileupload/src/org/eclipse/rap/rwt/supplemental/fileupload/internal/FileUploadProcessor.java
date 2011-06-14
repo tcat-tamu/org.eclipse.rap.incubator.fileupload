@@ -115,8 +115,7 @@ final class FileUploadProcessor {
   }
 
   private long getMaxFileSize() {
-    // TODO [rst] Add configuration option
-    return -1;
+    return handler.getMaxFileSize();
   }
 
   private static String stripFileName( String name ) {
