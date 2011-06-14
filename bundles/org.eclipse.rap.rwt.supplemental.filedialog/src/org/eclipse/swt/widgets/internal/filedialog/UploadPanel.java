@@ -142,7 +142,6 @@ public class UploadPanel extends Composite implements IFileUploadListener {
     browseBtn.setText( "Browse" );
     browseBtn.setToolTipText( "Browse to select a single file" );
     browseBtn.addSelectionListener( new SelectionAdapter() {
-
       public void widgetSelected( SelectionEvent event ) {
         String filename = browseBtn.getFileName();
         fileText.setText( filename );
@@ -173,10 +172,10 @@ public class UploadPanel extends Composite implements IFileUploadListener {
       removeBtn.setImage( deleteImage );
       removeBtn.setToolTipText( "Remove item" );
       removeBtn.addSelectionListener( new SelectionAdapter() {
-
         public void widgetSelected( SelectionEvent e ) {
-          if( progressCollector != null )
+          if( progressCollector != null ) {
             progressCollector.updateProgress( handler, 0 );
+          }
           dispose();
         }
       } );
@@ -243,7 +242,6 @@ public class UploadPanel extends Composite implements IFileUploadListener {
   public void uploadProgress( final FileUploadEvent uploadEvent ) {
     // checkWidget();
     browseBtn.getDisplay().asyncExec( new Runnable() {
-
       public void run() {
         double fraction = uploadEvent.getBytesRead() / ( double )uploadEvent.getContentLength();
         int percent = ( int )Math.floor( fraction * 100 );
@@ -266,7 +264,6 @@ public class UploadPanel extends Composite implements IFileUploadListener {
     DiskFileUploadReceiver receiver = ( DiskFileUploadReceiver )handler.getReceiver();
     uploadedFile = receiver.getTargetFile();
     browseBtn.getDisplay().asyncExec( new Runnable() {
-
       public void run() {
         int percent = 100;
         if( progressBar != null && !progressBar.isDisposed() ) {
@@ -284,7 +281,6 @@ public class UploadPanel extends Composite implements IFileUploadListener {
   public void uploadFailed( final FileUploadEvent uploadEvent ) {
     // checkWidget();
     browseBtn.getDisplay().asyncExec( new Runnable() {
-
       public void run() {
         if( progressBar != null && !progressBar.isDisposed() ) {
           progressBar.setState( SWT.ERROR );
