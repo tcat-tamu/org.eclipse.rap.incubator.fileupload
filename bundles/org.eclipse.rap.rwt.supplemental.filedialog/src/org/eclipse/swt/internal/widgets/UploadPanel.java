@@ -46,11 +46,11 @@ public class UploadPanel extends Composite implements IFileUploadListener {
   private final FileUploadHandler handler;
   private ValidationHandler validationHandler;
   private ProgressCollector progressCollector;
-  private FileUpload browseBtn;
+  private FileUpload browseButton;
   private Text fileText;
   private ProgressBar progressBar;
   private Label progressLabel;
-  private Button removeBtn;
+  private Button removeButton;
   private boolean inProgress;
   private File uploadedFile;
   private boolean autoUpload;
@@ -66,7 +66,7 @@ public class UploadPanel extends Composite implements IFileUploadListener {
 
   public void addSelectionListener( SelectionListener listener ) {
     checkWidget();
-    browseBtn.addSelectionListener( listener );
+    browseButton.addSelectionListener( listener );
   }
 
   public void setValidationHandler( ValidationHandler validationHandler ) {
@@ -76,10 +76,10 @@ public class UploadPanel extends Composite implements IFileUploadListener {
   public void setEnabled( boolean enabled ) {
     checkWidget();
     super.setEnabled( enabled );
-    browseBtn.setEnabled( enabled );
+    browseButton.setEnabled( enabled );
     fileText.setEnabled( enabled );
-    if( removeBtn != null ) {
-      removeBtn.setEnabled( enabled );
+    if( removeButton != null ) {
+      removeButton.setEnabled( enabled );
     }
   }
 
@@ -101,7 +101,7 @@ public class UploadPanel extends Composite implements IFileUploadListener {
     inProgress = true;
     String url = handler.getUploadUrl();
     handler.addUploadListener( this );
-    browseBtn.submit( url );
+    browseButton.submit( url );
   }
 
   public void dispose() {
@@ -136,12 +136,12 @@ public class UploadPanel extends Composite implements IFileUploadListener {
     layout.marginWidth = 0;
     layout.marginHeight = 0;
     setLayout( layout );
-    browseBtn = new FileUpload( this, SWT.NONE );
-    browseBtn.setText( "Browse" );
-    browseBtn.setToolTipText( "Browse to select a single file" );
-    browseBtn.addSelectionListener( new SelectionAdapter() {
+    browseButton = new FileUpload( this, SWT.NONE );
+    browseButton.setText( "Browse" );
+    browseButton.setToolTipText( "Browse to select a single file" );
+    browseButton.addSelectionListener( new SelectionAdapter() {
       public void widgetSelected( SelectionEvent event ) {
-        String filename = browseBtn.getFileName();
+        String filename = browseButton.getFileName();
         fileText.setText( filename );
         validate();
         if( autoUpload ) {
@@ -161,15 +161,15 @@ public class UploadPanel extends Composite implements IFileUploadListener {
       progressLabel.setText( progressBar.getSelection() + "%" );
     }
     if( hasStyle( REMOVEABLE ) ) {
-      removeBtn = new Button( this, SWT.PUSH );
+      removeButton = new Button( this, SWT.PUSH );
       Image removeIcon = Display.getCurrent().getSystemImage( SWT.ICON_CANCEL );
-      removeBtn.setImage( removeIcon );
+      removeButton.setImage( removeIcon );
       if( deleteImage == null ) {
         deleteImage = Graphics.getImage( "resources/delete_obj.gif", getClass().getClassLoader() );
       }
-      removeBtn.setImage( deleteImage );
-      removeBtn.setToolTipText( "Remove item" );
-      removeBtn.addSelectionListener( new SelectionAdapter() {
+      removeButton.setImage( deleteImage );
+      removeButton.setToolTipText( "Remove item" );
+      removeButton.addSelectionListener( new SelectionAdapter() {
         public void widgetSelected( SelectionEvent e ) {
           if( progressCollector != null ) {
             progressCollector.updateProgress( handler, 0 );
@@ -184,7 +184,7 @@ public class UploadPanel extends Composite implements IFileUploadListener {
   private void layoutChildren() {
     checkWidget();
     if( hasStyle( COMPACT ) ) {
-      browseBtn.setLayoutData( new GridData( SWT.FILL, SWT.FILL, false, false ) );
+      browseButton.setLayoutData( new GridData( SWT.FILL, SWT.FILL, false, false ) );
       GridData textLayoutData = new GridData( SWT.FILL, SWT.FILL, true, false );
       textLayoutData.minimumWidth = 186;
       fileText.setLayoutData( textLayoutData );
@@ -199,11 +199,11 @@ public class UploadPanel extends Composite implements IFileUploadListener {
         lblLayoutData.widthHint = ( int )avgCharWidth * 6;
         progressLabel.setLayoutData( lblLayoutData );
       }
-      if( removeBtn != null ) {
-        removeBtn.setLayoutData( new GridData( SWT.FILL, SWT.FILL, false, false ) );
+      if( removeButton != null ) {
+        removeButton.setLayoutData( new GridData( SWT.FILL, SWT.FILL, false, false ) );
       }
     } else {
-      browseBtn.setLayoutData( new GridData( SWT.FILL, SWT.FILL, false, false ) );
+      browseButton.setLayoutData( new GridData( SWT.FILL, SWT.FILL, false, false ) );
       GridData textLayoutData = new GridData( SWT.FILL, SWT.FILL, true, false );
       textLayoutData.minimumWidth = 186;
       textLayoutData.horizontalSpan = 4;
@@ -218,8 +218,8 @@ public class UploadPanel extends Composite implements IFileUploadListener {
         lblLayoutData.widthHint = ( int )avgCharWidth * 6;
         progressLabel.setLayoutData( lblLayoutData );
       }
-      if( removeBtn != null ) {
-        removeBtn.setLayoutData( new GridData( SWT.FILL, SWT.FILL, false, false ) );
+      if( removeButton != null ) {
+        removeButton.setLayoutData( new GridData( SWT.FILL, SWT.FILL, false, false ) );
       }
     }
   }
@@ -239,7 +239,7 @@ public class UploadPanel extends Composite implements IFileUploadListener {
 
   public void uploadProgress( final FileUploadEvent uploadEvent ) {
     // checkWidget();
-    browseBtn.getDisplay().asyncExec( new Runnable() {
+    browseButton.getDisplay().asyncExec( new Runnable() {
       public void run() {
         double fraction = uploadEvent.getBytesRead() / ( double )uploadEvent.getContentLength();
         int percent = ( int )Math.floor( fraction * 100 );
@@ -261,7 +261,7 @@ public class UploadPanel extends Composite implements IFileUploadListener {
     // checkWidget();
     DiskFileUploadReceiver receiver = ( DiskFileUploadReceiver )handler.getReceiver();
     uploadedFile = receiver.getTargetFile();
-    browseBtn.getDisplay().asyncExec( new Runnable() {
+    browseButton.getDisplay().asyncExec( new Runnable() {
       public void run() {
         int percent = 100;
         if( progressBar != null && !progressBar.isDisposed() ) {
@@ -278,7 +278,7 @@ public class UploadPanel extends Composite implements IFileUploadListener {
 
   public void uploadFailed( final FileUploadEvent uploadEvent ) {
     // checkWidget();
-    browseBtn.getDisplay().asyncExec( new Runnable() {
+    browseButton.getDisplay().asyncExec( new Runnable() {
       public void run() {
         if( progressBar != null && !progressBar.isDisposed() ) {
           progressBar.setState( SWT.ERROR );
