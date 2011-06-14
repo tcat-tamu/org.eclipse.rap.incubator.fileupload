@@ -26,7 +26,7 @@ public final class FileUploadHandler {
   private final String token;
   private final FileUploadReceiver receiver;
   private final FileUploadListenerList listeners;
-  private int maxFileSize = -1;
+  private long maxFileSize = -1;
   
   /**
    * Constructs a file upload handler that is associated with the given receiver. The receiver is
@@ -114,7 +114,7 @@ public final class FileUploadHandler {
    * indicates no limit.
    * @see #getMaxFileSize
    */
-  public void setMaxFileSize( int maxFileSize ) {
+  public void setMaxFileSize( long maxFileSize ) {
     this.maxFileSize = maxFileSize;
   }
 
