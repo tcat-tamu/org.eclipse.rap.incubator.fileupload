@@ -83,7 +83,7 @@ public class FileDialog extends Dialog {
   private Button okButton;
   private ProgressBar totalProgressBar;
   private Combo filterSelector;
-  private Button addFileSelectorBtn;
+  private Button addFileSelectorButton;
   private Composite scrollChild;
   private Composite uploadsWrapper;
   private ScrolledComposite uploadScroller;
@@ -364,10 +364,9 @@ public class FileDialog extends Dialog {
     uploadPanels = new ArrayList();
     uploadLocked = false;
     // [ar] - add a strategy for content type?
-    ExtensionValidationStrategy validationStrategy = new ExtensionValidationStrategy( filterExtensions,
-                                                                                      filterIndex );
+    ExtensionValidationStrategy validationStrategy
+      = new ExtensionValidationStrategy( filterExtensions, filterIndex );
     validationHandler = new ValidationHandler() {
-
       public void updateEnablement() {
         FileDialog.this.updateEnablement();
       }
@@ -382,29 +381,19 @@ public class FileDialog extends Dialog {
     shell = new Shell( getParent(), getStyle() );
     shell.setText( getText() );
     shell.addShellListener( new ShellAdapter() {
-
       public void shellClosed( final ShellEvent e ) {
         handleShellClose();
       }
     } );
-    // shell.addControlListener( new ControlAdapter() {
-    // public void controlResized( ControlEvent e ) {
-    // Point prefSize = shell.computeSize( SWT.DEFAULT, SWT.DEFAULT );
-    // Point initialPrefSize = (Point)shell.getData( "initialPrefSize" );
-    // if (initialPrefSize == null) {
-    // shell.setData( "initialPrefSize", prefSize );
-    // }
-    // if (!prefSize.equals( initialPrefSize )) {
-    // layoutAndCenterShell();
-    // shell.removeControlListener( this );
-    // }
-    // }
-    // });
   }
 
   private void layoutAndCenterShell() {
     Point prefSize = shell.computeSize( SWT.DEFAULT, SWT.DEFAULT );
+    // leave some space for larger fonts
+    prefSize.x += 50;
+    prefSize.y += 30;
     shell.setSize( prefSize );
+    shell.setMinimumSize( prefSize );
     Rectangle parentSize = getParent().getBounds();
     int locationX = ( parentSize.width - prefSize.x ) / 2 + parentSize.x;
     int locationY = ( parentSize.height - prefSize.y ) / 2 + parentSize.y;
@@ -457,8 +446,7 @@ public class FileDialog extends Dialog {
     footerComp.setLayout( footerLayout );
     footerComp.setLayoutData( new GridData( SWT.FILL, SWT.FILL, true, false ) );
     if( allowMultiple() ) {
-      footerLayout.numColumns = 3;
-      createAddSelectorBtn( footerComp );
+      createAddSelectorButton( scrollChild );
     }
     filterSelector = createFilterSelector( footerComp );
     filterSelector.setLayoutData( new GridData( SWT.FILL, SWT.FILL, false, false ) );
@@ -486,42 +474,52 @@ public class FileDialog extends Dialog {
     uploadArea.setLayoutData( new GridData( SWT.FILL, SWT.FILL, true, true ) );
     uploadArea.setText( "Selected Files" );
     uploadScroller = new ScrolledComposite( uploadArea, SWT.V_SCROLL );
+    uploadScroller.setExpandHorizontal( true );
+    uploadScroller.setExpandVertical( true );
     uploadScroller.addControlListener( new ControlAdapter() {
-
       public void controlResized( ControlEvent e ) {
         resizeUploads();
       }
     } );
     GridData uploadScrollerLayoutData = new GridData( SWT.FILL, SWT.FILL, true, true );
-    uploadScrollerLayoutData.minimumHeight = 112;
     uploadScroller.setLayoutData( uploadScrollerLayoutData );
     scrollChild = new Composite( uploadScroller, SWT.NONE );
     scrollChild.setLayout( new GridLayout( 1, true ) );
     uploadsWrapper = new Composite( scrollChild, SWT.NONE );
     GridLayout uploadWrapperLayout = new GridLayout( 1, true );
+    uploadWrapperLayout.marginTop = 1;
     uploadWrapperLayout.marginWidth = 0;
     uploadWrapperLayout.marginHeight = 0;
     uploadsWrapper.setLayout( uploadWrapperLayout );
-    uploadsWrapper.setLayoutData( new GridData( SWT.FILL, SWT.FILL, true, true ) );
+    uploadsWrapper.setLayoutData( new GridData( SWT.FILL, SWT.TOP, true, false ) );
     addUploadPanel();
     uploadScroller.setContent( scrollChild );
+    uploadScroller.setMinSize( scrollChild.computeSize( SWT.DEFAULT, SWT.DEFAULT ) );
   }
 
-  private void createAddSelectorBtn( Composite parent ) {
-    addFileSelectorBtn = new Button( parent, SWT.PUSH );
+  private void createAddSelectorButton( Composite parent ) {
+    addFileSelectorButton = new Button( parent, SWT.PUSH );
     if( addImage == null ) {
       addImage = Graphics.getImage( "resources/add_obj.gif", getClass().getClassLoader() );
     }
-    addFileSelectorBtn.setImage( addImage );
-    addFileSelectorBtn.setToolTipText( "Add more files" );
-    addFileSelectorBtn.setLayoutData( new GridData( SWT.FILL, SWT.FILL, false, false ) );
-    addFileSelectorBtn.addSelectionListener( new SelectionAdapter() {
-
+    addFileSelectorButton.setImage( addImage );
+    addFileSelectorButton.setToolTipText( "Add more files" );
+    addFileSelectorButton.addSelectionListener( new SelectionAdapter() {
       public void widgetSelected( SelectionEvent e ) {
-        UploadPanel newPanel = addUploadPanel();
-        resizeUploads();
-        uploadScroller.showControl( newPanel );
+        final UploadPanel uploadPanel = addUploadPanel();
         progressCollector.updateTotalProgress();
+        uploadScroller.setMinSize( scrollChild.computeSize( SWT.DEFAULT, SWT.DEFAULT ) );
+        // [if] workaround for ScrolledComposite#showControl issue
+        // TODO: remove it when the bug is fixed
+        uploadPanel.setEnabled( false );
+        uploadPanel.setVisible( false );
+        uploadScroller.getDisplay().timerExec( 10, new Runnable() {
+          public void run() {
+            uploadPanel.setEnabled( true );
+            uploadPanel.setVisible( true );
+            uploadScroller.showControl( addFileSelectorButton );
+          }
+        } );
       }
     } );
   }
@@ -530,33 +528,26 @@ public class FileDialog extends Dialog {
    * Only use for the SWT.MULTI case.
    */
   private void resizeUploads() {
-    int xHint = SWT.DEFAULT;
-    int clientWidth = uploadScroller.getClientArea().width;
-    if( clientWidth > 0 ) {
-      xHint = clientWidth;
-    }
-    Point wrapperSize = scrollChild.computeSize( xHint, SWT.DEFAULT );
-    scrollChild.setSize( wrapperSize );
+    scrollChild.pack( true );
   }
 
   /**
    * Only use for the SWT.MULTI case.
    */
   private UploadPanel addUploadPanel() {
-    final UploadPanel uploadPanel = new UploadPanel( uploadsWrapper, UploadPanel.COMPACT
+    final UploadPanel uploadPanel= new UploadPanel( uploadsWrapper, UploadPanel.COMPACT
                                                                      | UploadPanel.PROGRESS
                                                                      | UploadPanel.REMOVEABLE );
     uploadPanel.addDisposeListener( new DisposeListener() {
-
       public void widgetDisposed( DisposeEvent event ) {
         Display.getCurrent().asyncExec( new Runnable() {
-
           public void run() {
             if( !uploadsWrapper.isDisposed() ) {
               uploadPanels.remove( uploadPanel );
               validationHandler.setNumUploads( uploadPanels.size() );
               resizeUploads();
               progressCollector.updateTotalProgress();
+              uploadScroller.setMinSize( scrollChild.computeSize( SWT.DEFAULT, SWT.DEFAULT ) );
               updateEnablement();
             }
           }
@@ -668,8 +659,8 @@ public class FileDialog extends Dialog {
       okButton.setText( "Uploading..." );
       okButton.setToolTipText( "Waiting for uploads to finish" );
       okButton.setEnabled( false );
-      if( addFileSelectorBtn != null ) {
-        addFileSelectorBtn.setEnabled( false );
+      if( addFileSelectorButton != null ) {
+        addFileSelectorButton.setEnabled( false );
       }
       for( int i = 0; i < needsProcessing.size(); i++ ) {
         UploadPanel panel = ( UploadPanel )needsProcessing.get( i );
