@@ -685,6 +685,10 @@ public class FileDialog extends Dialog {
               }
             }
             shell.close();
+          } else {
+            okButton.setText( "Uploading..." );
+            okButton.setToolTipText( "Waiting for uploads to finish" );
+            okButton.setEnabled( false );
           }
         } else {
           okButton.setText( okText );
