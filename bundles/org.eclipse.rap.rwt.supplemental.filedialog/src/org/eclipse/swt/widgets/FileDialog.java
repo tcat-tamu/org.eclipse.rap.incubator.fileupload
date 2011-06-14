@@ -380,7 +380,7 @@ public class FileDialog extends Dialog {
     shell = new Shell( getParent(), getStyle() );
     shell.setText( getText() );
     shell.addShellListener( new ShellAdapter() {
-      public void shellClosed( final ShellEvent e ) {
+      public void shellClosed( ShellEvent e ) {
         handleShellClose();
       }
     } );
@@ -591,7 +591,7 @@ public class FileDialog extends Dialog {
     return filterCombo;
   }
 
-  private void createButtonArea( final Composite parent ) {
+  private void createButtonArea( Composite parent ) {
     Composite buttonComposite = new Composite( parent, SWT.NONE );
     GridData layoutData = new GridData( SWT.RIGHT, SWT.CENTER, false, false );
     layoutData.horizontalSpan = 2;
@@ -619,7 +619,7 @@ public class FileDialog extends Dialog {
     updateEnablement();
   }
 
-  private Button createButton( final Composite parent, final String text ) {
+  private Button createButton( Composite parent, String text ) {
     Button result = new Button( parent, SWT.PUSH );
     result.setText( text );
     GridData data = new GridData( GridData.HORIZONTAL_ALIGN_FILL );
