@@ -607,13 +607,11 @@ public class FileDialog extends Dialog {
     String cancelText = SWT.getMessage( "SWT_Cancel" );
     Button cancelButton = createButton( buttonComposite, cancelText );
     okButton.addSelectionListener( new SelectionAdapter() {
-
       public void widgetSelected( final SelectionEvent e ) {
         startUploads();
       }
     } );
     cancelButton.addSelectionListener( new SelectionAdapter() {
-
       public void widgetSelected( final SelectionEvent e ) {
         shell.close();
       }
