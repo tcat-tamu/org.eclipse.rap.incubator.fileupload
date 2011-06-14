@@ -19,8 +19,6 @@ import org.eclipse.rwt.lifecycle.UICallBack;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -476,17 +474,15 @@ public class FileDialog extends Dialog {
     uploadScroller = new ScrolledComposite( uploadArea, SWT.V_SCROLL );
     uploadScroller.setExpandHorizontal( true );
     uploadScroller.setExpandVertical( true );
-    uploadScroller.addControlListener( new ControlAdapter() {
-      public void controlResized( ControlEvent e ) {
-        resizeUploads();
-      }
-    } );
     GridData uploadScrollerLayoutData = new GridData( SWT.FILL, SWT.FILL, true, true );
     uploadScroller.setLayoutData( uploadScrollerLayoutData );
     scrollChild = new Composite( uploadScroller, SWT.NONE );
-    scrollChild.setLayout( new GridLayout( 1, true ) );
+    GridLayout scrollChildLayout = new GridLayout( 1, true );
+    scrollChildLayout.marginHeight = 0;
+    scrollChild.setLayout( scrollChildLayout );
     uploadsWrapper = new Composite( scrollChild, SWT.NONE );
     GridLayout uploadWrapperLayout = new GridLayout( 1, true );
+    // [if] marginTop = 1 is needed to avoid default composite size (64) if it is empty
     uploadWrapperLayout.marginTop = 1;
     uploadWrapperLayout.marginWidth = 0;
     uploadWrapperLayout.marginHeight = 0;
@@ -527,13 +523,6 @@ public class FileDialog extends Dialog {
   /**
    * Only use for the SWT.MULTI case.
    */
-  private void resizeUploads() {
-    scrollChild.pack( true );
-  }
-
-  /**
-   * Only use for the SWT.MULTI case.
-   */
   private UploadPanel addUploadPanel() {
     final UploadPanel uploadPanel= new UploadPanel( uploadsWrapper, UploadPanel.COMPACT
                                                                      | UploadPanel.PROGRESS
@@ -545,7 +534,7 @@ public class FileDialog extends Dialog {
             if( !uploadsWrapper.isDisposed() ) {
               uploadPanels.remove( uploadPanel );
               validationHandler.setNumUploads( uploadPanels.size() );
-              resizeUploads();
+              scrollChild.pack( true );
               progressCollector.updateTotalProgress();
               uploadScroller.setMinSize( scrollChild.computeSize( SWT.DEFAULT, SWT.DEFAULT ) );
               updateEnablement();
@@ -560,7 +549,7 @@ public class FileDialog extends Dialog {
     uploadPanel.setAutoUpload( isAutoUpload() );
     uploadPanels.add( uploadPanel );
     validationHandler.setNumUploads( uploadPanels.size() );
-    resizeUploads();
+    scrollChild.pack( true );
     updateEnablement();
     return uploadPanel;
   }
