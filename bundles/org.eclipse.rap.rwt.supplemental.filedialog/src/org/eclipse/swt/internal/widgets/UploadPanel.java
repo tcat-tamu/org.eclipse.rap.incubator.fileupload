@@ -136,7 +136,7 @@ public class UploadPanel extends Composite implements IFileUploadListener {
     setLayout( layout );
     browseButton = new FileUpload( this, SWT.NONE );
     browseButton.setText( "Browse" );
-    browseButton.setToolTipText( "Browse to select a single file" );
+    browseButton.setToolTipText( "Select a file" );
     browseButton.addSelectionListener( new SelectionAdapter() {
       public void widgetSelected( SelectionEvent event ) {
         String filename = browseButton.getFileName();
@@ -166,7 +166,7 @@ public class UploadPanel extends Composite implements IFileUploadListener {
         deleteImage = Graphics.getImage( "resources/delete_obj.gif", getClass().getClassLoader() );
       }
       removeButton.setImage( deleteImage );
-      removeButton.setToolTipText( "Remove item" );
+      removeButton.setToolTipText( "Remove file" );
       removeButton.addSelectionListener( new SelectionAdapter() {
         public void widgetSelected( SelectionEvent e ) {
           if( progressCollector != null ) {
