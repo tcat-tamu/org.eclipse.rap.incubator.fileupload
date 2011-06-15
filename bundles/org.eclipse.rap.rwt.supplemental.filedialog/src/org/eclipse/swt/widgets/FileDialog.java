@@ -388,9 +388,12 @@ public class FileDialog extends Dialog {
 
   private void layoutAndCenterShell() {
     Point prefSize = shell.computeSize( SWT.DEFAULT, SWT.DEFAULT );
-    // leave some space for larger fonts
     prefSize.x += 50;
-    prefSize.y += 30;
+    prefSize.y += 10;
+    if( allowMultiple() ) {
+      // leave room for five upload slots + add button
+      prefSize.y += 100;
+    }
     shell.setSize( prefSize );
     shell.setMinimumSize( prefSize );
     Rectangle parentSize = getParent().getBounds();
@@ -468,23 +471,18 @@ public class FileDialog extends Dialog {
   }
 
   private void createMultiSelector( Composite main ) {
-    Group uploadArea = new Group( main, SWT.NONE );
-    uploadArea.setLayout( new GridLayout( 1, true ) );
-    uploadArea.setLayoutData( new GridData( SWT.FILL, SWT.FILL, true, true ) );
-    uploadArea.setText( "Selected Files" );
-    uploadScroller = new ScrolledComposite( uploadArea, SWT.V_SCROLL );
+    uploadScroller = new ScrolledComposite( main, SWT.V_SCROLL | SWT.BORDER );
     uploadScroller.setExpandHorizontal( true );
     uploadScroller.setExpandVertical( true );
     GridData uploadScrollerLayoutData = new GridData( SWT.FILL, SWT.FILL, true, true );
     uploadScroller.setLayoutData( uploadScrollerLayoutData );
     scrollChild = new Composite( uploadScroller, SWT.NONE );
     GridLayout scrollChildLayout = new GridLayout( 1, true );
-    scrollChildLayout.marginHeight = 0;
     scrollChild.setLayout( scrollChildLayout );
     uploadsWrapper = new Composite( scrollChild, SWT.NONE );
     GridLayout uploadWrapperLayout = new GridLayout( 1, true );
-    // [if] marginTop = 1 is needed to avoid default composite size (64) if it is empty
-    uploadWrapperLayout.marginTop = 1;
+    // [if] marginBottom = 1 is needed to avoid default composite size (64) if it is empty
+    uploadWrapperLayout.marginBottom = 1;
     uploadWrapperLayout.marginWidth = 0;
     uploadWrapperLayout.marginHeight = 0;
     uploadsWrapper.setLayout( uploadWrapperLayout );
@@ -500,21 +498,21 @@ public class FileDialog extends Dialog {
       addImage = Graphics.getImage( "resources/add_obj.gif", getClass().getClassLoader() );
     }
     addFileSelectorButton.setImage( addImage );
-    addFileSelectorButton.setToolTipText( "Add more files" );
+    addFileSelectorButton.setToolTipText( "Add file" );
     addFileSelectorButton.addSelectionListener( new SelectionAdapter() {
       public void widgetSelected( SelectionEvent e ) {
         final UploadPanel uploadPanel = addUploadPanel();
         progressCollector.updateTotalProgress();
         uploadScroller.setMinSize( scrollChild.computeSize( SWT.DEFAULT, SWT.DEFAULT ) );
-        // [if] workaround for ScrolledComposite#showControl issue
-        // TODO: remove it when the bug 349301 is fixed
+        // [if] workaround for ScrolledComposite scroll issue - see bug 349301 and 349301
         uploadPanel.setEnabled( false );
         uploadPanel.setVisible( false );
         uploadScroller.getDisplay().timerExec( 10, new Runnable() {
           public void run() {
             uploadPanel.setEnabled( true );
             uploadPanel.setVisible( true );
-            uploadScroller.showControl( addFileSelectorButton );
+            int scrollTop = scrollChild.getSize().y - uploadScroller.getClientArea().y;
+            uploadScroller.setOrigin( 0, Math.max(  0, scrollTop ) );
           }
         } );
       }
@@ -525,9 +523,8 @@ public class FileDialog extends Dialog {
    * Only use for the SWT.MULTI case.
    */
   private UploadPanel addUploadPanel() {
-    final UploadPanel uploadPanel= new UploadPanel( uploadsWrapper, UploadPanel.COMPACT
-                                                                     | UploadPanel.PROGRESS
-                                                                     | UploadPanel.REMOVEABLE );
+    int uploadPanelStyle = UploadPanel.COMPACT | UploadPanel.PROGRESS | UploadPanel.REMOVEABLE;
+    final UploadPanel uploadPanel= new UploadPanel( uploadsWrapper, uploadPanelStyle );
     uploadPanel.addDisposeListener( new DisposeListener() {
       public void widgetDisposed( DisposeEvent event ) {
         Display.getCurrent().asyncExec( new Runnable() {
