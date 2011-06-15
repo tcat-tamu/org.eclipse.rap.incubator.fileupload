@@ -519,9 +519,6 @@ public class FileDialog extends Dialog {
     } );
   }
 
-  /**
-   * Only use for the SWT.MULTI case.
-   */
   private UploadPanel addUploadPanel() {
     int uploadPanelStyle = UploadPanel.COMPACT | UploadPanel.PROGRESS | UploadPanel.REMOVEABLE;
     final UploadPanel uploadPanel= new UploadPanel( uploadsWrapper, uploadPanelStyle );
