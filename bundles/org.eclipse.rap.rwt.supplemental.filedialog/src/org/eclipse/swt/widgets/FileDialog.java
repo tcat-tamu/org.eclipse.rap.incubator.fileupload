@@ -158,6 +158,8 @@ public class FileDialog extends Dialog {
         }
       }
     }
+    // [if] force SWT.TITLE as in SWT titlebar is always shown
+    result |= SWT.TITLE;
     // [if] Min button has no sense in RAP
     result &= ~SWT.MIN;
     return result;
