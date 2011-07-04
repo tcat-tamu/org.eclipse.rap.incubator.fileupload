@@ -64,6 +64,7 @@ import org.eclipse.swt.layout.GridLayout;
  *      information</a>
  */
 public class FileDialog extends Dialog {
+  private static final long serialVersionUID = 1L;
 
   // RAP implementation fields taken from JFace
   private final static int HORIZONTAL_DIALOG_UNIT_PER_CHAR = 4;
