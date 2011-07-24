@@ -78,7 +78,6 @@ public class FileDialog extends Dialog {
   int filterIndex;
   boolean overwrite = false;
   // RAP implementation fields
-  private Shell shell;
   private java.util.List uploadPanels;
   private Button okButton;
   private ProgressBar totalProgressBar;
@@ -351,15 +350,19 @@ public class FileDialog extends Dialog {
   public boolean isAutoUpload() {
     return autoUpload;
   }
-
+  
   public String open() {
+    prepareOpen();
+    runEventLoop( shell );
+    return fileName;
+  }
+
+  protected void prepareOpen() {
     UICallBack.activate( FileDialog.class.getName() + hashCode() );
     initializeDefaults();
     createShell();
     createControls();
     layoutAndCenterShell();
-    openShell();
-    return fileName;
   }
 
   private void initializeDefaults() {
@@ -403,17 +406,6 @@ public class FileDialog extends Dialog {
     int locationX = ( parentSize.width - prefSize.x ) / 2 + parentSize.x;
     int locationY = ( parentSize.height - prefSize.y ) / 2 + parentSize.y;
     shell.setLocation( locationX, locationY );
-  }
-
-  private void openShell() {
-    shell.open();
-    Display display = shell.getDisplay();
-    while( !shell.isDisposed() ) {
-      if( !display.readAndDispatch() ) {
-        display.sleep();
-      }
-    }
-    shell = null;
   }
 
   private void createControls() {
