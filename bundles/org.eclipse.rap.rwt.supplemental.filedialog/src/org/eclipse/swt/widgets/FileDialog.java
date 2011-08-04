@@ -350,13 +350,14 @@ public class FileDialog extends Dialog {
   public boolean isAutoUpload() {
     return autoUpload;
   }
-  
+
   public String open() {
     prepareOpen();
     runEventLoop( shell );
     return fileName;
   }
 
+  @Override
   protected void prepareOpen() {
     UICallBack.activate( FileDialog.class.getName() + hashCode() );
     initializeDefaults();
@@ -372,6 +373,7 @@ public class FileDialog extends Dialog {
     ExtensionValidationStrategy validationStrategy
       = new ExtensionValidationStrategy( filterExtensions, filterIndex );
     validationHandler = new ValidationHandler() {
+      @Override
       public void updateEnablement() {
         FileDialog.this.updateEnablement();
       }
@@ -386,6 +388,7 @@ public class FileDialog extends Dialog {
     shell = new Shell( getParent(), getStyle() );
     shell.setText( getText() );
     shell.addShellListener( new ShellAdapter() {
+      @Override
       public void shellClosed( ShellEvent e ) {
         handleShellClose();
       }
@@ -495,6 +498,7 @@ public class FileDialog extends Dialog {
     addFileSelectorButton.setImage( addImage );
     addFileSelectorButton.setToolTipText( "Add file" );
     addFileSelectorButton.addSelectionListener( new SelectionAdapter() {
+      @Override
       public void widgetSelected( SelectionEvent e ) {
         final UploadPanel uploadPanel = addUploadPanel();
         progressCollector.updateTotalProgress();
@@ -569,6 +573,7 @@ public class FileDialog extends Dialog {
     }
     filterCombo.select( getFilterIndex() );
     filterCombo.addSelectionListener( new SelectionAdapter() {
+      @Override
       public void widgetSelected( SelectionEvent e ) {
         setFilterIndex( filterCombo.getSelectionIndex() );
         for( int i = 0; i < uploadPanels.size(); i++ ) {
@@ -596,16 +601,24 @@ public class FileDialog extends Dialog {
     String cancelText = SWT.getMessage( "SWT_Cancel" );
     Button cancelButton = createButton( buttonComposite, cancelText );
     okButton.addSelectionListener( new SelectionAdapter() {
+      @Override
       public void widgetSelected( SelectionEvent e ) {
         startUploads();
       }
     } );
     cancelButton.addSelectionListener( new SelectionAdapter() {
+      @Override
       public void widgetSelected( SelectionEvent e ) {
-        shell.close();
+        closeShell();
       }
     } );
     updateEnablement();
+  }
+
+  // [if] Calling shell.close() in the selection listener directly throws IllegalAccessError
+  // see bug 253818
+  private void closeShell() {
+    shell.close();
   }
 
   private Button createButton( Composite parent, String text ) {
