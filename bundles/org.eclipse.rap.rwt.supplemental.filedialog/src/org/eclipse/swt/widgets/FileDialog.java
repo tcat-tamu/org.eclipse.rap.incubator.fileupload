@@ -78,7 +78,7 @@ public class FileDialog extends Dialog {
   int filterIndex;
   boolean overwrite = false;
   // RAP implementation fields
-  private java.util.List uploadPanels;
+  private java.util.List<UploadPanel> uploadPanels;
   private Button okButton;
   private ProgressBar totalProgressBar;
   private Combo filterSelector;
@@ -367,7 +367,7 @@ public class FileDialog extends Dialog {
   }
 
   private void initializeDefaults() {
-    uploadPanels = new ArrayList();
+    uploadPanels = new ArrayList<UploadPanel>();
     uploadLocked = false;
     // [ar] - add a strategy for content type?
     ExtensionValidationStrategy validationStrategy
@@ -577,7 +577,7 @@ public class FileDialog extends Dialog {
       public void widgetSelected( SelectionEvent e ) {
         setFilterIndex( filterCombo.getSelectionIndex() );
         for( int i = 0; i < uploadPanels.size(); i++ ) {
-          UploadPanel panel = ( UploadPanel )uploadPanels.get( i );
+          UploadPanel panel = uploadPanels.get( i );
           panel.validate();
         }
       }
@@ -636,9 +636,9 @@ public class FileDialog extends Dialog {
   }
 
   private void startUploads() {
-    java.util.List needsProcessing = new ArrayList();
+    java.util.List<UploadPanel> needsProcessing = new ArrayList<UploadPanel>();
     for( int i = 0; i < uploadPanels.size(); i++ ) {
-      UploadPanel panel = ( UploadPanel )uploadPanels.get( i );
+      UploadPanel panel = uploadPanels.get( i );
       if( !panel.isFinished() ) {
         needsProcessing.add( panel );
       }
@@ -652,7 +652,7 @@ public class FileDialog extends Dialog {
         addFileSelectorButton.setEnabled( false );
       }
       for( int i = 0; i < needsProcessing.size(); i++ ) {
-        UploadPanel panel = ( UploadPanel )needsProcessing.get( i );
+        UploadPanel panel = needsProcessing.get( i );
         if( !panel.isStarted() ) {
           panel.startUpload();
         }
@@ -676,7 +676,7 @@ public class FileDialog extends Dialog {
             fileNames = new String[ uploadPanels.size() ];
             fileName = null;
             for( int i = 0; i < uploadPanels.size(); i++ ) {
-              UploadPanel uploadPanel = ( UploadPanel )uploadPanels.get( i );
+              UploadPanel uploadPanel = uploadPanels.get( i );
               File uploadedFile = uploadPanel.getUploadedFile();
               // TODO [rst] Understand if file can be null
               if( uploadedFile != null ) {
@@ -695,7 +695,7 @@ public class FileDialog extends Dialog {
         } else {
           okButton.setText( okText );
           for( int i = 0; i < uploadPanels.size(); i++ ) {
-            UploadPanel panel = ( UploadPanel )uploadPanels.get( i );
+            UploadPanel panel = uploadPanels.get( i );
             if( panel.getSelectedFilename().length() == 0 ) {
               enabled = false;
             }
