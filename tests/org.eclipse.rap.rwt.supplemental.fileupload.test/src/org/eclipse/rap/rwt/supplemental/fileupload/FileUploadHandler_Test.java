@@ -50,7 +50,7 @@ public class FileUploadHandler_Test extends TestCase {
     handler = null;
     Fixture.tearDown();
   }
-  
+
   public void testCannotCreateWithNull() {
     try {
       new FileUploadHandler( null );
@@ -106,11 +106,11 @@ public class FileUploadHandler_Test extends TestCase {
 
   public void testAddMultipleListeners() {
     TestFileUploadListener anotherUploadListener = new TestFileUploadListener();
-  
+
     handler.addUploadListener( uploadListener );
     handler.addUploadListener( anotherUploadListener );
     new TestFileUploadEvent( handler ).dispatchProgress();
-  
+
     assertEquals( "progress.", uploadListener.getLog() );
     assertEquals( "progress.", anotherUploadListener.getLog() );
   }
@@ -124,23 +124,23 @@ public class FileUploadHandler_Test extends TestCase {
     } catch( NullPointerException expected ) {
     }
   }
-  
+
   public void testRemoveListener() {
     handler.addUploadListener( uploadListener );
-    
+
     handler.removeUploadListener( uploadListener );
     new TestFileUploadEvent( handler ).dispatchProgress();
-    
+
     assertEquals( "", uploadListener.getLog() );
   }
 
   public void testRemoveListenerTwice() {
     handler.addUploadListener( uploadListener );
-    
+
     handler.removeUploadListener( uploadListener );
     handler.removeUploadListener( uploadListener );
     new TestFileUploadEvent( handler ).dispatchProgress();
-    
+
     assertEquals( "", uploadListener.getLog() );
   }
 
@@ -148,7 +148,7 @@ public class FileUploadHandler_Test extends TestCase {
     handler.addUploadListener( uploadListener );
     TestFileUploadListener anotherUploadListener = new TestFileUploadListener();
     handler.addUploadListener( anotherUploadListener );
-    
+
     handler.removeUploadListener( anotherUploadListener );
     new TestFileUploadEvent( handler ).dispatchProgress();
 
@@ -170,7 +170,7 @@ public class FileUploadHandler_Test extends TestCase {
 
   public void testUploadWithException() throws Exception {
     FileUploadReceiver receiver = new FileUploadReceiver() {
-      public void receive( InputStream dataStream ) throws IOException {
+      public void receive( InputStream dataStream, IFileUploadDetails details ) throws IOException {
         throw new IOException( "the error message" );
       }
     };

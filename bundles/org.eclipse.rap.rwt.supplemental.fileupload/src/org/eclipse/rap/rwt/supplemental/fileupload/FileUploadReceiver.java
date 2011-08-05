@@ -22,9 +22,11 @@ public abstract class FileUploadReceiver {
 
   /**
    * Reads and processes all data from the provided input stream.
-   * 
+   *
    * @param dataStream the stream to read from
+   * @param details the details of the uploaded file like file name, content-type and size
    * @throws IOException if an input / output error occurs
    */
-  public abstract void receive( InputStream dataStream ) throws IOException;
+  public abstract void receive( InputStream dataStream, IFileUploadDetails details )
+    throws IOException;
 }

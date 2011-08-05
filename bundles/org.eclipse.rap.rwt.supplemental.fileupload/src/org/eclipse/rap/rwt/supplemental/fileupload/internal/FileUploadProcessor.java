@@ -22,12 +22,14 @@ import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadDetails;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadReceiver;
+import org.eclipse.rap.rwt.supplemental.fileupload.IFileUploadDetails;
 
 
 final class FileUploadProcessor {
-  
+
   private final FileUploadHandler handler;
   private final FileUploadTracker tracker;
 
@@ -42,10 +44,14 @@ final class FileUploadProcessor {
     try {
       DiskFileItem fileItem = readUploadedFileItem( request );
       if( fileItem != null ) {
-        tracker.setContentType( fileItem.getContentType() );
-        tracker.setFileName( stripFileName( fileItem.getName() ) );
+        String fileName = stripFileName( fileItem.getName() );
+        String contentType = fileItem.getContentType();
+        long contentLength = fileItem.getSize();
+        tracker.setFileName( fileName );
+        tracker.setContentType( contentType );
         FileUploadReceiver receiver = handler.getReceiver();
-        receiver.receive( fileItem.getInputStream() );
+        IFileUploadDetails details = new FileUploadDetails( fileName, contentType, contentLength );
+        receiver.receive( fileItem.getInputStream(), details );
         tracker.handleFinished();
       } else {
         String errorMessage = "No file upload data found in request";
@@ -96,7 +102,7 @@ final class FileUploadProcessor {
 
   private ProgressListener createProgressListener( final long maxFileSize ) {
     ProgressListener result = new ProgressListener() {
-  
+
       public void update( long bytesRead, long contentLength, int item ) {
         // Note: Apache fileupload 1.2 will throw an exception after the upload is finished.
         // So we handle the file size violation as best we can from here.
