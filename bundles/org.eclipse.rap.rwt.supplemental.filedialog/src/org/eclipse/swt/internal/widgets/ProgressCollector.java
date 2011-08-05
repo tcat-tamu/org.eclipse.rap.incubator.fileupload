@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.ProgressBar;
 
 public class ProgressCollector {
 
-  private Map metrics;
+  private Map<FileUploadHandler, Integer> metrics;
   private ProgressBar totalProgressBar;
   private final ValidationHandler validationHandler;
 
@@ -64,7 +64,7 @@ public class ProgressCollector {
   }
 
   public void reset() {
-    metrics = new HashMap();
+    metrics = new HashMap<FileUploadHandler, Integer>();
     if( totalProgressBar != null && !totalProgressBar.isDisposed() ) {
       totalProgressBar.setMinimum( 0 );
     }

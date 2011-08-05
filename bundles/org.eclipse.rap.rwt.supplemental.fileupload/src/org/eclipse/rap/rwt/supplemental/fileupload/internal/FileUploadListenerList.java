@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Copyright (c) 2011 EclipseSource and others. All rights reserved.
  * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 which accompanies this distribution, 
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
@@ -19,10 +19,10 @@ import org.eclipse.rap.rwt.supplemental.fileupload.IFileUploadListener;
 
 public final class FileUploadListenerList {
 
-  private final Set listeners;
+  private final Set< IFileUploadListener > listeners;
 
   public FileUploadListenerList() {
-    listeners = new HashSet();
+    listeners = new HashSet< IFileUploadListener >();
   }
 
   public void addUploadListener( IFileUploadListener listener ) {

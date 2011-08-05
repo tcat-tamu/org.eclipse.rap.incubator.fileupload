@@ -16,11 +16,11 @@ import java.util.List;
 
 public abstract class ValidationHandler {
 
-  private List strategies;
+  private List<ValidationStrategy> strategies;
   private int numUploads;
 
   public ValidationHandler() {
-    strategies = new ArrayList();
+    strategies = new ArrayList<ValidationStrategy>();
   }
 
   public void addValidationStrategy( ValidationStrategy stratagy ) {
@@ -34,7 +34,7 @@ public abstract class ValidationHandler {
   public boolean validate( String text ) {
     boolean validated = true;
     for( int i = 0; i < strategies.size(); i++ ) {
-      if( !( ( ValidationStrategy )strategies.get( i ) ).validate( text ) ) {
+      if( !strategies.get( i ).validate( text ) ) {
         validated = false;
       }
     }

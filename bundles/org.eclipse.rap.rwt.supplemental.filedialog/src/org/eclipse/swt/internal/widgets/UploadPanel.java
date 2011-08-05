@@ -72,6 +72,7 @@ public class UploadPanel extends Composite implements IFileUploadListener {
     this.validationHandler = validationHandler;
   }
 
+  @Override
   public void setEnabled( boolean enabled ) {
     checkWidget();
     super.setEnabled( enabled );
@@ -103,6 +104,7 @@ public class UploadPanel extends Composite implements IFileUploadListener {
     browseButton.submit( url );
   }
 
+  @Override
   public void dispose() {
     handler.removeUploadListener( this );
     handler.dispose();
@@ -139,6 +141,7 @@ public class UploadPanel extends Composite implements IFileUploadListener {
     browseButton.setText( "Browse" );
     browseButton.setToolTipText( "Select a file" );
     browseButton.addSelectionListener( new SelectionAdapter() {
+      @Override
       public void widgetSelected( SelectionEvent event ) {
         String filename = browseButton.getFileName();
         fileText.setText( filename );
@@ -169,6 +172,7 @@ public class UploadPanel extends Composite implements IFileUploadListener {
       removeButton.setImage( deleteImage );
       removeButton.setToolTipText( "Remove file" );
       removeButton.addSelectionListener( new SelectionAdapter() {
+        @Override
         public void widgetSelected( SelectionEvent e ) {
           if( progressCollector != null ) {
             progressCollector.updateProgress( handler, 0 );

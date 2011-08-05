@@ -21,12 +21,12 @@ public final class FileUploadHandlerStore {
 
   private static final String ATTR_NAME = FileUploadHandlerStore.class.getName() + ".instance";
   private static final Object LOCK = new Object();
-  private final Map handlers;
+  private final Map< String, FileUploadHandler > handlers;
   private final Object lock;
   private boolean registered;
 
   private FileUploadHandlerStore() {
-    handlers = new HashMap();
+    handlers = new HashMap< String, FileUploadHandler >();
     lock = new Object();
   }
 
@@ -58,7 +58,7 @@ public final class FileUploadHandlerStore {
   public FileUploadHandler getHandler( String token ) {
     FileUploadHandler result;
     synchronized( lock ) {
-      result = ( FileUploadHandler )handlers.get( token );
+      result = handlers.get( token );
     }
     return result;
   }
