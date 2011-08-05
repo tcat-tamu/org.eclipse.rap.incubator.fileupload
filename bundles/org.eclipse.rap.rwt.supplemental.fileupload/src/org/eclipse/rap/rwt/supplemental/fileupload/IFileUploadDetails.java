@@ -24,7 +24,7 @@ public interface IFileUploadDetails {
    * The total number of bytes which are expected in total, as transmitted by the uploading client.
    * May be unknown.
    *
-   * @return the content length in bytes
+   * @return the content length in bytes or -1 if unknown
    */
   long getContentLength();
 

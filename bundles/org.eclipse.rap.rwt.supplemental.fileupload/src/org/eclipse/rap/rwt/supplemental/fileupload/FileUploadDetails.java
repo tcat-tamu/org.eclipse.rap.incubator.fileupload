@@ -14,7 +14,7 @@ package org.eclipse.rap.rwt.supplemental.fileupload;
 /**
  * This class provides information on a file upload.
  */
-public class FileUploadDetails implements IFileUploadDetails {
+public final class FileUploadDetails implements IFileUploadDetails {
 
   private final String fileName;
   private final String contentType;

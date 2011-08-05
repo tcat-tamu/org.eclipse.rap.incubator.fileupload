@@ -22,16 +22,12 @@ import java.io.OutputStream;
  */
 public class DiskFileUploadReceiver extends FileUploadReceiver {
 
-  private final String DEFAULT_TARGET_FILE_NAME = "upload.tmp";
+  private static final String DEFAULT_TARGET_FILE_NAME = "upload.tmp";
 
   private File targetFile;
 
   public void receive( InputStream dataStream, IFileUploadDetails details ) throws IOException {
-    String fileName = DEFAULT_TARGET_FILE_NAME;
-    if( details != null && details.getFileName() != null ) {
-      fileName = details.getFileName();
-    }
-    File targetFile = createTargetFile( fileName );
+    File targetFile = createTargetFile( details );
     FileOutputStream outputStream = new FileOutputStream( targetFile );
     try {
       copy( dataStream, outputStream );
@@ -53,10 +49,14 @@ public class DiskFileUploadReceiver extends FileUploadReceiver {
   /**
    * Creates a file to save the received data to. Subclasses may override.
    *
-   * @param fileName the original file name of the uploaded file
+   * @param details the details of the uploaded file like file name, content-type and size
    * @return the file to store the data in
    */
-  protected File createTargetFile( String fileName ) throws IOException {
+  protected File createTargetFile( IFileUploadDetails details ) throws IOException {
+    String fileName = DEFAULT_TARGET_FILE_NAME;
+    if( details != null && details.getFileName() != null ) {
+      fileName = details.getFileName();
+    }
     return File.createTempFile( createPrefix( fileName ), createSuffix( fileName ) );
   }
 

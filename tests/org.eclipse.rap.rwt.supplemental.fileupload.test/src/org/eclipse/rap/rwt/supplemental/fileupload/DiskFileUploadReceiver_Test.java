@@ -39,7 +39,8 @@ public class DiskFileUploadReceiver_Test extends TestCase {
   public void testCreateTargetFile() throws IOException {
     DiskFileUploadReceiver receiver = new DiskFileUploadReceiver();
 
-    createdFile = receiver.createTargetFile( "foo.bar" );
+    IFileUploadDetails details = new FileUploadDetails( "foo.bar", "text/plain", 5 );
+    createdFile = receiver.createTargetFile( details );
 
     assertTrue( createdFile.exists() );
     assertTrue( createdFile.getName().startsWith( "foo." ) );
@@ -49,8 +50,9 @@ public class DiskFileUploadReceiver_Test extends TestCase {
   public void testCreatedTargetFilesDiffer() throws IOException {
     DiskFileUploadReceiver receiver = new DiskFileUploadReceiver();
 
-    createdFile = receiver.createTargetFile( "foo.bar" );
-    File createdFile2 = receiver.createTargetFile( "foo.bar" );
+    IFileUploadDetails details = new FileUploadDetails( "foo.bar", "text/plain", 5 );
+    createdFile = receiver.createTargetFile( details );
+    File createdFile2 = receiver.createTargetFile( details );
     createdFile2.deleteOnExit();
 
     assertFalse( createdFile.getAbsolutePath().equals( createdFile2.getAbsolutePath() ) );
