@@ -168,6 +168,36 @@ public class FileUploadHandler_Test extends TestCase {
     assertEquals( content.length(), receiver.getTotal() );
   }
 
+  public void testUploadWithMaxLimit() throws Exception {
+    TestFileUploadReceiver receiver = new TestFileUploadReceiver();
+    FileUploadHandler handler = new FileUploadHandler( receiver );
+    handler.setMaxFileSize( 1000 );
+    String content = "Lorem ipsum dolor sit amet.\n";
+
+    fakeUploadRequest( handler, content, "text/plain", "short.txt" );
+    serviceHandler.service();
+
+    assertEquals( 0, getResponseErrorStatus() );
+    assertEquals( content.length(), receiver.getTotal() );
+  }
+
+  public void testUploadWithExceedMaxLimit() throws Exception {
+    TestFileUploadReceiver receiver = new TestFileUploadReceiver();
+    FileUploadHandler handler = new FileUploadHandler( receiver );
+    handler.setMaxFileSize( 1000 );
+    StringBuffer buffer = new StringBuffer();
+    for( int i = 0; i < 1000; i++ ) {
+      buffer.append( "Lorem ipsum dolor sit amet.\n" );
+    }
+    String content = buffer.toString();
+
+    fakeUploadRequest( handler, content, "text/plain", "short.txt" );
+    serviceHandler.service();
+
+    assertEquals( HttpServletResponse.SC_INTERNAL_SERVER_ERROR, getResponseErrorStatus() );
+    assertTrue( getResponseContent().indexOf( "exceeds the configured maximum" ) != -1 );
+  }
+
   public void testUploadWithException() throws Exception {
     FileUploadReceiver receiver = new FileUploadReceiver() {
       public void receive( InputStream dataStream, IFileUploadDetails details ) throws IOException {
