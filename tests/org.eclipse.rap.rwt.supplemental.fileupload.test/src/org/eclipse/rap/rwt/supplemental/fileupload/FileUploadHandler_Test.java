@@ -186,7 +186,7 @@ public class FileUploadHandler_Test extends TestCase {
     FileUploadHandler handler = new FileUploadHandler( receiver );
     handler.setMaxFileSize( 1000 );
     StringBuffer buffer = new StringBuffer();
-    for( int i = 0; i < 1000; i++ ) {
+    for( int i = 0; i < 40; i++ ) {
       buffer.append( "Lorem ipsum dolor sit amet.\n" );
     }
     String content = buffer.toString();
@@ -194,8 +194,8 @@ public class FileUploadHandler_Test extends TestCase {
     fakeUploadRequest( handler, content, "text/plain", "short.txt" );
     serviceHandler.service();
 
-    assertEquals( HttpServletResponse.SC_INTERNAL_SERVER_ERROR, getResponseErrorStatus() );
-    assertTrue( getResponseContent().indexOf( "exceeds the configured maximum" ) != -1 );
+    assertEquals( HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE, getResponseErrorStatus() );
+    assertTrue( getResponseContent().indexOf( "file exceeds its maximum permitted  size" ) != -1 );
   }
 
   public void testUploadWithException() throws Exception {
