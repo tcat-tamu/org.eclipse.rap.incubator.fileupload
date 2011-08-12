@@ -60,11 +60,11 @@ final class FileUploadProcessor {
         response.sendError( HttpServletResponse.SC_BAD_REQUEST, errorMessage );
       }
     } catch( FileSizeLimitExceededException exception ) {
-      response.sendError( HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE, exception.getMessage() );
-    } catch( Exception exception ) {
       // Note: Apache fileupload 1.2 will throw an exception after the upload is finished.
       // Therefore we handle it in the progress listener and ignore this kind of exceptions here
       // https://issues.apache.org/jira/browse/FILEUPLOAD-145
+      response.sendError( HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE, exception.getMessage() );
+    } catch( Exception exception ) {
       tracker.setException( exception );
       tracker.handleFailed();
       response.sendError( HttpServletResponse.SC_INTERNAL_SERVER_ERROR, exception.getMessage() );
