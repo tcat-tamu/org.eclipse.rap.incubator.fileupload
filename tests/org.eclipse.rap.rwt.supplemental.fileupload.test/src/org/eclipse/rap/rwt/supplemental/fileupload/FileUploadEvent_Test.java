@@ -13,7 +13,7 @@ package org.eclipse.rap.rwt.supplemental.fileupload;
 import org.eclipse.rap.rwt.supplemental.fileupload.test.TestFileUploadEvent;
 import org.eclipse.rap.rwt.supplemental.fileupload.test.TestFileUploadListener;
 import org.eclipse.rap.rwt.supplemental.fileupload.test.TestFileUploadReceiver;
-import org.eclipse.rwt.Fixture;
+import org.eclipse.rap.rwt.testfixture.Fixture;
 
 import junit.framework.TestCase;
 

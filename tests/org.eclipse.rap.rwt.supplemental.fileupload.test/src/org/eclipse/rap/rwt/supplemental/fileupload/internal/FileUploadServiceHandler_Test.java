@@ -12,10 +12,10 @@ import org.eclipse.rap.rwt.supplemental.fileupload.TestAdapter;
 import org.eclipse.rap.rwt.supplemental.fileupload.test.FileUploadTestUtil;
 import org.eclipse.rap.rwt.supplemental.fileupload.test.TestFileUploadListener;
 import org.eclipse.rap.rwt.supplemental.fileupload.test.TestFileUploadReceiver;
-import org.eclipse.rwt.Fixture;
+import org.eclipse.rap.rwt.testfixture.Fixture;
+import org.eclipse.rap.rwt.testfixture.TestRequest;
+import org.eclipse.rap.rwt.testfixture.TestResponse;
 import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.TestRequest;
-import org.eclipse.rwt.TestResponse;
 
 
 public class FileUploadServiceHandler_Test extends TestCase {

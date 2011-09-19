@@ -7,9 +7,9 @@ import java.io.IOException;
 
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
 import org.eclipse.rap.rwt.supplemental.fileupload.TestAdapter;
-import org.eclipse.rwt.Fixture;
+import org.eclipse.rap.rwt.testfixture.Fixture;
+import org.eclipse.rap.rwt.testfixture.TestRequest;
 import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.TestRequest;
 import org.eclipse.rwt.service.IServiceHandler;
 
 

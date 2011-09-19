@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
 import org.eclipse.rap.rwt.supplemental.fileupload.test.TestFileUploadReceiver;
-import org.eclipse.rwt.Fixture;
+import org.eclipse.rap.rwt.testfixture.Fixture;
 
 
 public class FileUploadHandlerStore_Test extends TestCase {
