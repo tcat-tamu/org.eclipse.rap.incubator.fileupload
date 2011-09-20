@@ -48,7 +48,7 @@ public class DiskFileUploadReceiver extends FileUploadReceiver {
 
   /**
    * Creates a file to save the received data to. Subclasses may override.
-   *
+   * 
    * @param details the details of the uploaded file like file name, content-type and size
    * @return the file to store the data in
    */
@@ -57,7 +57,21 @@ public class DiskFileUploadReceiver extends FileUploadReceiver {
     if( details != null && details.getFileName() != null ) {
       fileName = details.getFileName();
     }
-    return File.createTempFile( createPrefix( fileName ), createSuffix( fileName ) );
+    StringBuilder parentFileName = new StringBuilder( fileName );
+    parentFileName.append( "." );
+    File parentDir = File.createTempFile( parentFileName.toString(), "" );
+    // [ar] by default, a file is created.
+    parentDir.delete();
+    File targetFile = null;
+    if( parentDir.mkdir() ) {
+      parentDir.deleteOnExit();
+      targetFile = new File( parentDir, fileName );
+    } else {
+      String prefix = createPrefix( fileName );
+      String suffix = createSuffix( fileName );
+      targetFile = File.createTempFile( prefix, suffix );
+    }
+    return targetFile;
   }
 
   private String createPrefix( String fileName ) {
