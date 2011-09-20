@@ -66,6 +66,7 @@ public class DiskFileUploadReceiver extends FileUploadReceiver {
     if( parentDir.mkdir() ) {
       parentDir.deleteOnExit();
       targetFile = new File( parentDir, fileName );
+      targetFile.createNewFile();
     } else {
       String prefix = createPrefix( fileName );
       String suffix = createSuffix( fileName );
