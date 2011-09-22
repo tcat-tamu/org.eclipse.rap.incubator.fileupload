@@ -43,8 +43,7 @@ public class DiskFileUploadReceiver_Test extends TestCase {
     createdFile = receiver.createTargetFile( details );
 
     assertTrue( createdFile.exists() );
-    assertTrue( createdFile.getName().startsWith( "foo." ) );
-    assertTrue( createdFile.getName().endsWith( ".bar" ) );
+    assertEquals( "foo.bar", createdFile.getName() );
   }
 
   public void testCreatedTargetFilesDiffer() throws IOException {
@@ -80,8 +79,7 @@ public class DiskFileUploadReceiver_Test extends TestCase {
 
     assertNotNull( createdFile );
     assertTrue( createdFile.exists() );
-    assertTrue( createdFile.getName().startsWith( "upload." ) );
-    assertTrue( createdFile.getName().endsWith( ".tmp" ) );
+    assertEquals( "upload.tmp", createdFile.getName() );
     assertEquals( content, FileUploadTestUtil.getFileContents( createdFile ) );
   }
 }

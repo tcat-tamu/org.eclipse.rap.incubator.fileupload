@@ -23,6 +23,7 @@ import java.io.OutputStream;
 public class DiskFileUploadReceiver extends FileUploadReceiver {
 
   private static final String DEFAULT_TARGET_FILE_NAME = "upload.tmp";
+  private static final String TEMP_DIRECTORY_PREFIX = "fileupload_";
 
   private File targetFile;
 
@@ -48,7 +49,7 @@ public class DiskFileUploadReceiver extends FileUploadReceiver {
 
   /**
    * Creates a file to save the received data to. Subclasses may override.
-   * 
+   *
    * @param details the details of the uploaded file like file name, content-type and size
    * @return the file to store the data in
    */
@@ -57,32 +58,20 @@ public class DiskFileUploadReceiver extends FileUploadReceiver {
     if( details != null && details.getFileName() != null ) {
       fileName = details.getFileName();
     }
-    StringBuilder parentFileName = new StringBuilder( fileName );
-    parentFileName.append( "." );
-    File parentDir = File.createTempFile( parentFileName.toString(), "" );
-    // [ar] by default, a file is created.
-    parentDir.delete();
-    File targetFile = null;
-    if( parentDir.mkdir() ) {
-      parentDir.deleteOnExit();
-      targetFile = new File( parentDir, fileName );
-      targetFile.createNewFile();
+    File result = new File( createTempDirectory(), fileName );
+    result.createNewFile();
+    return result;
+  }
+
+  private static File createTempDirectory() throws IOException {
+    File result = File.createTempFile( TEMP_DIRECTORY_PREFIX, "" );
+    result.delete();
+    if( result.mkdir() ) {
+      result.deleteOnExit();
     } else {
-      String prefix = createPrefix( fileName );
-      String suffix = createSuffix( fileName );
-      targetFile = File.createTempFile( prefix, suffix );
+      throw new IOException( "Unable to create temp directory: " + result.getAbsolutePath() );
     }
-    return targetFile;
-  }
-
-  private String createPrefix( String fileName ) {
-    int dotIndex = fileName.lastIndexOf( '.' );
-    return dotIndex == -1 ? fileName : fileName.substring( 0, dotIndex + 1 );
-  }
-
-  private String createSuffix( String fileName ) {
-    int dotIndex = fileName.lastIndexOf( '.' );
-    return dotIndex == -1 ? null : fileName.substring( dotIndex );
+    return result;
   }
 
   private static void copy( InputStream inputStream, OutputStream outputStream )
