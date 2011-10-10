@@ -331,23 +331,33 @@ public class FileDialog extends Dialog {
   }
 
   /**
-   * Sets the dialog to begin uploading immediately after files are selected.
+   * Sets the auto-upload state of the dialog. If true, the dialog will start
+   * uploading files immediately after they are selected. In any case, if the
+   * dialog is canceled, files are not made available to the application.
+   * <p>
+   * <strong>Note:</strong> this method is <em>not</em> part of the SWT API. It
+   * only exists in the RWT version.
+   * </p>
    *
-   * @param autoUpload <code>true</code> to set the dialog to autoupload as
-   *          files are selected, else <code>false</code>
+   * @param autoUpload <code>true</code> to set the dialog into autoupload mode,
+   *          <code>false</code> otherwise
    */
   public void setAutoUpload( boolean autoUpload ) {
     this.autoUpload = autoUpload;
   }
 
   /**
-   * Returns the flag that the dialog will use to determine whether to
-   * autoupload files.
+   * Returns the auto-upload state of the dialog. If true, the dialog will
+   * upload files automatically as they are selected.
+   * <p>
+   * <strong>Note:</strong> this method is <em>not</em> part of the SWT API. It
+   * only exists in the RWT version.
+   * </p>
    *
    * @return <code>true</code> if the dialog is configured to auto upload files,
-   *         else <code>false</code>
+   *         <code>false</code> otherwise
    */
-  public boolean isAutoUpload() {
+  public boolean getAutoUpload() {
     return autoUpload;
   }
 
@@ -463,7 +473,7 @@ public class FileDialog extends Dialog {
     uploadPanel.setValidationHandler( validationHandler );
     uploadPanel.setLayoutData( new GridData( SWT.FILL, SWT.FILL, true, true ) );
     uploadPanel.setProgressCollector( progressCollector );
-    uploadPanel.setAutoUpload( isAutoUpload() );
+    uploadPanel.setAutoUpload( getAutoUpload() );
     uploadPanels.add( uploadPanel );
     validationHandler.setNumUploads( uploadPanels.size() );
   }
@@ -540,7 +550,7 @@ public class FileDialog extends Dialog {
     uploadPanel.setValidationHandler( validationHandler );
     uploadPanel.setLayoutData( new GridData( SWT.FILL, SWT.FILL, true, true ) );
     uploadPanel.setProgressCollector( progressCollector );
-    uploadPanel.setAutoUpload( isAutoUpload() );
+    uploadPanel.setAutoUpload( getAutoUpload() );
     uploadPanels.add( uploadPanel );
     validationHandler.setNumUploads( uploadPanels.size() );
     scrollChild.pack( true );
