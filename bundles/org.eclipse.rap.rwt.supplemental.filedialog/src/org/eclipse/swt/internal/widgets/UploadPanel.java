@@ -1,5 +1,5 @@
 /*****************************************************************************************
- * Copyright (c) 2010, 2011 Texas Center for Applied Technology (TEES) (TAMUS) and others.
+ * Copyright (c) 2010, 2012 Texas Center for Applied Technology (TEES) (TAMUS) and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@ import org.eclipse.rap.rwt.supplemental.fileupload.DiskFileUploadReceiver;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadEvent;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadReceiver;
-import org.eclipse.rap.rwt.supplemental.fileupload.IFileUploadListener;
+import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadListener;
 import org.eclipse.rwt.graphics.Graphics;
 import org.eclipse.rwt.widgets.FileUpload;
 import org.eclipse.swt.SWT;
@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Text;
 
-public class UploadPanel extends Composite implements IFileUploadListener {
+public class UploadPanel extends Composite implements FileUploadListener {
   private static final long serialVersionUID = 1L;
 
   public static final int COMPACT = 1;
@@ -252,7 +252,7 @@ public class UploadPanel extends Composite implements IFileUploadListener {
           progressLabel.setText( percent + "%" );
         }
         // allow the uploadFinished call to notify collector of 100% progress since
-        //the file is actually written then
+        // the file is actually written then
         if( progressCollector != null && percent < 100 ) {
           progressCollector.updateProgress( handler, percent );
         }

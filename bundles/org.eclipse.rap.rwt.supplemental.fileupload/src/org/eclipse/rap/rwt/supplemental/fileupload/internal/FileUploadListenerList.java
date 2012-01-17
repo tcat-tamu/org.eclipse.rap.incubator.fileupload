@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 EclipseSource and others. All rights reserved.
+ * Copyright (c) 2011, 2012 EclipseSource and others. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
@@ -14,29 +14,29 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadEvent;
-import org.eclipse.rap.rwt.supplemental.fileupload.IFileUploadListener;
+import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadListener;
 
 
 public final class FileUploadListenerList {
 
-  private final Set< IFileUploadListener > listeners;
+  private final Set<FileUploadListener> listeners;
 
   public FileUploadListenerList() {
-    listeners = new HashSet< IFileUploadListener >();
+    listeners = new HashSet<FileUploadListener>();
   }
 
-  public void addUploadListener( IFileUploadListener listener ) {
+  public void addUploadListener( FileUploadListener listener ) {
     listeners.add( listener );
   }
 
-  public void removeUploadListener( IFileUploadListener listener ) {
+  public void removeUploadListener( FileUploadListener listener ) {
     listeners.remove( listener );
   }
 
   public void notifyUploadProgress( FileUploadEvent event ) {
     Iterator iterator = listeners.iterator();
     while( iterator.hasNext() ) {
-      IFileUploadListener listener = ( IFileUploadListener )iterator.next();
+      FileUploadListener listener = ( FileUploadListener )iterator.next();
       listener.uploadProgress( event );
     }
   }
@@ -44,7 +44,7 @@ public final class FileUploadListenerList {
   public void notifyUploadFinished( FileUploadEvent event ) {
     Iterator iterator = listeners.iterator();
     while( iterator.hasNext() ) {
-      IFileUploadListener listener = ( IFileUploadListener )iterator.next();
+      FileUploadListener listener = ( FileUploadListener )iterator.next();
       listener.uploadFinished( event );
     }
   }
@@ -52,7 +52,7 @@ public final class FileUploadListenerList {
   public void notifyUploadFailed( FileUploadEvent event ) {
     Iterator iterator = listeners.iterator();
     while( iterator.hasNext() ) {
-      IFileUploadListener listener = ( IFileUploadListener )iterator.next();
+      FileUploadListener listener = ( FileUploadListener )iterator.next();
       listener.uploadFailed( event );
     }
   }

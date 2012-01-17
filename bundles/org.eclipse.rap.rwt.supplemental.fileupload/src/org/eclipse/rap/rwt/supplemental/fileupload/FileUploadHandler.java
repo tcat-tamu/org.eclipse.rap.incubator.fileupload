@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 EclipseSource and others.
+ * Copyright (c) 2011, 2012 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,11 +27,11 @@ public final class FileUploadHandler {
   private final FileUploadReceiver receiver;
   private final FileUploadListenerList listeners;
   private long maxFileSize = -1;
-  
+
   /**
    * Constructs a file upload handler that is associated with the given receiver. The receiver is
    * responsible for reading and processing the uploaded data.
-   * 
+   *
    * @param receiver the receiver that should process the uploaded data, must not be
    *          <code>null</code>
    */
@@ -47,7 +47,7 @@ public final class FileUploadHandler {
 
   /**
    * Returns the upload URL to which a file can be uploaded.
-   * 
+   *
    * @return the encoded upload URL
    */
   public String getUploadUrl() {
@@ -56,7 +56,7 @@ public final class FileUploadHandler {
 
   /**
    * Returns the file upload receiver that is associated with this file upload handler.
-   * 
+   *
    * @return the associated receiver
    */
   public FileUploadReceiver getReceiver() {
@@ -66,11 +66,11 @@ public final class FileUploadHandler {
   /**
    * Adds a the given file upload listener to the collection of listeners who will be notified when
    * a file upload proceeds.
-   * 
+   *
    * @param listener the file upload listener to add, must not be <code>null</code>
    * @see #removeUploadListener
    */
-  public void addUploadListener( IFileUploadListener listener ) {
+  public void addUploadListener( FileUploadListener listener ) {
     if( listener == null ) {
       throw new NullPointerException( "listener is null" );
     }
@@ -80,11 +80,11 @@ public final class FileUploadHandler {
   /**
    * Removes the given file upload listener from the collection of listeners who will be notified
    * when a file upload proceeds.
-   * 
+   *
    * @param listener the file upload listener to remove, must not be <code>null</code>
    * @see #addUploadListener
    */
-  public void removeUploadListener( IFileUploadListener listener ) {
+  public void removeUploadListener( FileUploadListener listener ) {
     if( listener == null ) {
       throw new NullPointerException( "listener is null" );
     }
@@ -99,16 +99,16 @@ public final class FileUploadHandler {
   public void dispose() {
     FileUploadHandlerStore.getInstance().deregisterHandler( token );
   }
-  
+
   /**
-   * Returns the maximum file size in bytes allowed to be uploaded for this handler. The default 
+   * Returns the maximum file size in bytes allowed to be uploaded for this handler. The default
    * value of -1, indicates no limit.
    * @see #setMaxFileSize
    */
   public long getMaxFileSize() {
     return maxFileSize;
   }
-  
+
   /**
    * Sets the maximum file size in bytes allowed to be uploaded for this handler. A value of -1
    * indicates no limit.

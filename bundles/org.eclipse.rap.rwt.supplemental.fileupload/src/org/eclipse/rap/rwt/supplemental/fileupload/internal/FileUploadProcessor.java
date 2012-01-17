@@ -22,7 +22,6 @@ import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadDetails;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadReceiver;
 import org.eclipse.rap.rwt.supplemental.fileupload.IFileUploadDetails;
