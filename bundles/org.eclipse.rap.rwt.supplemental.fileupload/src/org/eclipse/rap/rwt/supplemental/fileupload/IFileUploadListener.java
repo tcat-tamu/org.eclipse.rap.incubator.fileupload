@@ -13,6 +13,7 @@ package org.eclipse.rap.rwt.supplemental.fileupload;
 
 /**
  * Instances of this interface are used to react to state changes of an ongoing file upload.
+ * @deprecated Use {@link FileUploadListener} instead.
  */
 @Deprecated
 public interface IFileUploadListener extends FileUploadListener {
