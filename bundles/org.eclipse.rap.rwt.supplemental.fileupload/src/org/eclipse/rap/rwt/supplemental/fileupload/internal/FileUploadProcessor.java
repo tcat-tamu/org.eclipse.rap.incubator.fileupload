@@ -89,7 +89,8 @@ final class FileUploadProcessor {
   }
 
   private ServletFileUpload createUpload() {
-    DiskFileItemFactory factory = new DiskFileItemFactory();
+    DiskFileItemFactory factory = new DiskFileItemFactory();      
+    factory.setFileCleaningTracker( FileUploadHandlerStore.getCleaningTracker() );
     ServletFileUpload result = new ServletFileUpload( factory );
     long maxFileSize = getMaxFileSize();
     result.setFileSizeMax( maxFileSize );
