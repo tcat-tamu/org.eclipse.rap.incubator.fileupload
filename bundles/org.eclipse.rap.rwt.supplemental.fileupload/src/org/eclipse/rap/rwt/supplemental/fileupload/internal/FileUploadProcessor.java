@@ -22,13 +22,18 @@ import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FileCleaningTracker;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadReceiver;
 import org.eclipse.rap.rwt.supplemental.fileupload.IFileUploadDetails;
+import org.eclipse.rwt.RWT;
+import org.eclipse.rwt.service.SessionStoreEvent;
+import org.eclipse.rwt.service.SessionStoreListener;
 
 
 final class FileUploadProcessor {
 
+  private static final String CLEANING_TRACKER_ATTR_NAME = FileCleaningTracker.class.getName() + ".fileupload";
   private final FileUploadHandler handler;
   private final FileUploadTracker tracker;
 
@@ -90,7 +95,7 @@ final class FileUploadProcessor {
 
   private ServletFileUpload createUpload() {
     DiskFileItemFactory factory = new DiskFileItemFactory();      
-    factory.setFileCleaningTracker( FileUploadHandlerStore.getCleaningTracker() );
+    factory.setFileCleaningTracker( getCleaningTracker() );
     ServletFileUpload result = new ServletFileUpload( factory );
     long maxFileSize = getMaxFileSize();
     result.setFileSizeMax( maxFileSize );
@@ -135,5 +140,25 @@ final class FileUploadProcessor {
       }
     }
     return result;
+  }
+  
+  private FileCleaningTracker getCleaningTracker() {    
+    FileCleaningTracker cleaningTracker = ( FileCleaningTracker )RWT.getSessionStore().getAttribute( CLEANING_TRACKER_ATTR_NAME );
+    if ( cleaningTracker == null ) {        
+      // Create cleaning tracker for current session and register session listener that will destroy it 
+      cleaningTracker = new FileCleaningTracker();
+      RWT.getSessionStore().setAttribute( CLEANING_TRACKER_ATTR_NAME, cleaningTracker );
+      RWT.getSessionStore().addSessionStoreListener( new FileUploadCleanupHandler() );
+    }
+    return cleaningTracker;
+  }
+
+  private static class FileUploadCleanupHandler implements SessionStoreListener {
+    public void beforeDestroy( SessionStoreEvent event ) {
+      // Destroy the 
+      FileCleaningTracker cleaningTracker = ( FileCleaningTracker ) RWT.getSessionStore().getAttribute( CLEANING_TRACKER_ATTR_NAME );
+      RWT.getSessionStore().removeAttribute( CLEANING_TRACKER_ATTR_NAME );
+      cleaningTracker.exitWhenFinished();
+    }
   }
 }
