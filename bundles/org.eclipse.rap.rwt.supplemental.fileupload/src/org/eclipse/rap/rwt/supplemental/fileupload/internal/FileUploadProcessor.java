@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 EclipseSource and others.
+ * Copyright (c) 2011, 2012 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,7 +33,8 @@ import org.eclipse.rwt.service.SessionStoreListener;
 
 final class FileUploadProcessor {
 
-  private static final String CLEANING_TRACKER_ATTR_NAME = FileCleaningTracker.class.getName() + ".fileupload";
+  private static final String CLEANING_TRACKER_ATTR_NAME
+    = FileCleaningTracker.class.getName() + ".fileupload";
   private final FileUploadHandler handler;
   private final FileUploadTracker tracker;
 
@@ -94,7 +95,7 @@ final class FileUploadProcessor {
   }
 
   private ServletFileUpload createUpload() {
-    DiskFileItemFactory factory = new DiskFileItemFactory();      
+    DiskFileItemFactory factory = new DiskFileItemFactory();
     factory.setFileCleaningTracker( getCleaningTracker() );
     ServletFileUpload result = new ServletFileUpload( factory );
     long maxFileSize = getMaxFileSize();
@@ -108,7 +109,7 @@ final class FileUploadProcessor {
     ProgressListener result = new ProgressListener() {
       long prevTotalBytesRead = -1;
       public void update( long totalBytesRead, long contentLength, int item ) {
-        // Depending on the servlet engine and other environmental factors, 
+        // Depending on the servlet engine and other environmental factors,
         // this listener may be notified for every network packet, so don't notify unless there
         // is an actual increase.
         if ( totalBytesRead > prevTotalBytesRead ) {
@@ -147,11 +148,13 @@ final class FileUploadProcessor {
     }
     return result;
   }
-  
-  private FileCleaningTracker getCleaningTracker() {    
-    FileCleaningTracker cleaningTracker = ( FileCleaningTracker )RWT.getSessionStore().getAttribute( CLEANING_TRACKER_ATTR_NAME );
-    if ( cleaningTracker == null ) {        
-      // Create cleaning tracker for current session and register session listener that will destroy it 
+
+  private FileCleaningTracker getCleaningTracker() {
+    FileCleaningTracker cleaningTracker
+      = ( FileCleaningTracker )RWT.getSessionStore().getAttribute( CLEANING_TRACKER_ATTR_NAME );
+    if ( cleaningTracker == null ) {
+      // Create cleaning tracker for current session and register session listener that will
+      // destroy it
       cleaningTracker = new FileCleaningTracker();
       RWT.getSessionStore().setAttribute( CLEANING_TRACKER_ATTR_NAME, cleaningTracker );
       RWT.getSessionStore().addSessionStoreListener( new FileUploadCleanupHandler() );
@@ -161,8 +164,9 @@ final class FileUploadProcessor {
 
   private static class FileUploadCleanupHandler implements SessionStoreListener {
     public void beforeDestroy( SessionStoreEvent event ) {
-      // Destroy the 
-      FileCleaningTracker cleaningTracker = ( FileCleaningTracker ) RWT.getSessionStore().getAttribute( CLEANING_TRACKER_ATTR_NAME );
+      // Destroy the cleaning tracker
+      FileCleaningTracker cleaningTracker
+        = ( FileCleaningTracker ) RWT.getSessionStore().getAttribute( CLEANING_TRACKER_ATTR_NAME );
       RWT.getSessionStore().removeAttribute( CLEANING_TRACKER_ATTR_NAME );
       cleaningTracker.exitWhenFinished();
     }
