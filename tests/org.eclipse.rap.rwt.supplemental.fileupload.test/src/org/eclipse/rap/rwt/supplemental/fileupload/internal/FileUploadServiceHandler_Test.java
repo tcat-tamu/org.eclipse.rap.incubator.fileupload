@@ -73,7 +73,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
     serviceHandler.service();
 
     assertEquals( 0, getResponseErrorStatus() );
-    String expected = "progress(4096/12134).progress(8175/12134).progress(12134/12134).finished.";
+    String expected = "progress(4096/12134).progress(8174/12134).progress(12134/12134).finished.";
     assertEquals( expected, testListener.getLog() );
     FileUploadEvent uploadedItem = testListener.getLastEvent();
     assertEquals( content, new String( testReceiver.getContent() ) );

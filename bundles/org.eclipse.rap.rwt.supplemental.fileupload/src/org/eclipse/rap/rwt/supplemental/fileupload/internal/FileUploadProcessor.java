@@ -106,18 +106,24 @@ final class FileUploadProcessor {
 
   private ProgressListener createProgressListener( final long maxFileSize ) {
     ProgressListener result = new ProgressListener() {
-
-      public void update( long bytesRead, long contentLength, int item ) {
-        // Note: Apache fileupload 1.2 will throw an exception after the upload is finished.
-        // So we handle the file size violation as best we can from here.
-        // https://issues.apache.org/jira/browse/FILEUPLOAD-145
-        if( maxFileSize != -1 && contentLength > maxFileSize ) {
-          tracker.setException( new Exception( "File exceeds maximum allowed size." ) );
-          tracker.handleFailed();
-        } else {
-          tracker.setContentLength( contentLength );
-          tracker.setBytesRead( bytesRead );
-          tracker.handleProgress();
+      long prevTotalBytesRead = -1;
+      public void update( long totalBytesRead, long contentLength, int item ) {
+        // Depending on the servlet engine and other environmental factors, 
+        // this listener may be notified for every network packet, so don't notify unless there
+        // is an actual increase.
+        if ( totalBytesRead > prevTotalBytesRead ) {
+          prevTotalBytesRead = totalBytesRead;
+          // Note: Apache fileupload 1.2.x will throw an exception after the upload is finished.
+          // So we handle the file size violation as best we can from here.
+          // https://issues.apache.org/jira/browse/FILEUPLOAD-145
+          if( maxFileSize != -1 && contentLength > maxFileSize ) {
+            tracker.setException( new Exception( "File exceeds maximum allowed size." ) );
+            tracker.handleFailed();
+          } else {
+            tracker.setContentLength( contentLength );
+            tracker.setBytesRead( totalBytesRead );
+            tracker.handleProgress();
+          }
         }
       }
     };
