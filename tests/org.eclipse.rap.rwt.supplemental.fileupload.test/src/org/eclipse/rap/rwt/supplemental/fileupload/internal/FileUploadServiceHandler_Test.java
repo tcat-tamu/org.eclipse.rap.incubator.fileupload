@@ -205,6 +205,8 @@ public class FileUploadServiceHandler_Test extends TestCase {
   public void testFileUploadCleanupThreadDestroy() throws Exception {
     //Ensure no reapers running from previous tests
     System.gc();
+    //Allow file reapers to die
+    Thread.sleep(1000);
     assertNull( findFileReaper() );
     testUploadShortFile();
     //Test for the presence of the file reaper thread
