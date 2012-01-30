@@ -11,6 +11,8 @@
 package org.eclipse.rap.rwt.supplemental.fileupload.internal;
 
 import java.io.File;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -198,6 +200,35 @@ public class FileUploadServiceHandler_Test extends TestCase {
     assertEquals( head + "<>&?", FileUploadServiceHandler.getUrl( "<>&?" ) );
     assertEquals( head + "testToken", FileUploadServiceHandler.getUrl( "testToken" ) );
     assertEquals( head + "123456789abcdef", FileUploadServiceHandler.getUrl( "123456789abcdef" ) );
+  }
+  
+  public void testFileUploadCleanupThreadDestroy() throws Exception {
+    //Ensure no reapers running from previous tests
+    System.gc();
+    assertNull( findFileReaper() );
+    testUploadShortFile();
+    //Test for the presence of the file reaper thread
+    assertNotNull( findFileReaper() );
+    //Upload cleanup handler will be invoked upon rwt session destroy
+    RWT.getRequest().getSession().invalidate();
+    //File reaper is destroyed upon garbage collection
+    System.gc();
+    //Allow file reaper to die
+    Thread.sleep(100);
+    assertNull( findFileReaper() );
+  }
+  
+  private Thread findFileReaper () {
+    Set threadSet = Thread.getAllStackTraces().keySet();
+    Iterator threadItr = threadSet.iterator();
+    Thread fileReaper = null;
+    while ( threadItr.hasNext() && fileReaper == null ) {
+      Thread t = ( Thread ) threadItr.next();
+      if ( t.getName().equals( "File Reaper" ) ) {
+        fileReaper = t;
+      }
+    }
+    return fileReaper;
   }
 
   private void fakeUploadRequest( String token ) {
