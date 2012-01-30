@@ -214,7 +214,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
     //File reaper is destroyed upon garbage collection
     System.gc();
     //Allow file reaper to die
-    Thread.sleep(100);
+    Thread.sleep(1000);
     assertNull( findFileReaper() );
   }
   
