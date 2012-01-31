@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 EclipseSource and others.
+ * Copyright (c) 2011, 2012 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,12 +30,14 @@ import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.internal.application.RWTFactory;
 
 
+@SuppressWarnings( "restriction" )
 public class FileUploadHandler_Test extends TestCase {
 
   private FileUploadServiceHandler serviceHandler;
   private TestFileUploadListener uploadListener;
   private FileUploadHandler handler;
 
+  @Override
   protected void setUp() throws Exception {
     Fixture.setUp();
     handler = new FileUploadHandler( new TestFileUploadReceiver() );
@@ -43,6 +45,7 @@ public class FileUploadHandler_Test extends TestCase {
     serviceHandler = new FileUploadServiceHandler();
   }
 
+  @Override
   protected void tearDown() throws Exception {
     serviceHandler = null;
     uploadListener = null;
@@ -200,6 +203,7 @@ public class FileUploadHandler_Test extends TestCase {
 
   public void testUploadWithException() throws Exception {
     FileUploadReceiver receiver = new FileUploadReceiver() {
+      @Override
       public void receive( InputStream dataStream, IFileUploadDetails details ) throws IOException {
         throw new IOException( "the error message" );
       }
