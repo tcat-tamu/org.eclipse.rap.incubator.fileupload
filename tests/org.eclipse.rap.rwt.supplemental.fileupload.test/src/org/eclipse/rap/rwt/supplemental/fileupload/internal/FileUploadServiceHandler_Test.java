@@ -11,9 +11,11 @@
 package org.eclipse.rap.rwt.supplemental.fileupload.internal;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
@@ -38,6 +40,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
   private TestFileUploadReceiver testReceiver;
   private FileUploadHandler uploadHandler;
 
+  @Override
   protected void setUp() throws Exception {
     Fixture.setUp();
     serviceHandler = new FileUploadServiceHandler();
@@ -47,6 +50,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
     tempDirectory = FileUploadTestUtil.createTempDirectory();
   }
 
+  @Override
   protected void tearDown() throws Exception {
     FileUploadTestUtil.deleteRecursively( tempDirectory );
     tempDirectory = null;
@@ -74,6 +78,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
 
   public void testUploadBigFile() throws Exception {
     TestFileUploadListener testListener = new TestFileUploadListener() {
+      @Override
       public void uploadProgress( FileUploadEvent info ) {
         log.append( "progress(" + info.getBytesRead() + "/" + info.getContentLength() + ").");
       }
@@ -201,26 +206,35 @@ public class FileUploadServiceHandler_Test extends TestCase {
     assertEquals( head + "testToken", FileUploadServiceHandler.getUrl( "testToken" ) );
     assertEquals( head + "123456789abcdef", FileUploadServiceHandler.getUrl( "123456789abcdef" ) );
   }
-  
-  public void testFileUploadCleanupThreadDestroy() throws Exception {
-    //Ensure no reapers running from previous tests
-    System.gc();
-    //Allow file reapers to die
-    Thread.sleep(1000);
+
+  public void testFileUploadCleanupThreadCreated() throws Exception {
     assertNull( findFileReaper() );
-    testUploadShortFile();
-    //Test for the presence of the file reaper thread
+
+    simulateUpload();
+
     assertNotNull( findFileReaper() );
-    //Upload cleanup handler will be invoked upon rwt session destroy
+  }
+
+  public void testFileUploadCleanupThreadDestroyed() throws Exception {
+    assertNull( findFileReaper() );
+
+    simulateUpload();
     RWT.getRequest().getSession().invalidate();
-    //File reaper is destroyed upon garbage collection
-    System.gc();
-    //Allow file reaper to die
-    Thread.sleep(1000);
+
     assertNull( findFileReaper() );
   }
-  
-  private Thread findFileReaper () {
+
+  private void simulateUpload() throws IOException, ServletException {
+    String content = "Lorem ipsum dolor sit amet.";
+    fakeUploadRequest( content, "text/plain", "short.txt"  );
+    serviceHandler.service();
+  }
+
+  private Thread findFileReaper() throws InterruptedException {
+    // File reaper is destroyed upon garbage collection
+    System.gc();
+    // Allow file reaper to die
+    Thread.sleep( 10 );
     Set threadSet = Thread.getAllStackTraces().keySet();
     Iterator threadItr = threadSet.iterator();
     Thread fileReaper = null;
