@@ -18,14 +18,7 @@
    </license>
 
    <plugin
-         id="org.eclipse.rap.rwt.supplemental.filedialog"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.rap.rwt.supplemental.fileupload"
+         id="org.apache.commons.io"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -39,7 +32,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.apache.commons.io"
+         id="org.eclipse.rap.rwt.supplemental.fileupload"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -47,6 +40,13 @@
 
    <plugin
          id="org.eclipse.rap.rwt.supplemental.fileupload.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.rap.rwt.supplemental.filedialog"
          download-size="0"
          install-size="0"
          version="0.0.0"
