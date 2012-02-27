@@ -57,6 +57,8 @@ public class DiskFileUploadReceiver extends FileUploadReceiver {
    * 
    * @param uploadedFile - the file that was uploaded and handled by an instance of
    *          DiskFileUploadReceiver.
+   * @return the content type of the uploaded file or <code>null</code> if the content type could
+   *         not be found.
    */
   public static String getContentType( File uploadedFile ) {
     String contentType = null;
