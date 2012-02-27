@@ -287,6 +287,8 @@ public class UploadPanel extends Composite implements FileUploadListener {
 
   public void uploadFailed( final FileUploadEvent uploadEvent ) {
     // checkWidget();
+    uploadedFile = null;
+    contentType = null;
     browseButton.getDisplay().asyncExec( new Runnable() {
       public void run() {
         if( progressBar != null && !progressBar.isDisposed() ) {
