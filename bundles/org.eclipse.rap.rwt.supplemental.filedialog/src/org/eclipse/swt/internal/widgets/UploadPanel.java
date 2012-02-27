@@ -52,6 +52,7 @@ public class UploadPanel extends Composite implements FileUploadListener {
   private Button removeButton;
   private boolean inProgress;
   private File uploadedFile;
+  private String contentType;
   private boolean autoUpload;
   private Image deleteImage;
 
@@ -90,6 +91,11 @@ public class UploadPanel extends Composite implements FileUploadListener {
   public String getSelectedFilename() {
     checkWidget();
     return fileText.getText();
+  }
+  
+  
+  public String getContentType() {
+    return contentType;
   }
 
   public File getUploadedFile() {
@@ -264,6 +270,7 @@ public class UploadPanel extends Composite implements FileUploadListener {
     // checkWidget();
     DiskFileUploadReceiver receiver = ( DiskFileUploadReceiver )handler.getReceiver();
     uploadedFile = receiver.getTargetFile();
+    contentType = uploadEvent.getContentType();
     browseButton.getDisplay().asyncExec( new Runnable() {
       public void run() {
         int percent = 100;
