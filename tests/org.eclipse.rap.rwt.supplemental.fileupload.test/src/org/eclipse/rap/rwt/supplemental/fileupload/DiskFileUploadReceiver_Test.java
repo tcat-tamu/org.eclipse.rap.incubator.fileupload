@@ -23,11 +23,16 @@ import org.eclipse.rap.rwt.supplemental.fileupload.test.FileUploadTestUtil;
 public class DiskFileUploadReceiver_Test extends TestCase {
 
   private File createdFile;
+  private File createdContentTypeFile;
 
   protected void tearDown() throws Exception {
     if( createdFile != null ) {
       createdFile.delete();
       createdFile = null;
+    }
+    if ( createdContentTypeFile != null ) {
+      createdContentTypeFile.delete();
+      createdContentTypeFile = null;
     }
   }
 
@@ -45,6 +50,22 @@ public class DiskFileUploadReceiver_Test extends TestCase {
 
     assertTrue( createdFile.exists() );
     assertEquals( "foo.bar", createdFile.getName() );
+  }
+  
+  public void testCreateContentTypeFile() throws IOException {
+    DiskFileUploadReceiver receiver = new DiskFileUploadReceiver();
+
+    IFileUploadDetails details = new FileUploadDetails( "foo.bar", "text/plain", 5 );
+    createdFile = receiver.createTargetFile( details );
+    createdContentTypeFile = receiver.createContentTypeFile( createdFile, details );
+
+    assertTrue( createdContentTypeFile.exists() );
+  }
+  
+  public void testGetContentType() throws IOException {
+    testReceive();
+    assertEquals( "text/plain", DiskFileUploadReceiver.getContentType( createdFile ) );
+    assertEquals( null, DiskFileUploadReceiver.getContentType( new File( "test" ) ) );
   }
 
   public void testCreatedTargetFilesDiffer() throws IOException {

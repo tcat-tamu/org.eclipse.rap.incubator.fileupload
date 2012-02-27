@@ -10,11 +10,15 @@
  ******************************************************************************/
 package org.eclipse.rap.rwt.supplemental.fileupload;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 
 
 /**
@@ -22,10 +26,12 @@ import java.io.OutputStream;
  */
 public class DiskFileUploadReceiver extends FileUploadReceiver {
 
+  private static final String DEFAULT_CONTENT_TYPE_FILE_NAME = "content-type.tmp";
   private static final String DEFAULT_TARGET_FILE_NAME = "upload.tmp";
   private static final String TEMP_DIRECTORY_PREFIX = "fileupload_";
 
   private File targetFile;
+  private File contentTypeFile;
 
   public void receive( InputStream dataStream, IFileUploadDetails details ) throws IOException {
     File targetFile = createTargetFile( details );
@@ -36,6 +42,44 @@ public class DiskFileUploadReceiver extends FileUploadReceiver {
       outputStream.close();
     }
     this.targetFile = targetFile;
+    
+    contentTypeFile = createContentTypeFile( targetFile, details );
+    if( contentTypeFile != null ) {
+      PrintWriter pw = new PrintWriter( contentTypeFile );
+      pw.print( details.getContentType() );
+      pw.close();
+    }
+  }
+  
+  /**
+   * Obtains the content type provided by the client when the given file was uploaded. This method
+   * does not look at the uploaded file contents to determine the content type.
+   * 
+   * @param uploadedFile - the file that was uploaded and handled by an instance of
+   *          DiskFileUploadReceiver.
+   */
+  public static String getContentType( File uploadedFile ) {
+    String contentType = null;
+    BufferedReader br = null;
+    if( uploadedFile.exists() ) {
+      File cTypeFile = new File( uploadedFile.getParentFile(), DEFAULT_CONTENT_TYPE_FILE_NAME );
+      if( cTypeFile.exists() ) {
+        try {
+          br = new BufferedReader( new InputStreamReader( new FileInputStream( cTypeFile ) ) );
+          contentType = br.readLine();
+        } catch( IOException e ) {
+          e.printStackTrace();
+        } finally {
+          try {
+            if( br != null )
+              br.close();
+          } catch( IOException ce ) {
+            ce.printStackTrace();
+          }
+        }
+      }
+    }
+    return contentType;
   }
 
   /**
@@ -62,6 +106,25 @@ public class DiskFileUploadReceiver extends FileUploadReceiver {
     result.createNewFile();
     return result;
   }
+  
+  /**
+   * Creates a file to save the content-type. Subclasses may override.
+   *
+   * @param uploadedFile the file that contains uploaded data
+   * @param details the details of the uploaded file like file name, content-type and size
+   * @return the file to store the content-type data in
+   */
+  protected File createContentTypeFile( File uploadedFile, IFileUploadDetails details ) 
+      throws IOException {
+    String fileName = DEFAULT_CONTENT_TYPE_FILE_NAME;
+    File result = null;
+    if( details != null && details.getContentType() != null ) {
+      result = new File( uploadedFile.getParentFile(), fileName );
+      result.createNewFile();
+    }
+    return result;
+  }
+
 
   private static File createTempDirectory() throws IOException {
     File result = File.createTempFile( TEMP_DIRECTORY_PREFIX, "" );
