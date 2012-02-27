@@ -92,8 +92,7 @@ public class UploadPanel extends Composite implements FileUploadListener {
     checkWidget();
     return fileText.getText();
   }
-  
-  
+
   public String getContentType() {
     return contentType;
   }
