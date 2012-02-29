@@ -24,7 +24,11 @@ final class FileUploadExampleContribution implements IExampleContribution {
     return "File Upload";
   }
 
-  public String getCategory() {
+  public String getCategoryId() {
+    return null;
+  }
+
+  public String getCategoryName() {
     return null;
   }
 
