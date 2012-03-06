@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 EclipseSource and others.
+ * Copyright (c) 2011, 2012 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,15 +10,29 @@
  ******************************************************************************/
 package org.eclipse.rap.examples.demo.fileupload;
 
-import org.eclipse.jface.layout.GridDataFactory;
+import java.io.File;
+
 import org.eclipse.rap.examples.ExampleUtil;
 import org.eclipse.rap.examples.IExamplePage;
-import org.eclipse.rwt.widgets.*;
+import org.eclipse.rap.rwt.supplemental.fileupload.DiskFileUploadReceiver;
+import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadEvent;
+import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
+import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadListener;
+import org.eclipse.rwt.lifecycle.UICallBack;
+import org.eclipse.rwt.widgets.DialogCallback;
+import org.eclipse.rwt.widgets.DialogUtil;
+import org.eclipse.rwt.widgets.FileUpload;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 
 public class FileUploadExamplePage implements IExamplePage {
@@ -27,29 +41,60 @@ public class FileUploadExamplePage implements IExamplePage {
   private FileUpload fileUpload;
   private Label fileNameLabel;
   private Button uploadButton;
-  private Label statsLabel;
+  private Text logText;
 
   public void createControl( Composite parent ) {
-    parent.setLayout( ExampleUtil.createMainLayout( 1 ) );
-    Control fileUploadArea = createFileUploadArea( parent );
+    parent.setLayout( ExampleUtil.createMainLayout( 3 ) );
+    Control controlsColumn = createControlsColumn( parent );
+    controlsColumn.setLayoutData( ExampleUtil.createFillData() );
+    Control serverColumn = createLogColumn( parent );
+    serverColumn.setLayoutData( ExampleUtil.createFillData() );
+    Control infoColumn = createInfoColumn( parent );
+    infoColumn.setLayoutData( ExampleUtil.createFillData() );
+  }
+
+  private Control createControlsColumn( Composite parent ) {
+    Composite column = new Composite( parent, SWT.NONE );
+    column.setLayout( ExampleUtil.createGridLayoutWithoutMargin( 1, false ) );
+    Control fileUploadArea = createFileUploadArea( column );
     fileUploadArea.setLayoutData( ExampleUtil.createHorzFillData() );
-    Control fileDialogArea = createFileDialogArea( parent );
-    fileDialogArea.setLayoutData( ExampleUtil.createFillData() );
+    Control fileDialogArea = createFileDialogArea( column );
+    fileDialogArea.setLayoutData( ExampleUtil.createHorzFillData() );
+    return column;
+  }
+
+  private Control createLogColumn( Composite parent ) {
+    Composite column = new Composite( parent, SWT.NONE );
+    column.setLayout( ExampleUtil.createGridLayout( 1, false, true, true ) );
+    ExampleUtil.createHeading( column, "Server log", 2 );
+    logText = new Text( column, SWT.MULTI | SWT.READ_ONLY | SWT.H_SCROLL | SWT.BORDER );
+    logText.setText( INITIAL_TEXT );
+    logText.setLayoutData( ExampleUtil.createFillData() );
+    createClearButton( column );
+    return column;
+  }
+
+  private Control createInfoColumn( Composite parent ) {
+    Label label = new Label( parent, SWT.NONE );
+    label.setLayoutData( ExampleUtil.createFillData() );
+    return label;
   }
 
   private Control createFileUploadArea( Composite parent ) {
-    Group group = new Group( parent, SWT.NONE );
-    group.setText( "File Upload" );
-    GridLayout layout = ExampleUtil.createGridLayout( 3, false, 10, 10 );
-    layout.marginBottom = 50;
-    group.setLayout( layout );
-    fileUpload = new FileUpload( group, SWT.NONE );
+    Composite area = new Composite( parent, SWT.NONE );
+    area.setLayout( ExampleUtil.createGridLayout( 2, true, true, true ) );
+    ExampleUtil.createHeading( area, "FileUpload widget", 2 );
+    fileUpload = new FileUpload( area, SWT.NONE );
     fileUpload.setText( "Select File" );
-    fileNameLabel = new Label( group, SWT.NONE );
+    fileUpload.setLayoutData( new GridData( SWT.FILL, SWT.CENTER, false, false ) );
+    fileNameLabel = new Label( area, SWT.NONE );
     fileNameLabel.setText( "no file selected" );
     fileNameLabel.setLayoutData( ExampleUtil.createHorzFillData() );
-    uploadButton = new Button( group, SWT.PUSH );
+    fileNameLabel.setLayoutData( new GridData( SWT.FILL, SWT.CENTER, true, false ) );
+    uploadButton = new Button( area, SWT.PUSH );
     uploadButton.setText( "Upload" );
+    uploadButton.setLayoutData( new GridData( SWT.FILL, SWT.CENTER, false, false ) );
+    new Label( area, SWT.NONE );
     fileUpload.addSelectionListener( new SelectionAdapter() {
       @Override
       public void widgetSelected( SelectionEvent e ) {
@@ -57,35 +102,69 @@ public class FileUploadExamplePage implements IExamplePage {
         fileNameLabel.setText( fileName == null ? "" : fileName );
       }
     } );
+    final String url = startUploadReceiver();
     uploadButton.addSelectionListener( new SelectionAdapter() {
       @Override
       public void widgetSelected( SelectionEvent e ) {
-        fileUpload.submit( "http://localhost/" );
+        UICallBack.activate( "upload" );
+        fileUpload.submit( url );
       }
     } );
-    return group;
+    return area;
+  }
+
+  private String startUploadReceiver() {
+    DiskFileUploadReceiver receiver = new DiskFileUploadReceiver();
+    FileUploadHandler uploadHandler = new FileUploadHandler( receiver );
+    uploadHandler.addUploadListener( new FileUploadListener() {
+
+      public void uploadProgress( FileUploadEvent event ) {
+        // handle upload progress
+      }
+
+      public void uploadFailed( FileUploadEvent event ) {
+        addToLog( "upload failed: " + event.getFileName() );
+      }
+
+      public void uploadFinished( FileUploadEvent event ) {
+        addToLog( "received: " + event.getFileName() );
+      }
+    } );
+    return uploadHandler.getUploadUrl();
+  }
+
+  private void addToLog( final String message ) {
+    if( !logText.isDisposed() ) {
+      logText.getDisplay().asyncExec( new Runnable() {
+        public void run() {
+          String text = logText.getText();
+          if( INITIAL_TEXT.equals( text ) ) {
+            text = "";
+          }
+          logText.setText( text + message + "\n" );
+          UICallBack.deactivate( "upload" );
+        }
+      } );
+    }
   }
 
   private Composite createFileDialogArea( Composite parent ) {
-    Group group = new Group( parent, SWT.NONE );
-    group.setText( "File Dialog" );
-    group.setLayout( ExampleUtil.createGridLayout( 1, false, 10, 10 ) );
-    Composite buttonComposite = new Composite( group, SWT.NONE );
-    buttonComposite.setLayoutData( GridDataFactory.fillDefaults().create() );
-    buttonComposite.setLayout( new GridLayout( 1, true ) );
-    createAddSingleButton( buttonComposite );
-    createAddMultiButton( buttonComposite );
-    createClearButton( buttonComposite );
-    createStatsLabel( group );
-    return group;
+    Composite area = new Composite( parent, SWT.NONE );
+    area.setLayout( ExampleUtil.createGridLayout( 2, true, true, true ) );
+    ExampleUtil.createHeading( area, "FileDialog", 2 );
+    createAddSingleButton( area );
+    new Label( area, SWT.NONE );
+    createAddMultiButton( area );
+    return area;
   }
 
   private void createAddSingleButton( Composite parent ) {
-    Button addBtn = new Button( parent, SWT.PUSH );
-    addBtn.setText( "Add Single File" );
-    addBtn.setToolTipText( "Launches file dialog for single file selection." );
+    Button button = new Button( parent, SWT.PUSH );
+    button.setLayoutData( ExampleUtil.createHorzFillData() );
+    button.setText( "Single File" );
+    button.setToolTipText( "Launches file dialog for single file selection." );
     final Shell parentShell = parent.getShell();
-    addBtn.addSelectionListener( new SelectionAdapter() {
+    button.addSelectionListener( new SelectionAdapter() {
       @Override
       public void widgetSelected( SelectionEvent e ) {
         openFileDialog( parentShell, false );
@@ -94,34 +173,30 @@ public class FileUploadExamplePage implements IExamplePage {
   }
 
   private void createAddMultiButton( Composite parent ) {
-    Button addMultiBtn = new Button( parent, SWT.PUSH );
-    addMultiBtn.setText( "Add Multiple Files" );
-    addMultiBtn.setToolTipText( "Launches file dialog for multiple file selection." );
+    Button button = new Button( parent, SWT.PUSH );
+    button.setLayoutData( ExampleUtil.createHorzFillData() );
+    button.setText( "Multiple Files" );
+    button.setToolTipText( "Launches file dialog for multiple file selection." );
     final Shell parentShell = parent.getShell();
-    addMultiBtn.addSelectionListener( new SelectionAdapter() {
+    button.addSelectionListener( new SelectionAdapter() {
       @Override
       public void widgetSelected( SelectionEvent e ) {
         openFileDialog( parentShell, true );
       }
     } );
   }
-  
+
   private void createClearButton( Composite parent ) {
-    Button clearBtn = new Button( parent, SWT.PUSH );
-    clearBtn.setText( "Clear" );
-    clearBtn.setToolTipText( "Clears the results list" );
-    clearBtn.addSelectionListener( new SelectionAdapter() {
+    Button button = new Button( parent, SWT.PUSH );
+    button.setLayoutData( ExampleUtil.createHorzFillData() );
+    button.setText( "Clear" );
+    button.setToolTipText( "Clears the results list" );
+    button.addSelectionListener( new SelectionAdapter() {
       @Override
       public void widgetSelected( SelectionEvent e ) {
-        statsLabel.setText( "" );
+        logText.setText( INITIAL_TEXT );
       }
     } );
-  }
-
-  private void createStatsLabel( Group group ) {
-    statsLabel = new Label( group, SWT.NONE );
-    statsLabel.setText( INITIAL_TEXT );
-    statsLabel.setLayoutData( ExampleUtil.createFillData() );
   }
 
   private void openFileDialog( Shell parent, boolean multi ) {
@@ -139,13 +214,10 @@ public class FileUploadExamplePage implements IExamplePage {
   }
 
   private void showUploadResults( FileDialog fileDialog ) {
-    StringBuilder builder = new StringBuilder();
-    builder.append( "Results:\n" );
     String[] selectedFiles = fileDialog.getFileNames();
     for( String fileName : selectedFiles ) {
-      builder.append( fileName + "\n" );
+      addToLog( "received: " + new File( fileName ).getName() );
     }
-    statsLabel.setText( builder.toString() );
   }
 
   private static int getDialogStyle( boolean multi ) {
