@@ -12,6 +12,7 @@ package org.eclipse.rap.examples.demo.fileupload;
 
 import org.eclipse.rap.examples.IExampleContribution;
 import org.eclipse.rap.examples.IExamplePage;
+import org.eclipse.rwt.application.ApplicationConfiguration;
 
 
 final class FileUploadExampleContribution implements IExampleContribution {
@@ -24,15 +25,10 @@ final class FileUploadExampleContribution implements IExampleContribution {
     return "File Upload";
   }
 
-  public String getCategoryId() {
-    return null;
-  }
-
-  public String getCategoryName() {
-    return null;
-  }
-
   public IExamplePage createPage() {
     return new FileUploadExamplePage();
+  }
+
+  public void configure( ApplicationConfiguration configuration ) {
   }
 }
