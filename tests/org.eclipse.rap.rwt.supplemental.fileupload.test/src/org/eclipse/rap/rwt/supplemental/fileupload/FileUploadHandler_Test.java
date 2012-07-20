@@ -27,7 +27,7 @@ import org.eclipse.rap.rwt.supplemental.fileupload.test.TestFileUploadReceiver;
 import org.eclipse.rap.rwt.testfixture.Fixture;
 import org.eclipse.rap.rwt.testfixture.TestResponse;
 import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.internal.application.RWTFactory;
+import org.eclipse.rap.rwt.internal.application.RWTFactory;
 
 
 @SuppressWarnings( "restriction" )
