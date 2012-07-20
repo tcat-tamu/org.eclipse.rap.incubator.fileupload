@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component>
+  <name>
+    FileUpload
+  </name>
+  <maintainer>
+    Austin Riddle
+  </maintainer>
+  <description>
+    <p>
+      RAP File Upload Support
+    </p>
+  </description>
+</component>
