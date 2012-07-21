@@ -11,10 +11,10 @@
 package org.eclipse.rap.rwt.supplemental.fileupload.internal;
 
 import org.apache.commons.io.FileCleaningTracker;
-import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.service.ISessionStore;
-import org.eclipse.rwt.service.SessionStoreEvent;
-import org.eclipse.rwt.service.SessionStoreListener;
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.service.ISessionStore;
+import org.eclipse.rap.rwt.service.SessionStoreEvent;
+import org.eclipse.rap.rwt.service.SessionStoreListener;
 
 
 class CleaningTrackerUtil {

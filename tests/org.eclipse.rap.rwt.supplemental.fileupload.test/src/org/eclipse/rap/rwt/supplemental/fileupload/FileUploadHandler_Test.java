@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
 
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.supplemental.fileupload.internal.FileUploadHandlerStore;
 import org.eclipse.rap.rwt.supplemental.fileupload.internal.FileUploadServiceHandler;
 import org.eclipse.rap.rwt.supplemental.fileupload.test.FileUploadTestUtil;
@@ -26,7 +27,6 @@ import org.eclipse.rap.rwt.supplemental.fileupload.test.TestFileUploadListener;
 import org.eclipse.rap.rwt.supplemental.fileupload.test.TestFileUploadReceiver;
 import org.eclipse.rap.rwt.testfixture.Fixture;
 import org.eclipse.rap.rwt.testfixture.TestResponse;
-import org.eclipse.rwt.RWT;
 import org.eclipse.rap.rwt.internal.application.RWTFactory;
 
 

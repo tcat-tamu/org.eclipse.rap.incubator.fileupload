@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2002, 2011 EclipseSource and others.
+ * Copyright (c) 2002, 2012 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,9 +20,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.service.IServiceHandler;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
-import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.service.IServiceHandler;
 
 
 public final class FileUploadServiceHandler implements IServiceHandler {

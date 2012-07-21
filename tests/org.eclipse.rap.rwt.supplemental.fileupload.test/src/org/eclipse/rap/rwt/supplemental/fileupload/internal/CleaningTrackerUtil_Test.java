@@ -15,8 +15,8 @@ import static org.mockito.Mockito.verify;
 import junit.framework.TestCase;
 
 import org.apache.commons.io.FileCleaningTracker;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.testfixture.Fixture;
-import org.eclipse.rwt.RWT;
 
 
 public class CleaningTrackerUtil_Test extends TestCase {

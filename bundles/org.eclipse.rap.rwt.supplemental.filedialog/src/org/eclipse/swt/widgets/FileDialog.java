@@ -1,22 +1,22 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     IBM Corporation - initial API and implementation
- *     Austin Riddle (Texas Center for Applied Technology) - RAP implementation
- *     EclipseSource - ongoing development
+ *    IBM Corporation - initial API and implementation
+ *    Austin Riddle (Texas Center for Applied Technology) - RAP implementation
+ *    EclipseSource - ongoing development
  *******************************************************************************/
 package org.eclipse.swt.widgets;
 
 import java.io.File;
 import java.util.ArrayList;
 
-import org.eclipse.rwt.graphics.Graphics;
-import org.eclipse.rwt.lifecycle.UICallBack;
+import org.eclipse.rap.rwt.graphics.Graphics;
+import org.eclipse.rap.rwt.lifecycle.UICallBack;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -36,6 +36,7 @@ import org.eclipse.swt.internal.widgets.UploadPanel;
 import org.eclipse.swt.internal.widgets.ValidationHandler;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+
 
 /**
  * Instances of this class allow the user to navigate the file system and select

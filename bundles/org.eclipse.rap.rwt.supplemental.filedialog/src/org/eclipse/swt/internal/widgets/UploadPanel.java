@@ -13,13 +13,13 @@ package org.eclipse.swt.internal.widgets;
 
 import java.io.File;
 
+import org.eclipse.rap.rwt.graphics.Graphics;
 import org.eclipse.rap.rwt.supplemental.fileupload.DiskFileUploadReceiver;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadEvent;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadReceiver;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadListener;
-import org.eclipse.rwt.graphics.Graphics;
-import org.eclipse.rwt.widgets.FileUpload;
+import org.eclipse.rap.rwt.widgets.FileUpload;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
