@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 EclipseSource and others.
+ * Copyright (c) 2011, 2012 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,6 +33,7 @@ public class DiskFileUploadReceiver extends FileUploadReceiver {
   private File targetFile;
   private File contentTypeFile;
 
+  @Override
   public void receive( InputStream dataStream, IFileUploadDetails details ) throws IOException {
     File targetFile = createTargetFile( details );
     FileOutputStream outputStream = new FileOutputStream( targetFile );
@@ -42,7 +43,7 @@ public class DiskFileUploadReceiver extends FileUploadReceiver {
       outputStream.close();
     }
     this.targetFile = targetFile;
-    
+
     contentTypeFile = createContentTypeFile( targetFile, details );
     if( contentTypeFile != null ) {
       PrintWriter pw = new PrintWriter( contentTypeFile );
@@ -50,11 +51,11 @@ public class DiskFileUploadReceiver extends FileUploadReceiver {
       pw.close();
     }
   }
-  
+
   /**
    * Obtains the content type provided by the client when the given file was uploaded. This method
    * does not look at the uploaded file contents to determine the content type.
-   * 
+   *
    * @param uploadedFile - the file that was uploaded and handled by an instance of
    *          DiskFileUploadReceiver.
    * @return the content type of the uploaded file or <code>null</code> if the content type could
@@ -73,8 +74,9 @@ public class DiskFileUploadReceiver extends FileUploadReceiver {
           e.printStackTrace();
         } finally {
           try {
-            if( br != null )
+            if( br != null ) {
               br.close();
+            }
           } catch( IOException ce ) {
             ce.printStackTrace();
           }
@@ -108,7 +110,7 @@ public class DiskFileUploadReceiver extends FileUploadReceiver {
     result.createNewFile();
     return result;
   }
-  
+
   /**
    * Creates a file to save the content-type. Subclasses may override.
    *
@@ -116,7 +118,7 @@ public class DiskFileUploadReceiver extends FileUploadReceiver {
    * @param details the details of the uploaded file like file name, content-type and size
    * @return the file to store the content-type data in
    */
-  protected File createContentTypeFile( File uploadedFile, IFileUploadDetails details ) 
+  protected File createContentTypeFile( File uploadedFile, IFileUploadDetails details )
       throws IOException {
     String fileName = DEFAULT_CONTENT_TYPE_FILE_NAME;
     File result = null;

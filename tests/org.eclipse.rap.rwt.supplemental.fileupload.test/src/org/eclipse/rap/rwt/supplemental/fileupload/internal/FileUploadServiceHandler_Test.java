@@ -64,7 +64,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
     String content = "Lorem ipsum dolor sit amet.";
 
     fakeUploadRequest( content, "text/plain", "short.txt"  );
-    serviceHandler.service();
+    serviceHandler.service( RWT.getRequest(), RWT.getResponse() );
 
     assertEquals( 0, getResponseErrorStatus() );
     assertEquals( "progress.finished.", testListener.getLog() );
@@ -87,7 +87,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
     String content = createExampleContent( 12000 );
 
     fakeUploadRequest( content, "text/plain", "test.txt"  );
-    serviceHandler.service();
+    serviceHandler.service( RWT.getRequest(), RWT.getResponse() );
 
     assertEquals( 0, getResponseErrorStatus() );
     String expected = "progress(4096/12134).progress(8174/12134).progress(12134/12134).finished.";
@@ -101,7 +101,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
     uploadHandler.addUploadListener( testListener );
 
     fakeUploadRequest( "", "text/plain", "empty.txt"  );
-    serviceHandler.service();
+    serviceHandler.service( RWT.getRequest(), RWT.getResponse() );
 
     assertEquals( 0, getResponseErrorStatus() );
     assertEquals( "progress.finished.", testListener.getLog() );
@@ -112,7 +112,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
     uploadHandler.addUploadListener( testListener );
 
     fakeUploadRequest( "Some content", null, "test.txt"  );
-    serviceHandler.service();
+    serviceHandler.service( RWT.getRequest(), RWT.getResponse() );
 
     assertEquals( 0, getResponseErrorStatus() );
     assertEquals( "progress.finished.", testListener.getLog() );
@@ -125,7 +125,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
     uploadHandler.addUploadListener( testListener );
 
     fakeUploadRequest( null );
-    serviceHandler.service();
+    serviceHandler.service( RWT.getRequest(), RWT.getResponse() );
 
     assertEquals( HttpServletResponse.SC_FORBIDDEN, getResponseErrorStatus() );
     assertEquals( "", testListener.getLog() );
@@ -135,7 +135,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
     uploadHandler.addUploadListener( testListener );
 
     fakeUploadRequest( "unknown-id" );
-    serviceHandler.service();
+    serviceHandler.service( RWT.getRequest(), RWT.getResponse() );
 
     assertEquals( HttpServletResponse.SC_FORBIDDEN, getResponseErrorStatus() );
     assertEquals( "", testListener.getLog() );
@@ -147,7 +147,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
     fakeUploadRequest( "Some content", "text/plain", "test.txt"  );
     TestRequest request = ( TestRequest )RWT.getRequest();
     request.setMethod( "GET" );
-    serviceHandler.service();
+    serviceHandler.service( RWT.getRequest(), RWT.getResponse() );
 
     assertEquals( HttpServletResponse.SC_METHOD_NOT_ALLOWED, getResponseErrorStatus() );
     assertEquals( "", testListener.getLog() );
@@ -159,7 +159,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
     fakeUploadRequest( "Some content", "text/plain", "test.txt"  );
     TestRequest request = ( TestRequest )RWT.getRequest();
     request.setContentType( "application/octet-stream" );
-    serviceHandler.service();
+    serviceHandler.service( RWT.getRequest(), RWT.getResponse() );
 
     assertEquals( HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, getResponseErrorStatus() );
     assertEquals( "", testListener.getLog() );
@@ -171,7 +171,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
     fakeUploadRequest( "Some content", "text/plain", "test.txt"  );
     TestRequest request = ( TestRequest )RWT.getRequest();
     request.setBody( "some bogus body content" );
-    serviceHandler.service();
+    serviceHandler.service( RWT.getRequest(), RWT.getResponse() );
 
     assertEquals( "progress.failed.", testListener.getLog() );
   }
@@ -181,7 +181,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
     uploadHandler.addUploadListener( testListener );
 
     fakeUploadRequest( "some content", "text/plain", "/tmp/some.txt"  );
-    serviceHandler.service();
+    serviceHandler.service( RWT.getRequest(), RWT.getResponse() );
 
     FileUploadEvent uploadedItem = testListener.getLastEvent();
     assertEquals( "some.txt", uploadedItem.getFileName() );
@@ -192,7 +192,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
     uploadHandler.addUploadListener( testListener );
 
     fakeUploadRequest( "some content", "text/plain", "C:\\temp\\some.txt"  );
-    serviceHandler.service();
+    serviceHandler.service( RWT.getRequest(), RWT.getResponse() );
 
     FileUploadEvent uploadedItem = testListener.getLastEvent();
     assertEquals( "some.txt", uploadedItem.getFileName() );
@@ -227,7 +227,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
   private void simulateUpload() throws IOException, ServletException {
     String content = "Lorem ipsum dolor sit amet.";
     fakeUploadRequest( content, "text/plain", "short.txt"  );
-    serviceHandler.service();
+    serviceHandler.service( RWT.getRequest(), RWT.getResponse() );
   }
 
   private Thread findFileReaper() throws InterruptedException {

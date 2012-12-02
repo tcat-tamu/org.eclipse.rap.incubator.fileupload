@@ -1,12 +1,20 @@
+/*******************************************************************************
+ * Copyright (c) 2011, 2012 EclipseSource and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    EclipseSource - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.rap.rwt.supplemental.fileupload.test;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
 import org.eclipse.rap.rwt.RWT;
-import org.eclipse.rap.rwt.service.IServiceHandler;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
 import org.eclipse.rap.rwt.supplemental.fileupload.TestAdapter;
 import org.eclipse.rap.rwt.testfixture.Fixture;
@@ -67,7 +75,7 @@ public final class FileUploadTestUtil {
     Fixture.fakeNewRequest();
     TestRequest request = ( TestRequest )RWT.getRequest();
     request.setMethod( "POST" );
-    request.setParameter( IServiceHandler.REQUEST_PARAM, "org.eclipse.rap.fileupload" );
+    request.setParameter( "custom_service_handler", "org.eclipse.rap.fileupload" );
     String boundary = "-----4711-----";
     String body = createMultipartBody( content, contentType, fileName, boundary );
     if( token != null ) {

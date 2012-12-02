@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
 
-import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.supplemental.fileupload.internal.FileUploadHandlerStore;
 import org.eclipse.rap.rwt.supplemental.fileupload.internal.FileUploadServiceHandler;
 import org.eclipse.rap.rwt.supplemental.fileupload.test.FileUploadTestUtil;
@@ -28,6 +27,7 @@ import org.eclipse.rap.rwt.supplemental.fileupload.test.TestFileUploadReceiver;
 import org.eclipse.rap.rwt.testfixture.Fixture;
 import org.eclipse.rap.rwt.testfixture.TestResponse;
 import org.eclipse.rap.rwt.internal.application.RWTFactory;
+import org.eclipse.rap.rwt.internal.service.ContextProvider;
 
 
 @SuppressWarnings( "restriction" )
@@ -165,7 +165,7 @@ public class FileUploadHandler_Test extends TestCase {
     String content = "Lorem ipsum dolor sit amet.";
 
     fakeUploadRequest( handler, content, "text/plain", "short.txt" );
-    serviceHandler.service();
+    serviceHandler.service( ContextProvider.getRequest(), ContextProvider.getResponse() );
 
     assertEquals( 0, getResponseErrorStatus() );
     assertEquals( content.length(), receiver.getTotal() );
@@ -178,7 +178,7 @@ public class FileUploadHandler_Test extends TestCase {
     String content = "Lorem ipsum dolor sit amet.\n";
 
     fakeUploadRequest( handler, content, "text/plain", "short.txt" );
-    serviceHandler.service();
+    serviceHandler.service( ContextProvider.getRequest(), ContextProvider.getResponse() );
 
     assertEquals( 0, getResponseErrorStatus() );
     assertEquals( content.length(), receiver.getTotal() );
@@ -195,7 +195,7 @@ public class FileUploadHandler_Test extends TestCase {
     String content = buffer.toString();
 
     fakeUploadRequest( handler, content, "text/plain", "short.txt" );
-    serviceHandler.service();
+    serviceHandler.service( ContextProvider.getRequest(), ContextProvider.getResponse() );
 
     assertEquals( HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE, getResponseErrorStatus() );
     assertTrue( getResponseContent().indexOf( "file exceeds its maximum permitted  size" ) != -1 );
@@ -211,7 +211,7 @@ public class FileUploadHandler_Test extends TestCase {
     FileUploadHandler handler = new FileUploadHandler( receiver );
 
     fakeUploadRequest( handler, "The content", "text/plain", "short.txt" );
-    serviceHandler.service();
+    serviceHandler.service( ContextProvider.getRequest(), ContextProvider.getResponse() );
 
     assertEquals( HttpServletResponse.SC_INTERNAL_SERVER_ERROR, getResponseErrorStatus() );
     assertTrue( getResponseContent().indexOf( "the error message" ) != -1 );
@@ -222,7 +222,8 @@ public class FileUploadHandler_Test extends TestCase {
     handler.addUploadListener( listener );
 
     fakeUploadRequest( handler, "The content", "text/plain", "short.txt" );
-    RWTFactory.getServiceManager().getHandler().service();
+    RWTFactory.getServiceManager().getHandler().service( ContextProvider.getRequest(),
+                                                         ContextProvider.getResponse() );
 
     assertNotNull( listener.getLastEvent() );
   }
@@ -240,12 +241,12 @@ public class FileUploadHandler_Test extends TestCase {
   }
 
   private static int getResponseErrorStatus() {
-    TestResponse response = ( TestResponse )RWT.getResponse();
+    TestResponse response = ( TestResponse )ContextProvider.getResponse();
     return response.getErrorStatus();
   }
 
   private static String getResponseContent() {
-    TestResponse response = ( TestResponse )RWT.getResponse();
+    TestResponse response = ( TestResponse )ContextProvider.getResponse();
     return response.getContent();
   }
 }
