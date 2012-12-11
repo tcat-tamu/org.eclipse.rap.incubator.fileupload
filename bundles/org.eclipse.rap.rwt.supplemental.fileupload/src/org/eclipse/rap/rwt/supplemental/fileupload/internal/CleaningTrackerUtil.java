@@ -12,9 +12,9 @@ package org.eclipse.rap.rwt.supplemental.fileupload.internal;
 
 import org.apache.commons.io.FileCleaningTracker;
 import org.eclipse.rap.rwt.RWT;
-import org.eclipse.rap.rwt.service.ISessionStore;
-import org.eclipse.rap.rwt.service.SessionStoreEvent;
-import org.eclipse.rap.rwt.service.SessionStoreListener;
+import org.eclipse.rap.rwt.service.UISession;
+import org.eclipse.rap.rwt.service.UISessionEvent;
+import org.eclipse.rap.rwt.service.UISessionListener;
 
 
 class CleaningTrackerUtil {
@@ -29,31 +29,31 @@ class CleaningTrackerUtil {
 
   public static FileCleaningTracker getCleaningTracker( boolean create ) {
     FileCleaningTracker tracker;
-    ISessionStore store = RWT.getSessionStore();
-    synchronized( store ) {
-      tracker = ( FileCleaningTracker )store.getAttribute( TRACKER_ATTR );
+    UISession uisession = RWT.getUISession();
+    synchronized( uisession ) {
+      tracker = ( FileCleaningTracker )uisession.getAttribute( TRACKER_ATTR );
       if( tracker == null && create ) {
         tracker = new FileCleaningTracker();
-        store.setAttribute( TRACKER_ATTR, tracker );
-        store.addSessionStoreListener( LISTENER );
+        uisession.setAttribute( TRACKER_ATTR, tracker );
+        uisession.addUISessionListener( LISTENER );
       }
     }
     return tracker;
   }
 
-  static void stopCleaningTracker( ISessionStore store ) {
-    synchronized( store ) {
-      FileCleaningTracker tracker = ( FileCleaningTracker )store.getAttribute( TRACKER_ATTR );
+  static void stopCleaningTracker( UISession uisession ) {
+    synchronized( uisession ) {
+      FileCleaningTracker tracker = ( FileCleaningTracker )uisession.getAttribute( TRACKER_ATTR );
       if( tracker != null ) {
         tracker.exitWhenFinished();
-        store.removeAttribute( TRACKER_ATTR );
+        uisession.removeAttribute( TRACKER_ATTR );
       }
     }
   }
 
-  private static class FileUploadCleanupHandler implements SessionStoreListener {
-    public void beforeDestroy( SessionStoreEvent event ) {
-      stopCleaningTracker( event.getSessionStore() );
+  private static class FileUploadCleanupHandler implements UISessionListener {
+    public void beforeDestroy( UISessionEvent event ) {
+      stopCleaningTracker( event.getUISession() );
     }
   }
 }

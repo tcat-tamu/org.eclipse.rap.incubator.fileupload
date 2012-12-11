@@ -29,7 +29,7 @@ public class CleaningTrackerUtil_Test extends TestCase {
 
   @Override
   protected void tearDown() throws Exception {
-    CleaningTrackerUtil.stopCleaningTracker( RWT.getSessionStore() );
+    CleaningTrackerUtil.stopCleaningTracker( RWT.getUISession() );
     Fixture.tearDown();
   }
 
@@ -50,16 +50,16 @@ public class CleaningTrackerUtil_Test extends TestCase {
   public void testStopClearsBuffer() throws Exception {
     CleaningTrackerUtil.getCleaningTracker( true );
 
-    CleaningTrackerUtil.stopCleaningTracker( RWT.getSessionStore() );
+    CleaningTrackerUtil.stopCleaningTracker( RWT.getUISession() );
 
     assertNull( CleaningTrackerUtil.getCleaningTracker( false ) );
   }
 
   public void testStopCallsExitWhenFinished() throws Exception {
     FileCleaningTracker tracker = mock( FileCleaningTracker.class );
-    RWT.getSessionStore().setAttribute( CleaningTrackerUtil.TRACKER_ATTR, tracker );
+    RWT.getUISession().setAttribute( CleaningTrackerUtil.TRACKER_ATTR, tracker );
 
-    CleaningTrackerUtil.stopCleaningTracker( RWT.getSessionStore() );
+    CleaningTrackerUtil.stopCleaningTracker( RWT.getUISession() );
 
     verify( tracker ).exitWhenFinished();
   }
