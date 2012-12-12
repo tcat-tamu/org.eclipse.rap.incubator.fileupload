@@ -34,10 +34,10 @@ public final class FileUploadHandlerStore {
   public static FileUploadHandlerStore getInstance() {
     FileUploadHandlerStore result;
     synchronized( LOCK ) {
-      result = ( FileUploadHandlerStore )RWT.getApplicationStore().getAttribute( ATTR_NAME );
+      result = ( FileUploadHandlerStore )RWT.getApplicationContext().getAttribute( ATTR_NAME );
       if( result == null ) {
         result = new FileUploadHandlerStore();
-        RWT.getApplicationStore().setAttribute( ATTR_NAME, result );        
+        RWT.getApplicationContext().setAttribute( ATTR_NAME, result );
       }
     }
     return result;
