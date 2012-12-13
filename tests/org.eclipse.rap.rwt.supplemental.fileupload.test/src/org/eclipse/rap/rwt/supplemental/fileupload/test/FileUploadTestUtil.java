@@ -75,7 +75,7 @@ public final class FileUploadTestUtil {
     Fixture.fakeNewRequest();
     TestRequest request = ( TestRequest )RWT.getRequest();
     request.setMethod( "POST" );
-    request.setParameter( "custom_service_handler", "org.eclipse.rap.fileupload" );
+    request.setParameter( "servicehandler", "org.eclipse.rap.fileupload" );
     String boundary = "-----4711-----";
     String body = createMultipartBody( content, contentType, fileName, boundary );
     if( token != null ) {

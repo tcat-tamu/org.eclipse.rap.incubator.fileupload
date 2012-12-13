@@ -199,7 +199,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
   }
 
   public void testGetURL() {
-    String head = "rap?custom_service_handler=org.eclipse.rap.fileupload&token=";
+    String head = "rap?servicehandler=org.eclipse.rap.fileupload&token=";
 
     assertEquals( head, FileUploadServiceHandler.getUrl( "" ) );
     assertEquals( head + "<>&?", FileUploadServiceHandler.getUrl( "<>&?" ) );
