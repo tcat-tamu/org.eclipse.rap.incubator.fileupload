@@ -79,7 +79,7 @@ public final class FileUploadTestUtil {
     String boundary = "-----4711-----";
     String body = createMultipartBody( content, contentType, fileName, boundary );
     if( token != null ) {
-      Fixture.fakeRequestParam( "token", token );
+      request.setParameter( "token", token );
     }
     request.setBody( body );
     request.setContentType( "multipart/form-data; boundary=" + boundary );
