@@ -14,7 +14,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
 import org.eclipse.rap.rwt.supplemental.fileupload.TestAdapter;
 import org.eclipse.rap.rwt.testfixture.Fixture;
@@ -72,8 +71,7 @@ public final class FileUploadTestUtil {
                                         String contentType,
                                         String fileName )
   {
-    Fixture.fakeNewRequest();
-    TestRequest request = ( TestRequest )RWT.getRequest();
+    TestRequest request = Fixture.fakeNewRequest();
     request.setMethod( "POST" );
     request.setParameter( "servicehandler", "org.eclipse.rap.fileupload" );
     String boundary = "-----4711-----";
