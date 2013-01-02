@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 EclipseSource and others.
+ * Copyright (c) 2011, 2013 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.rap.rwt.supplemental.fileupload;
 
+import static org.eclipse.rap.rwt.internal.service.ContextProvider.getApplicationContext;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -18,6 +20,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
 
+import org.eclipse.rap.rwt.internal.service.ContextProvider;
+import org.eclipse.rap.rwt.service.ServiceHandler;
 import org.eclipse.rap.rwt.supplemental.fileupload.internal.FileUploadHandlerStore;
 import org.eclipse.rap.rwt.supplemental.fileupload.internal.FileUploadServiceHandler;
 import org.eclipse.rap.rwt.supplemental.fileupload.test.FileUploadTestUtil;
@@ -26,8 +30,6 @@ import org.eclipse.rap.rwt.supplemental.fileupload.test.TestFileUploadListener;
 import org.eclipse.rap.rwt.supplemental.fileupload.test.TestFileUploadReceiver;
 import org.eclipse.rap.rwt.testfixture.Fixture;
 import org.eclipse.rap.rwt.testfixture.TestResponse;
-import org.eclipse.rap.rwt.internal.application.RWTFactory;
-import org.eclipse.rap.rwt.internal.service.ContextProvider;
 
 
 @SuppressWarnings( "restriction" )
@@ -222,8 +224,8 @@ public class FileUploadHandler_Test extends TestCase {
     handler.addUploadListener( listener );
 
     fakeUploadRequest( handler, "The content", "text/plain", "short.txt" );
-    RWTFactory.getServiceManager().getHandler().service( ContextProvider.getRequest(),
-                                                         ContextProvider.getResponse() );
+    ServiceHandler serviceHandler = getApplicationContext().getServiceManager().getHandler();
+    serviceHandler.service( ContextProvider.getRequest(), ContextProvider.getResponse() );
 
     assertNotNull( listener.getLastEvent() );
   }
