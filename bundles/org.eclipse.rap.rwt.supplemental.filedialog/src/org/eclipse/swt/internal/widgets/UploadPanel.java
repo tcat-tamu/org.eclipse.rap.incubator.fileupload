@@ -1,5 +1,5 @@
 /*****************************************************************************************
- * Copyright (c) 2010, 2012 Texas Center for Applied Technology (TEES) (TAMUS) and others.
+ * Copyright (c) 2010, 2013 Texas Center for Applied Technology (TEES) (TAMUS) and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ package org.eclipse.swt.internal.widgets;
 import java.io.File;
 
 import org.eclipse.rap.rwt.graphics.Graphics;
+import org.eclipse.rap.rwt.internal.textsize.TextSizeUtil;
 import org.eclipse.rap.rwt.supplemental.fileupload.DiskFileUploadReceiver;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadEvent;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
@@ -34,6 +35,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Text;
 
+@SuppressWarnings("restriction")
 public class UploadPanel extends Composite implements FileUploadListener {
   private static final long serialVersionUID = 1L;
 
@@ -202,7 +204,7 @@ public class UploadPanel extends Composite implements FileUploadListener {
         progressLayoutData.widthHint = 128;
         progressBar.setLayoutData( progressLayoutData );
         GridData lblLayoutData = new GridData( SWT.FILL, SWT.FILL, false, false );
-        float avgCharWidth = Graphics.getAvgCharWidth( progressLabel.getFont() );
+        float avgCharWidth = TextSizeUtil.getAvgCharWidth( progressLabel.getFont() );
         lblLayoutData.minimumWidth = ( int )avgCharWidth * 6;
         lblLayoutData.widthHint = ( int )avgCharWidth * 6;
         progressLabel.setLayoutData( lblLayoutData );
@@ -221,7 +223,7 @@ public class UploadPanel extends Composite implements FileUploadListener {
         progressLayoutData.horizontalSpan = 4;
         progressBar.setLayoutData( progressLayoutData );
         GridData lblLayoutData = new GridData( SWT.FILL, SWT.FILL, false, false );
-        float avgCharWidth = Graphics.getAvgCharWidth( progressLabel.getFont() );
+        float avgCharWidth = TextSizeUtil.getAvgCharWidth( progressLabel.getFont() );
         lblLayoutData.minimumWidth = ( int )avgCharWidth * 6;
         lblLayoutData.widthHint = ( int )avgCharWidth * 6;
         progressLabel.setLayoutData( lblLayoutData );

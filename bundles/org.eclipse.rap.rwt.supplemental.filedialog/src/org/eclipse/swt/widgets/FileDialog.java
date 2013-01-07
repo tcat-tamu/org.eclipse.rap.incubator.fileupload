@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.eclipse.rap.rwt.graphics.Graphics;
+import org.eclipse.rap.rwt.internal.textsize.TextSizeUtil;
 import org.eclipse.rap.rwt.lifecycle.UICallBack;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
@@ -64,6 +65,7 @@ import org.eclipse.swt.layout.GridLayout;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further
  *      information</a>
  */
+@SuppressWarnings("restriction")
 public class FileDialog extends Dialog {
   private static final long serialVersionUID = 1L;
 
@@ -637,7 +639,7 @@ public class FileDialog extends Dialog {
     result.setText( text );
     GridData data = new GridData( GridData.HORIZONTAL_ALIGN_FILL );
     Font dialogFont = result.getFont();
-    float charWidth = Graphics.getAvgCharWidth( dialogFont );
+    float charWidth = TextSizeUtil.getAvgCharWidth( dialogFont );
     float width = charWidth * BUTTON_WIDTH + HORIZONTAL_DIALOG_UNIT_PER_CHAR / 2;
     int widthHint = ( int )( width / HORIZONTAL_DIALOG_UNIT_PER_CHAR );
     Point minSize = result.computeSize( SWT.DEFAULT, SWT.DEFAULT, true );
