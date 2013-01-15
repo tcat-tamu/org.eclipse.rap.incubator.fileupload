@@ -14,7 +14,7 @@ import java.io.File;
 
 import org.eclipse.rap.examples.ExampleUtil;
 import org.eclipse.rap.examples.IExamplePage;
-import org.eclipse.rap.rwt.lifecycle.UICallBack;
+import org.eclipse.rap.rwt.service.ServerPushSession;
 import org.eclipse.rap.rwt.supplemental.fileupload.DiskFileUploadReceiver;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadEvent;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
@@ -42,6 +42,7 @@ public class FileUploadExamplePage implements IExamplePage {
   private Label fileNameLabel;
   private Button uploadButton;
   private Text logText;
+  private ServerPushSession pushSession;
 
   public void createControl( Composite parent ) {
     parent.setLayout( ExampleUtil.createMainLayout( 3 ) );
@@ -103,10 +104,11 @@ public class FileUploadExamplePage implements IExamplePage {
       }
     } );
     final String url = startUploadReceiver();
+    pushSession = new ServerPushSession();
     uploadButton.addSelectionListener( new SelectionAdapter() {
       @Override
       public void widgetSelected( SelectionEvent e ) {
-        UICallBack.activate( "upload" );
+        pushSession.start();
         fileUpload.submit( url );
       }
     } );
@@ -142,7 +144,7 @@ public class FileUploadExamplePage implements IExamplePage {
             text = "";
           }
           logText.setText( text + message + "\n" );
-          UICallBack.deactivate( "upload" );
+          pushSession.stop();
         }
       } );
     }
