@@ -13,13 +13,12 @@ package org.eclipse.swt.internal.widgets;
 
 import java.io.File;
 
-import org.eclipse.rap.rwt.graphics.Graphics;
 import org.eclipse.rap.rwt.internal.textsize.TextSizeUtil;
 import org.eclipse.rap.rwt.supplemental.fileupload.DiskFileUploadReceiver;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadEvent;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
-import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadReceiver;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadListener;
+import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadReceiver;
 import org.eclipse.rap.rwt.widgets.FileUpload;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -174,7 +173,7 @@ public class UploadPanel extends Composite implements FileUploadListener {
       Image removeIcon = Display.getCurrent().getSystemImage( SWT.ICON_CANCEL );
       removeButton.setImage( removeIcon );
       if( deleteImage == null ) {
-        deleteImage = Graphics.getImage( "resources/delete_obj.gif", getClass().getClassLoader() );
+        deleteImage = ImageUtil.getImage( getDisplay(), "delete_obj.gif" );
       }
       removeButton.setImage( deleteImage );
       removeButton.setToolTipText( "Remove file" );

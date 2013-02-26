@@ -15,9 +15,8 @@ package org.eclipse.swt.widgets;
 import java.io.File;
 import java.util.ArrayList;
 
-import org.eclipse.rap.rwt.graphics.Graphics;
 import org.eclipse.rap.rwt.internal.textsize.TextSizeUtil;
-import org.eclipse.rap.rwt.lifecycle.UICallBack;
+import org.eclipse.rap.rwt.service.ServerPushSession;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -32,6 +31,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.internal.widgets.ExtensionValidationStrategy;
+import org.eclipse.swt.internal.widgets.ImageUtil;
 import org.eclipse.swt.internal.widgets.ProgressCollector;
 import org.eclipse.swt.internal.widgets.UploadPanel;
 import org.eclipse.swt.internal.widgets.ValidationHandler;
@@ -94,6 +94,7 @@ public class FileDialog extends Dialog {
   private ProgressCollector progressCollector;
   private ValidationHandler validationHandler;
   private Image addImage;
+  private ServerPushSession pushSession;
 
   /**
    * Constructs a new instance of this class given only its parent.
@@ -140,6 +141,7 @@ public class FileDialog extends Dialog {
   public FileDialog( Shell parent, int style ) {
     super( parent, checkStyle( parent, style ) );
     checkSubclass();
+    pushSession = new ServerPushSession();
   }
 
   static int checkStyle( Shell parent, int style ) {
@@ -372,7 +374,7 @@ public class FileDialog extends Dialog {
 
   @Override
   protected void prepareOpen() {
-    UICallBack.activate( FileDialog.class.getName() + hashCode() );
+    pushSession.start();
     initializeDefaults();
     createShell();
     createControls();
@@ -506,7 +508,7 @@ public class FileDialog extends Dialog {
   private void createAddSelectorButton( Composite parent ) {
     addFileSelectorButton = new Button( parent, SWT.PUSH );
     if( addImage == null ) {
-      addImage = Graphics.getImage( "resources/add_obj.gif", getClass().getClassLoader() );
+      addImage = ImageUtil.getImage( parent.getDisplay(), "add_obj.gif" );
     }
     addFileSelectorButton.setImage( addImage );
     addFileSelectorButton.setToolTipText( "Add file" );
@@ -725,7 +727,7 @@ public class FileDialog extends Dialog {
   }
 
   private void cleanup() {
-    UICallBack.deactivate( FileDialog.class.getName() + hashCode() );
+    pushSession.stop();
   }
 
   private void handleShellClose() {
