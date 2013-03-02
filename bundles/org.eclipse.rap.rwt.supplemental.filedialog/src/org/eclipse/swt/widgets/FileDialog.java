@@ -615,25 +615,28 @@ public class FileDialog extends Dialog {
     okButton.forceFocus();
     String cancelText = SWT.getMessage( "SWT_Cancel" );
     Button cancelButton = createButton( buttonComposite, cancelText );
-    okButton.addSelectionListener( new SelectionAdapter() {
-      @Override
-      public void widgetSelected( SelectionEvent e ) {
-        startUploads();
+    okButton.addListener( SWT.Selection, new Listener() {
+      public void handleEvent( Event event ) {
+        okPressed();
       }
     } );
-    cancelButton.addSelectionListener( new SelectionAdapter() {
-      @Override
-      public void widgetSelected( SelectionEvent e ) {
-        closeShell();
+    cancelButton.addListener( SWT.Selection, new Listener() {
+      public void handleEvent( Event event ) {
+        cancelPressed();
       }
     } );
     updateEnablement();
   }
 
-  // [if] Calling shell.close() in the selection listener directly throws IllegalAccessError
-  // see bug 253818
-  private void closeShell() {
+  void cancelPressed() {
+    // [if] Calling shell.close() in the selection listener directly throws IllegalAccessError
+    // see bug 253818
     shell.close();
+  }
+
+  void okPressed() {
+    returnCode =  SWT.OK;
+    startUploads();
   }
 
   private Button createButton( Composite parent, String text ) {
@@ -733,4 +736,5 @@ public class FileDialog extends Dialog {
   private void handleShellClose() {
     cleanup();
   }
+
 }
