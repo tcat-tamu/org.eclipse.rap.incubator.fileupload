@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 EclipseSource and others.
+ * Copyright (c) 2011, 2013 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,44 +10,53 @@
  ******************************************************************************/
 package org.eclipse.rap.rwt.supplemental.fileupload.internal;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import junit.framework.TestCase;
 
 import org.apache.commons.io.FileCleaningTracker;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.testfixture.Fixture;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 
-public class CleaningTrackerUtil_Test extends TestCase {
+public class CleaningTrackerUtil_Test {
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() {
     Fixture.setUp();
     Fixture.fakeNewRequest();
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() {
     CleaningTrackerUtil.stopCleaningTracker( RWT.getUISession() );
     Fixture.tearDown();
   }
 
+  @Test
   public void testNoCleanerInstanceByDefault() {
     assertNull( CleaningTrackerUtil.getCleaningTracker( false ) );
   }
 
+  @Test
   public void testCleanerIsCreated() {
     assertNotNull( CleaningTrackerUtil.getCleaningTracker( true ) );
   }
 
-  public void testCleanerIsBuffered() throws Exception {
+  @Test
+  public void testCleanerIsBuffered() {
     FileCleaningTracker tracker = CleaningTrackerUtil.getCleaningTracker( true );
 
     assertSame( tracker, CleaningTrackerUtil.getCleaningTracker( true ) );
   }
 
-  public void testStopClearsBuffer() throws Exception {
+  @Test
+  public void testStopClearsBuffer() {
     CleaningTrackerUtil.getCleaningTracker( true );
 
     CleaningTrackerUtil.stopCleaningTracker( RWT.getUISession() );
@@ -55,7 +64,8 @@ public class CleaningTrackerUtil_Test extends TestCase {
     assertNull( CleaningTrackerUtil.getCleaningTracker( false ) );
   }
 
-  public void testStopCallsExitWhenFinished() throws Exception {
+  @Test
+  public void testStopCallsExitWhenFinished() {
     FileCleaningTracker tracker = mock( FileCleaningTracker.class );
     RWT.getUISession().setAttribute( CleaningTrackerUtil.TRACKER_ATTR, tracker );
 
@@ -64,7 +74,8 @@ public class CleaningTrackerUtil_Test extends TestCase {
     verify( tracker ).exitWhenFinished();
   }
 
-  public void testAutoStop() throws Exception {
+  @Test
+  public void testAutoStop() {
     CleaningTrackerUtil.getCleaningTracker( true );
 
     Fixture.disposeOfServiceContext();

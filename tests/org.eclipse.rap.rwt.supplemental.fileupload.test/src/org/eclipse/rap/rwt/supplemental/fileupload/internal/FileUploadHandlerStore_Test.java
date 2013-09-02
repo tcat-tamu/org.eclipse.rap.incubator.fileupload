@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 EclipseSource and others.
+ * Copyright (c) 2011, 2013 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,44 +10,54 @@
  ******************************************************************************/
 package org.eclipse.rap.rwt.supplemental.fileupload.internal;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
 import org.eclipse.rap.rwt.supplemental.fileupload.test.TestFileUploadReceiver;
 import org.eclipse.rap.rwt.testfixture.Fixture;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 
-public class FileUploadHandlerStore_Test extends TestCase {
+public class FileUploadHandlerStore_Test {
 
   private FileUploadHandlerStore itemStore;
   private FileUploadHandler testHandler;
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() {
     Fixture.setUp();
     itemStore = FileUploadHandlerStore.getInstance();
     testHandler = new FileUploadHandler( new TestFileUploadReceiver() );
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() {
     testHandler.dispose();
     testHandler = null;
     itemStore = null;
     Fixture.tearDown();
   }
 
+  @Test
   public void testGetInstance() {
     assertNotNull( itemStore );
     assertSame( itemStore, FileUploadHandlerStore.getInstance() );
   }
 
+  @Test
   public void testGetNotExistingHandler() {
     FileUploadHandler result = itemStore.getHandler( "testId" );
 
     assertNull( result );
   }
 
+  @Test
   public void testRegisterAndGetHandler() {
     itemStore.registerHandler( "testId", testHandler );
 
@@ -56,6 +66,7 @@ public class FileUploadHandlerStore_Test extends TestCase {
     assertSame( testHandler, result );
   }
 
+  @Test
   public void testGetHandlerWithDifferentId() {
     itemStore.registerHandler( "testId", testHandler );
 
@@ -64,6 +75,7 @@ public class FileUploadHandlerStore_Test extends TestCase {
     assertNull( result );
   }
 
+  @Test
   public void testDeregisterHandler() {
     itemStore.registerHandler( "testId", testHandler );
 
@@ -73,6 +85,7 @@ public class FileUploadHandlerStore_Test extends TestCase {
     assertNull( result );
   }
 
+  @Test
   public void testCreateToken() {
     String token = FileUploadHandlerStore.createToken();
 
@@ -80,4 +93,5 @@ public class FileUploadHandlerStore_Test extends TestCase {
     assertTrue( token.length() > 0 );
     assertFalse( token.equals( FileUploadHandlerStore.createToken() ) );
   }
+
 }

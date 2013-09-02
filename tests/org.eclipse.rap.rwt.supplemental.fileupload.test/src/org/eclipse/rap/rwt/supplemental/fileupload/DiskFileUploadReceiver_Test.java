@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 EclipseSource and others.
+ * Copyright (c) 2011, 2013 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,22 +10,29 @@
  ******************************************************************************/
 package org.eclipse.rap.rwt.supplemental.fileupload;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 
-import junit.framework.TestCase;
-
 import org.eclipse.rap.rwt.supplemental.fileupload.internal.FileUploadDetails;
 import org.eclipse.rap.rwt.supplemental.fileupload.test.FileUploadTestUtil;
+import org.junit.After;
+import org.junit.Test;
 
 
-public class DiskFileUploadReceiver_Test extends TestCase {
+public class DiskFileUploadReceiver_Test {
 
   private File createdFile;
   private File createdContentTypeFile;
 
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() {
     if( createdFile != null ) {
       createdFile.delete();
       createdFile = null;
@@ -36,12 +43,14 @@ public class DiskFileUploadReceiver_Test extends TestCase {
     }
   }
 
+  @Test
   public void testInitialGetTargetFile() {
     DiskFileUploadReceiver receiver = new DiskFileUploadReceiver();
 
     assertNull( receiver.getTargetFile() );
   }
 
+  @Test
   public void testCreateTargetFile() throws IOException {
     DiskFileUploadReceiver receiver = new DiskFileUploadReceiver();
 
@@ -51,7 +60,8 @@ public class DiskFileUploadReceiver_Test extends TestCase {
     assertTrue( createdFile.exists() );
     assertEquals( "foo.bar", createdFile.getName() );
   }
-  
+
+  @Test
   public void testCreateContentTypeFile() throws IOException {
     DiskFileUploadReceiver receiver = new DiskFileUploadReceiver();
 
@@ -61,13 +71,15 @@ public class DiskFileUploadReceiver_Test extends TestCase {
 
     assertTrue( createdContentTypeFile.exists() );
   }
-  
+
+  @Test
   public void testGetContentType() throws IOException {
     testReceive();
     assertEquals( "text/plain", DiskFileUploadReceiver.getContentType( createdFile ) );
     assertEquals( null, DiskFileUploadReceiver.getContentType( new File( "test" ) ) );
   }
 
+  @Test
   public void testCreatedTargetFilesDiffer() throws IOException {
     DiskFileUploadReceiver receiver = new DiskFileUploadReceiver();
 
@@ -79,6 +91,7 @@ public class DiskFileUploadReceiver_Test extends TestCase {
     assertFalse( createdFile.getAbsolutePath().equals( createdFile2.getAbsolutePath() ) );
   }
 
+  @Test
   public void testReceive() throws IOException {
     DiskFileUploadReceiver receiver = new DiskFileUploadReceiver();
     String content = "Hello world!";
@@ -92,6 +105,7 @@ public class DiskFileUploadReceiver_Test extends TestCase {
     assertEquals( content, FileUploadTestUtil.getFileContents( createdFile ) );
   }
 
+  @Test
   public void testReceiveWithNullDetails() throws IOException {
     DiskFileUploadReceiver receiver = new DiskFileUploadReceiver();
     String content = "Hello world!";
@@ -104,4 +118,5 @@ public class DiskFileUploadReceiver_Test extends TestCase {
     assertEquals( "upload.tmp", createdFile.getName() );
     assertEquals( content, FileUploadTestUtil.getFileContents( createdFile ) );
   }
+
 }

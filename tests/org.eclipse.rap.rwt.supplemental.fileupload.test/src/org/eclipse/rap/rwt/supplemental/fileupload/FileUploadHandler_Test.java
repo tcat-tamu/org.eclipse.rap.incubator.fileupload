@@ -11,14 +11,18 @@
 package org.eclipse.rap.rwt.supplemental.fileupload;
 
 import static org.eclipse.rap.rwt.internal.service.ContextProvider.getApplicationContext;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
-
-import junit.framework.TestCase;
 
 import org.eclipse.rap.rwt.internal.service.ContextProvider;
 import org.eclipse.rap.rwt.service.ServiceHandler;
@@ -30,25 +34,28 @@ import org.eclipse.rap.rwt.supplemental.fileupload.test.TestFileUploadListener;
 import org.eclipse.rap.rwt.supplemental.fileupload.test.TestFileUploadReceiver;
 import org.eclipse.rap.rwt.testfixture.Fixture;
 import org.eclipse.rap.rwt.testfixture.TestResponse;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 
 @SuppressWarnings( "restriction" )
-public class FileUploadHandler_Test extends TestCase {
+public class FileUploadHandler_Test {
 
   private FileUploadServiceHandler serviceHandler;
   private TestFileUploadListener uploadListener;
   private FileUploadHandler handler;
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() {
     Fixture.setUp();
     handler = new FileUploadHandler( new TestFileUploadReceiver() );
     uploadListener = new TestFileUploadListener();
     serviceHandler = new FileUploadServiceHandler();
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() {
     serviceHandler = null;
     uploadListener = null;
     handler.dispose();
@@ -56,6 +63,7 @@ public class FileUploadHandler_Test extends TestCase {
     Fixture.tearDown();
   }
 
+  @Test
   public void testCannotCreateWithNull() {
     try {
       new FileUploadHandler( null );
@@ -64,17 +72,20 @@ public class FileUploadHandler_Test extends TestCase {
     }
   }
 
+  @Test
   public void testInitialized() {
     assertTrue( handler.getUploadUrl().indexOf( handler.getToken() ) != -1 );
     assertSame( handler, getRegisteredHandler( handler.getToken() ) );
   }
 
+  @Test
   public void testDispose() {
     handler.dispose();
 
     assertNull( getRegisteredHandler( handler.getToken() ) );
   }
 
+  @Test
   public void testGetReceiver() {
     FileUploadReceiver receiver = new TestFileUploadReceiver();
     FileUploadHandler handler = new FileUploadHandler( receiver );
@@ -82,6 +93,7 @@ public class FileUploadHandler_Test extends TestCase {
     assertSame( receiver, handler.getReceiver() );
   }
 
+  @Test
   public void testAddListenerWithNull() {
     try {
       handler.addUploadListener( null );
@@ -90,6 +102,7 @@ public class FileUploadHandler_Test extends TestCase {
     }
   }
 
+  @Test
   public void testAddListener() {
     handler.addUploadListener( uploadListener );
 
@@ -100,6 +113,7 @@ public class FileUploadHandler_Test extends TestCase {
     assertSame( event, uploadListener.getLastEvent() );
   }
 
+  @Test
   public void testAddListenerTwice() {
     handler.addUploadListener( uploadListener );
     handler.addUploadListener( uploadListener );
@@ -109,6 +123,7 @@ public class FileUploadHandler_Test extends TestCase {
     assertEquals( "progress.", uploadListener.getLog() );
   }
 
+  @Test
   public void testAddMultipleListeners() {
     TestFileUploadListener anotherUploadListener = new TestFileUploadListener();
 
@@ -120,6 +135,7 @@ public class FileUploadHandler_Test extends TestCase {
     assertEquals( "progress.", anotherUploadListener.getLog() );
   }
 
+  @Test
   public void testRemoveListenerWithNull() {
     handler.addUploadListener( uploadListener );
 
@@ -130,6 +146,7 @@ public class FileUploadHandler_Test extends TestCase {
     }
   }
 
+  @Test
   public void testRemoveListener() {
     handler.addUploadListener( uploadListener );
 
@@ -139,6 +156,7 @@ public class FileUploadHandler_Test extends TestCase {
     assertEquals( "", uploadListener.getLog() );
   }
 
+  @Test
   public void testRemoveListenerTwice() {
     handler.addUploadListener( uploadListener );
 
@@ -149,6 +167,7 @@ public class FileUploadHandler_Test extends TestCase {
     assertEquals( "", uploadListener.getLog() );
   }
 
+  @Test
   public void testRemoveOneOfTwoListeners() {
     handler.addUploadListener( uploadListener );
     TestFileUploadListener anotherUploadListener = new TestFileUploadListener();
@@ -161,7 +180,8 @@ public class FileUploadHandler_Test extends TestCase {
     assertEquals( "", anotherUploadListener.getLog() );
   }
 
-  public void testUpload() throws Exception {
+  @Test
+  public void testUpload() throws IOException, ServletException {
     TestFileUploadReceiver receiver = new TestFileUploadReceiver();
     FileUploadHandler handler = new FileUploadHandler( receiver );
     String content = "Lorem ipsum dolor sit amet.";
@@ -173,7 +193,8 @@ public class FileUploadHandler_Test extends TestCase {
     assertEquals( content.length(), receiver.getTotal() );
   }
 
-  public void testUploadWithMaxLimit() throws Exception {
+  @Test
+  public void testUploadWithMaxLimit() throws IOException, ServletException {
     TestFileUploadReceiver receiver = new TestFileUploadReceiver();
     FileUploadHandler handler = new FileUploadHandler( receiver );
     handler.setMaxFileSize( 1000 );
@@ -186,7 +207,8 @@ public class FileUploadHandler_Test extends TestCase {
     assertEquals( content.length(), receiver.getTotal() );
   }
 
-  public void testUploadWithExceedMaxLimit() throws Exception {
+  @Test
+  public void testUploadWithExceedMaxLimit() throws IOException, ServletException {
     TestFileUploadReceiver receiver = new TestFileUploadReceiver();
     FileUploadHandler handler = new FileUploadHandler( receiver );
     handler.setMaxFileSize( 1000 );
@@ -203,7 +225,8 @@ public class FileUploadHandler_Test extends TestCase {
     assertTrue( getResponseContent().indexOf( "file exceeds its maximum permitted  size" ) != -1 );
   }
 
-  public void testUploadWithException() throws Exception {
+  @Test
+  public void testUploadWithException() throws IOException, ServletException {
     FileUploadReceiver receiver = new FileUploadReceiver() {
       @Override
       public void receive( InputStream dataStream, IFileUploadDetails details ) throws IOException {
@@ -219,6 +242,7 @@ public class FileUploadHandler_Test extends TestCase {
     assertTrue( getResponseContent().indexOf( "the error message" ) != -1 );
   }
 
+  @Test
   public void testServiceHandlerIsRegistered() throws IOException, ServletException {
     TestFileUploadListener listener = new TestFileUploadListener();
     handler.addUploadListener( listener );

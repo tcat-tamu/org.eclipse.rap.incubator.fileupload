@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 EclipseSource and others.
+ * Copyright (c) 2011, 2013 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,11 @@
  ******************************************************************************/
 package org.eclipse.rap.rwt.supplemental.fileupload.internal;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -17,8 +22,6 @@ import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
-
-import junit.framework.TestCase;
 
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadEvent;
@@ -30,9 +33,12 @@ import org.eclipse.rap.rwt.supplemental.fileupload.test.TestFileUploadReceiver;
 import org.eclipse.rap.rwt.testfixture.Fixture;
 import org.eclipse.rap.rwt.testfixture.TestRequest;
 import org.eclipse.rap.rwt.testfixture.TestResponse;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 
-public class FileUploadServiceHandler_Test extends TestCase {
+public class FileUploadServiceHandler_Test {
 
   private FileUploadServiceHandler serviceHandler;
   private File tempDirectory;
@@ -40,8 +46,8 @@ public class FileUploadServiceHandler_Test extends TestCase {
   private TestFileUploadReceiver testReceiver;
   private FileUploadHandler uploadHandler;
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() {
     Fixture.setUp();
     serviceHandler = new FileUploadServiceHandler();
     testReceiver = new TestFileUploadReceiver();
@@ -50,8 +56,8 @@ public class FileUploadServiceHandler_Test extends TestCase {
     tempDirectory = FileUploadTestUtil.createTempDirectory();
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() {
     FileUploadTestUtil.deleteRecursively( tempDirectory );
     tempDirectory = null;
     testListener = null;
@@ -59,7 +65,8 @@ public class FileUploadServiceHandler_Test extends TestCase {
     Fixture.tearDown();
   }
 
-  public void testUploadShortFile() throws Exception {
+  @Test
+  public void testUploadShortFile() throws IOException, ServletException {
     uploadHandler.addUploadListener( testListener );
     String content = "Lorem ipsum dolor sit amet.";
 
@@ -76,7 +83,8 @@ public class FileUploadServiceHandler_Test extends TestCase {
     assertEquals( content, new String( testReceiver.getContent() ) );
   }
 
-  public void testUploadBigFile() throws Exception {
+  @Test
+  public void testUploadBigFile() throws IOException, ServletException {
     TestFileUploadListener testListener = new TestFileUploadListener() {
       @Override
       public void uploadProgress( FileUploadEvent info ) {
@@ -97,7 +105,8 @@ public class FileUploadServiceHandler_Test extends TestCase {
     assertEquals( "text/plain", uploadedItem.getContentType() );
   }
 
-  public void testCanUploadEmptyFile() throws Exception {
+  @Test
+  public void testCanUploadEmptyFile() throws IOException, ServletException {
     uploadHandler.addUploadListener( testListener );
 
     fakeUploadRequest( "", "text/plain", "empty.txt"  );
@@ -108,7 +117,8 @@ public class FileUploadServiceHandler_Test extends TestCase {
     assertEquals( "", new String( testReceiver.getContent() ) );
   }
 
-  public void testCanUploadFileWithoutContentType() throws Exception {
+  @Test
+  public void testCanUploadFileWithoutContentType() throws IOException, ServletException {
     uploadHandler.addUploadListener( testListener );
 
     fakeUploadRequest( "Some content", null, "test.txt"  );
@@ -121,7 +131,8 @@ public class FileUploadServiceHandler_Test extends TestCase {
     assertEquals( null, uploadedItem.getContentType() );
   }
 
-  public void testUploadWithoutToken() throws Exception {
+  @Test
+  public void testUploadWithoutToken() throws IOException, ServletException {
     uploadHandler.addUploadListener( testListener );
 
     fakeUploadRequest( null );
@@ -131,7 +142,8 @@ public class FileUploadServiceHandler_Test extends TestCase {
     assertEquals( "", testListener.getLog() );
   }
 
-  public void testUploadWithInvalidToken() throws Exception {
+  @Test
+  public void testUploadWithInvalidToken() throws IOException, ServletException {
     uploadHandler.addUploadListener( testListener );
 
     fakeUploadRequest( "unknown-id" );
@@ -141,7 +153,8 @@ public class FileUploadServiceHandler_Test extends TestCase {
     assertEquals( "", testListener.getLog() );
   }
 
-  public void testUploadWithGetRequest() throws Exception {
+  @Test
+  public void testUploadWithGetRequest() throws IOException, ServletException {
     uploadHandler.addUploadListener( testListener );
 
     fakeUploadRequest( "Some content", "text/plain", "test.txt"  );
@@ -153,7 +166,8 @@ public class FileUploadServiceHandler_Test extends TestCase {
     assertEquals( "", testListener.getLog() );
   }
 
-  public void testUploadRequestWithWrongContentType() throws Exception {
+  @Test
+  public void testUploadRequestWithWrongContentType() throws IOException, ServletException {
     uploadHandler.addUploadListener( testListener );
 
     fakeUploadRequest( "Some content", "text/plain", "test.txt"  );
@@ -165,7 +179,8 @@ public class FileUploadServiceHandler_Test extends TestCase {
     assertEquals( "", testListener.getLog() );
   }
 
-  public void testUploadRequestWithoutBoundary() throws Exception {
+  @Test
+  public void testUploadRequestWithoutBoundary() throws IOException, ServletException {
     uploadHandler.addUploadListener( testListener );
 
     fakeUploadRequest( "Some content", "text/plain", "test.txt"  );
@@ -177,7 +192,8 @@ public class FileUploadServiceHandler_Test extends TestCase {
   }
 
   // Some browsers, such as IE and Opera, include path information, we cut them off for consistency
-  public void testOriginalFileNameWithPathSegment() throws Exception {
+  @Test
+  public void testOriginalFileNameWithPathSegment() throws IOException, ServletException {
     uploadHandler.addUploadListener( testListener );
 
     fakeUploadRequest( "some content", "text/plain", "/tmp/some.txt"  );
@@ -188,7 +204,8 @@ public class FileUploadServiceHandler_Test extends TestCase {
   }
 
   // Some browsers, such as IE and Opera, include path information, we cut them off for consistency
-  public void testOriginalFileWithWindowsPath() throws Exception {
+  @Test
+  public void testOriginalFileWithWindowsPath() throws IOException, ServletException {
     uploadHandler.addUploadListener( testListener );
 
     fakeUploadRequest( "some content", "text/plain", "C:\\temp\\some.txt"  );
@@ -198,6 +215,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
     assertEquals( "some.txt", uploadedItem.getFileName() );
   }
 
+  @Test
   public void testGetURL() {
     String head = "rap?servicehandler=org.eclipse.rap.fileupload&token=";
 
@@ -207,6 +225,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
     assertEquals( head + "123456789abcdef", FileUploadServiceHandler.getUrl( "123456789abcdef" ) );
   }
 
+  @Test
   public void testFileUploadCleanupThreadCreated() throws Exception {
     assertNull( findFileReaper() );
 
@@ -215,6 +234,7 @@ public class FileUploadServiceHandler_Test extends TestCase {
     assertNotNull( findFileReaper() );
   }
 
+  @Test
   public void testFileUploadCleanupThreadDestroyed() throws Exception {
     assertNull( findFileReaper() );
 

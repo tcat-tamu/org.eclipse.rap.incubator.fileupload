@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 EclipseSource and others.
+ * Copyright (c) 2011, 2013 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,37 +10,43 @@
  ******************************************************************************/
 package org.eclipse.rap.rwt.supplemental.fileupload.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-
-import junit.framework.TestCase;
 
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 
 /*
  * Tests to understand and verify how commons.fileupload works
  */
-public class CommonsFileUpload_Test extends TestCase {
+public class CommonsFileUpload_Test {
 
   private File tempDirectory;
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() {
     tempDirectory = FileUploadTestUtil.createTempDirectory();
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() {
     FileUploadTestUtil.deleteRecursively( tempDirectory );
   }
 
+  @Test
   public void testUploadEmptyFileWithZeroThreshold() throws FileUploadException {
     FileItemFactory factory = new DiskFileItemFactory( 0, tempDirectory );
     ServletFileUpload upload = new ServletFileUpload( factory );
@@ -58,6 +64,7 @@ public class CommonsFileUpload_Test extends TestCase {
     assertFalse( fileItem.getStoreLocation().exists() );
   }
 
+  @Test
   public void testUploadSmallerThanThreshold() throws FileUploadException {
     FileItemFactory factory = new DiskFileItemFactory( 100, tempDirectory );
     ServletFileUpload upload = new ServletFileUpload( factory );
@@ -75,6 +82,7 @@ public class CommonsFileUpload_Test extends TestCase {
     assertFalse( fileItem.getStoreLocation().exists() );
   }
 
+  @Test
   public void testUploadLongFile() throws FileUploadException {
     FileItemFactory factory = new DiskFileItemFactory( 100, tempDirectory );
     ServletFileUpload upload = new ServletFileUpload( factory );
@@ -93,4 +101,5 @@ public class CommonsFileUpload_Test extends TestCase {
     assertEquals( 600, fileItem.getSize() );
     assertTrue( fileItem.getStoreLocation().exists() );
   }
+
 }
