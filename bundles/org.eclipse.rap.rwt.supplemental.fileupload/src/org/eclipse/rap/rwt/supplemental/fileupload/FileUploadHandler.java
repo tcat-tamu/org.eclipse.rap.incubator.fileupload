@@ -21,7 +21,7 @@ import org.eclipse.rap.rwt.supplemental.fileupload.internal.FileUploadServiceHan
  * Upload listeners can be attached to react on progress. When the upload has finished, a
  * FileUploadHandler has to be disposed of by calling its <code>dispose()</code> method.
  */
-public final class FileUploadHandler {
+public class FileUploadHandler {
 
   private final String token;
   private final FileUploadReceiver receiver;
