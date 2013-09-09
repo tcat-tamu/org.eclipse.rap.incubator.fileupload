@@ -15,10 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.rap.rwt.supplemental.fileupload.DiskFileUploadReceiver;
-import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadEvent;
-import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
-import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadListener;
+import org.eclipse.rap.addons.fileupload.DiskFileUploadReceiver;
+import org.eclipse.rap.addons.fileupload.FileUploadEvent;
+import org.eclipse.rap.addons.fileupload.FileUploadHandler;
+import org.eclipse.rap.addons.fileupload.FileUploadListener;
 import org.eclipse.rap.rwt.widgets.FileUpload;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -140,11 +140,7 @@ public class FileUploadRunnable implements Runnable {
     }
 
     public void uploadFinished( FileUploadEvent event ) {
-      final List<String> targetFileNames = new ArrayList<String>();
-      File targetFile = ( ( DiskFileUploadReceiver )handler.getReceiver() ).getTargetFile();
-      if( targetFile != null ) {
-        targetFileNames.add( targetFile.getAbsolutePath() );
-      }
+      final List<String> targetFileNames = getTargetFileNames();
       asyncExec( new Runnable() {
         public void run() {
           handleFinished( targetFileNames );
@@ -160,6 +156,15 @@ public class FileUploadRunnable implements Runnable {
         }
       } );
       doNotify();
+    }
+
+    private List<String> getTargetFileNames() {
+      List<String> result = new ArrayList<String>();
+      List<File> targetFiles = ( ( DiskFileUploadReceiver )handler.getReceiver() ).getTargetFiles();
+      for( File targetFile : targetFiles ) {
+        result.add( targetFile.getAbsolutePath() );
+      }
+      return result;
     }
 
   }

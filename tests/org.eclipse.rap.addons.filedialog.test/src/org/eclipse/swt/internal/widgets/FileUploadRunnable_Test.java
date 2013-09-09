@@ -25,11 +25,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.rap.addons.fileupload.DiskFileUploadReceiver;
+import org.eclipse.rap.addons.fileupload.FileDetails;
+import org.eclipse.rap.addons.fileupload.FileUploadEvent;
+import org.eclipse.rap.addons.fileupload.FileUploadHandler;
+import org.eclipse.rap.addons.fileupload.FileUploadListener;
 import org.eclipse.rap.rwt.lifecycle.PhaseId;
-import org.eclipse.rap.rwt.supplemental.fileupload.DiskFileUploadReceiver;
-import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadEvent;
-import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
-import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadListener;
 import org.eclipse.rap.rwt.testfixture.Fixture;
 import org.eclipse.rap.rwt.widgets.FileUpload;
 import org.eclipse.swt.SWT;
@@ -265,18 +266,8 @@ public class FileUploadRunnable_Test {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public String getFileName() {
-      return null;
-    }
-
-    @Override
-    public Exception getException() {
-      return null;
-    }
-
-    @Override
-    public String getContentType() {
-      return null;
+    public FileDetails[] getFileDetails() {
+      return new FileDetails[ 0 ];
     }
 
     @Override
@@ -287,6 +278,11 @@ public class FileUploadRunnable_Test {
     @Override
     public long getBytesRead() {
       return 0;
+    }
+
+    @Override
+    public Exception getException() {
+      return null;
     }
 
     @Override

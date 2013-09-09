@@ -12,13 +12,14 @@ package org.eclipse.rap.addons.filedialog.demo.examples;
 
 import java.io.File;
 
+import org.eclipse.rap.addons.fileupload.DiskFileUploadReceiver;
+import org.eclipse.rap.addons.fileupload.FileDetails;
+import org.eclipse.rap.addons.fileupload.FileUploadEvent;
+import org.eclipse.rap.addons.fileupload.FileUploadHandler;
+import org.eclipse.rap.addons.fileupload.FileUploadListener;
 import org.eclipse.rap.examples.ExampleUtil;
 import org.eclipse.rap.examples.IExamplePage;
 import org.eclipse.rap.rwt.service.ServerPushSession;
-import org.eclipse.rap.rwt.supplemental.fileupload.DiskFileUploadReceiver;
-import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadEvent;
-import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
-import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadListener;
 import org.eclipse.rap.rwt.widgets.DialogCallback;
 import org.eclipse.rap.rwt.widgets.DialogUtil;
 import org.eclipse.rap.rwt.widgets.FileUpload;
@@ -125,11 +126,13 @@ public class FileUploadExamplePage implements IExamplePage {
       }
 
       public void uploadFailed( FileUploadEvent event ) {
-        addToLog( "upload failed: " + event.getFileName() );
+        addToLog( "upload failed: " + event.getException() );
       }
 
       public void uploadFinished( FileUploadEvent event ) {
-        addToLog( "received: " + event.getFileName() );
+        for( FileDetails file : event.getFileDetails() ) {
+          addToLog( "received: " + file.getFileName() );
+        }
       }
     } );
     return uploadHandler.getUploadUrl();

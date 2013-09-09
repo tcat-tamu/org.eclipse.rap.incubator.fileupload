@@ -21,9 +21,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.rap.addons.fileupload.DiskFileUploadReceiver;
+import org.eclipse.rap.addons.fileupload.FileUploadHandler;
 import org.eclipse.rap.rwt.service.ServerPushSession;
-import org.eclipse.rap.rwt.supplemental.fileupload.DiskFileUploadReceiver;
-import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
 import org.eclipse.rap.rwt.widgets.FileUpload;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
