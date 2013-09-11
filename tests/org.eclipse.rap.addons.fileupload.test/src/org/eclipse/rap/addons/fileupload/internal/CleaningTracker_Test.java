@@ -18,6 +18,7 @@ import static org.mockito.Mockito.mock;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,6 +32,11 @@ public class CleaningTracker_Test {
   public void setUp() throws IOException {
     tempFile = File.createTempFile( "temp-", null );
     cleaningTracker = new CleaningTracker();
+  }
+
+  @After
+  public void tearDown() {
+    tempFile.delete();
   }
 
   @Test
