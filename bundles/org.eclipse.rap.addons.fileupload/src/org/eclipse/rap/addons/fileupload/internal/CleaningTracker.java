@@ -17,7 +17,12 @@ import java.util.List;
 import org.apache.commons.io.FileCleaningTracker;
 import org.apache.commons.io.FileDeleteStrategy;
 
-
+/*
+ * Simpler file cleaning tracker implementation due to bug
+ *
+ * FileCleaningTracker Reaper thread not ended
+ * https://issues.apache.org/jira/browse/FILEUPLOAD-205
+ */
 public class CleaningTracker extends FileCleaningTracker {
 
   private final List<String> filesToDelete;
