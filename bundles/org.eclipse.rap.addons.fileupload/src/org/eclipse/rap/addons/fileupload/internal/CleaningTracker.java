@@ -30,21 +30,27 @@ public class CleaningTracker extends FileCleaningTracker {
 
   @Override
   public void track( File file, Object marker ) {
-    filesToDelete.add( file.getAbsolutePath() );
+    track( file, marker, null );
   }
 
   @Override
   public void track( File file, Object marker, FileDeleteStrategy deleteStrategy ) {
+    if( file == null ) {
+      throw new NullPointerException( "The file must not be null" );
+    }
     filesToDelete.add( file.getAbsolutePath() );
   }
 
   @Override
   public void track( String path, Object marker ) {
-    filesToDelete.add( path );
+    track( path, marker, null );
   }
 
   @Override
   public void track( String path, Object marker, FileDeleteStrategy deleteStrategy ) {
+    if( path == null ) {
+      throw new NullPointerException( "The path must not be null" );
+    }
     filesToDelete.add( path );
   }
 

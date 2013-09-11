@@ -39,6 +39,16 @@ public class CleaningTracker_Test {
     tempFile.delete();
   }
 
+  @Test( expected = NullPointerException.class )
+  public void testTrack_nullFile() {
+    cleaningTracker.track( ( File )null, null );
+  }
+
+  @Test( expected = NullPointerException.class )
+  public void testTrack_nullPath() {
+    cleaningTracker.track( ( String )null, null );
+  }
+
   @Test
   public void testDeleteTemporaryFiles_trackedByFile_1() {
     cleaningTracker.track( tempFile, null );
