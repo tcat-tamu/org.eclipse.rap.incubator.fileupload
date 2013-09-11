@@ -11,13 +11,9 @@
 package org.eclipse.rap.addons.fileupload.internal;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -216,48 +212,6 @@ public class FileUploadServiceHandler_Test {
     assertEquals( head + "<>&?", FileUploadServiceHandler.getUrl( "<>&?" ) );
     assertEquals( head + "testToken", FileUploadServiceHandler.getUrl( "testToken" ) );
     assertEquals( head + "123456789abcdef", FileUploadServiceHandler.getUrl( "123456789abcdef" ) );
-  }
-
-  @Test
-  public void testFileUploadCleanupThreadCreated() throws Exception {
-    assertNull( findFileReaper() );
-
-    simulateUpload();
-
-    assertNotNull( findFileReaper() );
-  }
-
-  @Test
-  public void testFileUploadCleanupThreadDestroyed() throws Exception {
-    assertNull( findFileReaper() );
-
-    simulateUpload();
-    RWT.getRequest().getSession().invalidate();
-
-    assertNull( findFileReaper() );
-  }
-
-  private void simulateUpload() throws IOException, ServletException {
-    String content = "Lorem ipsum dolor sit amet.";
-    fakeUploadRequest( content, "text/plain", "short.txt"  );
-    serviceHandler.service( RWT.getRequest(), RWT.getResponse() );
-  }
-
-  private Thread findFileReaper() throws InterruptedException {
-    // File reaper is destroyed upon garbage collection
-    System.gc();
-    // Allow file reaper to die
-    Thread.sleep( 10 );
-    Set threadSet = Thread.getAllStackTraces().keySet();
-    Iterator threadItr = threadSet.iterator();
-    Thread fileReaper = null;
-    while ( threadItr.hasNext() && fileReaper == null ) {
-      Thread t = ( Thread ) threadItr.next();
-      if ( t.getName().equals( "File Reaper" ) ) {
-        fileReaper = t;
-      }
-    }
-    return fileReaper;
   }
 
   private void fakeUploadRequest( String token ) {

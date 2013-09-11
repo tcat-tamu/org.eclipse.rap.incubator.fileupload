@@ -32,10 +32,12 @@ final class FileUploadProcessor {
 
   private final FileUploadHandler handler;
   private final FileUploadTracker tracker;
+  private final CleaningTracker cleaningTracker;
 
   FileUploadProcessor( FileUploadHandler handler ) {
     this.handler = handler;
     tracker = new FileUploadTracker( handler );
+    cleaningTracker = new CleaningTracker();
   }
 
   void handleFileUpload( HttpServletRequest request, HttpServletResponse response )
@@ -69,6 +71,7 @@ final class FileUploadProcessor {
       tracker.handleFailed();
       response.sendError( HttpServletResponse.SC_INTERNAL_SERVER_ERROR, exception.getMessage() );
     }
+    cleaningTracker.deleteTemporaryFiles();
   }
 
   private List<FileItem> readUploadedFileItems( HttpServletRequest request )
@@ -89,7 +92,7 @@ final class FileUploadProcessor {
 
   private ServletFileUpload createUpload() {
     DiskFileItemFactory factory = new DiskFileItemFactory();
-    factory.setFileCleaningTracker( CleaningTrackerUtil.getCleaningTracker( true ) );
+    factory.setFileCleaningTracker( cleaningTracker );
     ServletFileUpload upload = new ServletFileUpload( factory );
     upload.setFileSizeMax( handler.getMaxFileSize() );
     upload.setProgressListener( createProgressListener() );
