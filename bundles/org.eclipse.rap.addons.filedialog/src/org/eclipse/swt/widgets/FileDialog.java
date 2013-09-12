@@ -380,19 +380,9 @@ public class FileDialog extends Dialog {
   void deleteUploadedFiles() {
     for( String fileName : progressCollector.getCompletedFileNames() ) {
       File file = new File( fileName );
-      deleteRecursively( file.getParentFile() );
-    }
-  }
-
-  private static void deleteRecursively( File file ) {
-    if( file != null && file.exists() ) {
-      File[] files = file.listFiles();
-      if( files != null ) {
-        for( int i = 0; i < files.length; i++ ) {
-          deleteRecursively( files[ i ] );
-        }
+      if( file.exists() ) {
+        file.delete();
       }
-      file.delete();
     }
   }
 
