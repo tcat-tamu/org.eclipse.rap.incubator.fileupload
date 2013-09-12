@@ -160,7 +160,7 @@ public class FileUploadRunnable implements Runnable {
 
     private List<String> getTargetFileNames() {
       List<String> result = new ArrayList<String>();
-      List<File> targetFiles = ( ( DiskFileUploadReceiver )handler.getReceiver() ).getTargetFiles();
+      File[] targetFiles = ( ( DiskFileUploadReceiver )handler.getReceiver() ).getTargetFiles();
       for( File targetFile : targetFiles ) {
         result.add( targetFile.getAbsolutePath() );
       }

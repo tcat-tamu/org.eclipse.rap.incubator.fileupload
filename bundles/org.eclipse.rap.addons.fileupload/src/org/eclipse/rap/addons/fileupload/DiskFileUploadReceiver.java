@@ -20,7 +20,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -94,12 +93,12 @@ public class DiskFileUploadReceiver extends FileUploadReceiver {
   }
 
   /**
-   * Returns a list with files that the received data has been saved to.
+   * Returns an array with files that the received data has been saved to.
    *
-   * @return the list with target files or empty list if no files have been stored yet
+   * @return the array with target files or empty array if no files have been stored yet
    */
-  public List<File> getTargetFiles() {
-    return Collections.unmodifiableList( targetFiles );
+  public File[] getTargetFiles() {
+    return targetFiles.toArray( new File[ 0 ] );
   }
 
   /**

@@ -21,6 +21,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -62,7 +63,9 @@ public class FileUploadRunnable_Test {
     when( fileUpload.getDisplay() ).thenReturn( display );
     uploadPanel = mock( UploadPanel.class );
     progressCollector = mock( ProgressCollector.class );
-    handler = spy( new FileUploadHandler( mock( DiskFileUploadReceiver.class ) ) );
+    DiskFileUploadReceiver diskFileUploadReceiver = mock( DiskFileUploadReceiver.class );
+    when( diskFileUploadReceiver.getTargetFiles() ).thenReturn( new File[ 0 ] );
+    handler = spy( new FileUploadHandler( diskFileUploadReceiver ) );
     runnable = new FileUploadRunnable( fileUpload, uploadPanel, progressCollector, handler );
   }
 

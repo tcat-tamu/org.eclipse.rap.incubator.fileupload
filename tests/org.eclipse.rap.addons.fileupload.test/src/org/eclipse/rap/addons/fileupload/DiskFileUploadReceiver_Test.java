@@ -46,7 +46,7 @@ public class DiskFileUploadReceiver_Test {
   public void testInitialGetTargetFiles() {
     DiskFileUploadReceiver receiver = new DiskFileUploadReceiver();
 
-    assertEquals( 0, receiver.getTargetFiles().size() );
+    assertEquals( 0, receiver.getTargetFiles().length );
   }
 
   @Test
@@ -97,7 +97,7 @@ public class DiskFileUploadReceiver_Test {
 
     FileDetails details = new FileDetailsImpl( "foo.bar", "text/plain", content.length() );
     receiver.receive( new ByteArrayInputStream( content.getBytes() ), details );
-    createdFile = receiver.getTargetFiles().get( 0 );
+    createdFile = receiver.getTargetFiles()[ 0 ];
 
     assertNotNull( createdFile );
     assertTrue( createdFile.exists() );
@@ -110,7 +110,7 @@ public class DiskFileUploadReceiver_Test {
     String content = "Hello world!";
 
     receiver.receive( new ByteArrayInputStream( content.getBytes() ), null );
-    createdFile = receiver.getTargetFiles().get( 0 );
+    createdFile = receiver.getTargetFiles()[ 0 ];
 
     assertNotNull( createdFile );
     assertTrue( createdFile.exists() );
