@@ -373,12 +373,12 @@ public class FileDialog extends Dialog {
     pushSession.stop();
     singleThreadExecutor.shutdownNow();
     if( returnCode == SWT.CANCEL ) {
-      deleteUploadedFiles();
+      deleteUploadedFiles( progressCollector.getCompletedFileNames() );
     }
   }
 
-  void deleteUploadedFiles() {
-    for( String fileName : progressCollector.getCompletedFileNames() ) {
+  void deleteUploadedFiles( String[] fileNames ) {
+    for( String fileName : fileNames ) {
       File file = new File( fileName );
       if( file.exists() ) {
         file.delete();

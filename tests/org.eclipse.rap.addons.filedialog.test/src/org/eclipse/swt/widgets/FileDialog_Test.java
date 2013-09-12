@@ -17,8 +17,12 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.eclipse.rap.rwt.internal.serverpush.ServerPushManager;
@@ -125,23 +129,32 @@ public class FileDialog_Test {
 
   @Test
   public void testClose_deletesUploadedFiles() {
+    dialog = spy( new TestFileDialog( shell ) );
+    DialogUtil.open( dialog, callback );
+
     dialog.shell.close();
 
-    assertTrue( ( ( TestFileDialog )dialog ).uploadedFilesDeleted );
+    verify( dialog ).deleteUploadedFiles( any( String[].class ) );
   }
 
   @Test
   public void testCancel_deletesUploadedFiles() {
+    dialog = spy( new TestFileDialog( shell ) );
+    DialogUtil.open( dialog, callback );
+
     getCancelButton().notifyListeners( SWT.Selection, null );
 
-    assertTrue( ( ( TestFileDialog )dialog ).uploadedFilesDeleted );
+    verify( dialog ).deleteUploadedFiles( any( String[].class ) );
   }
 
   @Test
   public void testOK_doesNotDeleteUploadedFiles() {
+    dialog = spy( new TestFileDialog( shell ) );
+    DialogUtil.open( dialog, callback );
+
     getOKButton().notifyListeners( SWT.Selection, null );
 
-    assertFalse( ( ( TestFileDialog )dialog ).uploadedFilesDeleted );
+    verify( dialog, never() ).deleteUploadedFiles( any( String[].class ) );
   }
 
   @Test
@@ -218,6 +231,15 @@ public class FileDialog_Test {
     assertSame( fileUpload, getFileUpload() );
   }
 
+  @Test
+  public void testDeleteUploadedFiles() throws IOException {
+    File uploadedFile = File.createTempFile( "temp-", null );
+
+    dialog.deleteUploadedFiles( new String[] { uploadedFile.getAbsolutePath() } );
+
+    assertFalse( uploadedFile.exists() );
+  }
+
   private FileUpload getFileUpload() {
     Composite buttonsArea = ( Composite )dialog.shell.getChildren()[ 1 ];
     return ( FileUpload )buttonsArea.getChildren()[ 0 ];
@@ -235,8 +257,6 @@ public class FileDialog_Test {
 
   private class TestFileDialog extends FileDialog {
 
-    private boolean uploadedFilesDeleted;
-
     public TestFileDialog( Shell shell ) {
       super( shell );
     }
@@ -248,11 +268,6 @@ public class FileDialog_Test {
     @Override
     ThreadPoolExecutor createSingleThreadExecutor() {
       return singleThreadExecutor;
-    }
-
-    @Override
-    void deleteUploadedFiles() {
-      uploadedFilesDeleted = true;
     }
 
   }
