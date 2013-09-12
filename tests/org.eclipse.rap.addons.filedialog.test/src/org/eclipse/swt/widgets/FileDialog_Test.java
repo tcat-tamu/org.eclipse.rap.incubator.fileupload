@@ -124,6 +124,27 @@ public class FileDialog_Test {
   }
 
   @Test
+  public void testClose_deletesUploadedFiles() {
+    dialog.shell.close();
+
+    assertTrue( ( ( TestFileDialog )dialog ).uploadedFilesDeleted );
+  }
+
+  @Test
+  public void testCancel_deletesUploadedFiles() {
+    getCancelButton().notifyListeners( SWT.Selection, null );
+
+    assertTrue( ( ( TestFileDialog )dialog ).uploadedFilesDeleted );
+  }
+
+  @Test
+  public void testOK_doesNotDeleteUploadedFiles() {
+    getOKButton().notifyListeners( SWT.Selection, null );
+
+    assertFalse( ( ( TestFileDialog )dialog ).uploadedFilesDeleted );
+  }
+
+  @Test
   public void testGetFileName_returnEmptyString() {
     dialog.shell.close();
 
@@ -212,7 +233,9 @@ public class FileDialog_Test {
     return ( Button )buttonsArea.getChildren()[ 3 ];
   }
 
-  private final class TestFileDialog extends FileDialog {
+  private class TestFileDialog extends FileDialog {
+
+    private boolean uploadedFilesDeleted;
 
     public TestFileDialog( Shell shell ) {
       super( shell );
@@ -225,6 +248,11 @@ public class FileDialog_Test {
     @Override
     ThreadPoolExecutor createSingleThreadExecutor() {
       return singleThreadExecutor;
+    }
+
+    @Override
+    void deleteUploadedFiles() {
+      uploadedFilesDeleted = true;
     }
 
   }

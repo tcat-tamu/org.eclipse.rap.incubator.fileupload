@@ -17,6 +17,7 @@ import static org.eclipse.swt.internal.widgets.LayoutUtil.createFillData;
 import static org.eclipse.swt.internal.widgets.LayoutUtil.createGridLayout;
 import static org.eclipse.swt.internal.widgets.LayoutUtil.createHorizontalFillData;
 
+import java.io.File;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -371,6 +372,28 @@ public class FileDialog extends Dialog {
   private void cleanup() {
     pushSession.stop();
     singleThreadExecutor.shutdownNow();
+    if( returnCode == SWT.CANCEL ) {
+      deleteUploadedFiles();
+    }
+  }
+
+  void deleteUploadedFiles() {
+    for( String fileName : progressCollector.getCompletedFileNames() ) {
+      File file = new File( fileName );
+      deleteRecursively( file.getParentFile() );
+    }
+  }
+
+  private static void deleteRecursively( File file ) {
+    if( file != null && file.exists() ) {
+      File[] files = file.listFiles();
+      if( files != null ) {
+        for( int i = 0; i < files.length; i++ ) {
+          deleteRecursively( files[ i ] );
+        }
+      }
+      file.delete();
+    }
   }
 
   static int checkStyle( Shell parent, int style ) {
