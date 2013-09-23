@@ -45,6 +45,7 @@ public class ProgressCollector extends Composite {
   void updateProgress( int percent ) {
     if( !isDisposed() ) {
       progressBar.setSelection( percent );
+      progressBar.setToolTipText( percent + "%" );
     }
   }
 
