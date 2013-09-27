@@ -244,7 +244,8 @@ public class FileDialog extends Dialog {
     Composite buttonsArea = new Composite( parent, SWT.NONE );
     buttonsArea.setLayout( createGridLayout( 4, 0, 5 ) );
     buttonsArea.setLayoutData( createHorizontalFillData() );
-    createFileUpload( buttonsArea, isMulti() ? "Add" : "Browse" );
+    String text = isMulti() ? SWT.getMessage( "SWT_Add" ) : SWT.getMessage( "SWT_Browse" );
+    createFileUpload( buttonsArea, text );
     createSpacer( buttonsArea );
     okButton = createButton( buttonsArea, SWT.getMessage( "SWT_OK" ) );
     parent.getShell().setDefaultButton( okButton );
@@ -314,7 +315,7 @@ public class FileDialog extends Dialog {
     if( isMulti() ) {
       Composite buttonsArea = fileUpload.getParent();
       hideFileUpload( fileUpload );
-      createFileUpload( buttonsArea, "Add" );
+      createFileUpload( buttonsArea, SWT.getMessage( "SWT_Add" ) );
       buttonsArea.layout();
     } else {
       fileUpload.setEnabled( false );
