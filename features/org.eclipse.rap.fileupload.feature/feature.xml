@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.rap.fileupload.feature"
       label="%featureName"
-      version="2.0.0.qualifier"
+      version="2.2.0.qualifier"
       provider-name="%providerName">
 
    <description url="http://www.eclipse.org/rap">
@@ -32,28 +32,28 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.rap.rwt.supplemental.fileupload"
+         id="org.eclipse.rap.addons.filedialog"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.rap.rwt.supplemental.fileupload.source"
+         id="org.eclipse.rap.addons.filedialog.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.rap.rwt.supplemental.filedialog"
+         id="org.eclipse.rap.addons.fileupload"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.rap.rwt.supplemental.filedialog.source"
+         id="org.eclipse.rap.addons.fileupload.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
