@@ -39,8 +39,8 @@
          SecurityException: class org.eclipse.swt.widgets...s signer information 
          does not match signer information of other classes in the same package
     <module>../../tests/org.eclipse.rap.addons.filedialog.test</module>
-    -->
     <module>../../tests/org.eclipse.rap.addons.fileupload.test</module>
+    -->
     <module>../../features/org.eclipse.rap.fileupload.feature</module>
     <module>repository</module>
   </modules>
