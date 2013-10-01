@@ -198,10 +198,28 @@ public class FileUploadRunnable_Test {
   }
 
   @Test
+  public void testHandleFinished_resetsToolTip() {
+    List<String> completedFiles = new ArrayList<String>();
+    completedFiles.add( "foo" );
+    completedFiles.add( "bar" );
+
+    runnable.handleFinished( completedFiles );
+
+    verify( progressCollector ).resetToolTip();
+  }
+
+  @Test
   public void testHandleFailed_updatesIcons() {
     runnable.handleFailed();
 
     verify( uploadPanel ).updateIcons( State.FAILED );
+  }
+
+  @Test
+  public void testHandleFailed_resetsToolTip() {
+    runnable.handleFailed();
+
+    verify( progressCollector ).resetToolTip();
   }
 
   @Test

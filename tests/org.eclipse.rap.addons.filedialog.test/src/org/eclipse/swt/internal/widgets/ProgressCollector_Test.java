@@ -12,6 +12,7 @@ package org.eclipse.swt.internal.widgets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,10 +84,26 @@ public class ProgressCollector_Test {
   }
 
   @Test
+  public void testUpdateProgress_setsToolTip() {
+    progressCollector.updateProgress( 20 );
+
+    assertEquals( "20%", getProgressBar().getToolTipText() );
+  }
+
+  @Test
   public void testUpdateProgress_onDisposedProgressCollector_doesNotThrowException() {
     progressCollector.dispose();
 
     progressCollector.updateProgress( 20 );
+  }
+
+  @Test
+  public void testResetToolTip() {
+    progressCollector.updateProgress( 20 );
+
+    progressCollector.resetToolTip();
+
+    assertNull( getProgressBar().getToolTipText() );
   }
 
   private ProgressBar getProgressBar() {

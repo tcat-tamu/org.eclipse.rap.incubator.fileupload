@@ -95,12 +95,14 @@ public class FileUploadRunnable implements Runnable {
   void handleFinished( List<String> targetFileNames ) {
     state.set( State.FINISHED );
     uploadPanel.updateIcons( State.FINISHED );
+    progressCollector.resetToolTip();
     progressCollector.updateCompletedFiles( targetFileNames );
   }
 
   void handleFailed() {
     state.set( State.FAILED );
     uploadPanel.updateIcons( State.FAILED );
+    progressCollector.resetToolTip();
   }
 
   State getState() {

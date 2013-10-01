@@ -55,4 +55,8 @@ public class ProgressCollector extends Composite {
     }
   }
 
+  void resetToolTip() {
+    progressBar.setToolTipText( null );
+  }
+
 }
