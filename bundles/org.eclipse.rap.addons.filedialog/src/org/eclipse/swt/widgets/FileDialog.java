@@ -250,12 +250,12 @@ public class FileDialog extends Dialog {
     okButton = createButton( buttonsArea, SWT.getMessage( "SWT_OK" ) );
     parent.getShell().setDefaultButton( okButton );
     okButton.forceFocus();
-    Button cancelButton = createButton( buttonsArea, SWT.getMessage( "SWT_Cancel" ) );
     okButton.addListener( SWT.Selection, new Listener() {
       public void handleEvent( Event event ) {
         okPressed();
       }
     } );
+    Button cancelButton = createButton( buttonsArea, SWT.getMessage( "SWT_Cancel" ) );
     cancelButton.addListener( SWT.Selection, new Listener() {
       public void handleEvent( Event event ) {
         cancelPressed();
@@ -263,7 +263,7 @@ public class FileDialog extends Dialog {
     } );
   }
 
-  private void createFileUpload( Composite parent, String text ) {
+  protected FileUpload createFileUpload( Composite parent, String text ) {
     FileUpload fileUpload = new FileUpload( parent, isMulti() ? SWT.MULTI : SWT.NONE );
     fileUpload.setText( text );
     fileUpload.setLayoutData( createButtonLayoutData( fileUpload ) );
@@ -273,6 +273,7 @@ public class FileDialog extends Dialog {
       }
     } );
     fileUpload.moveAbove( null );
+    return fileUpload;
   }
 
   private void createSpacer( Composite buttonArea ) {
@@ -280,7 +281,7 @@ public class FileDialog extends Dialog {
     spacer.setLayoutData( createButtonLayoutData( spacer ) );
   }
 
-  private static Button createButton( Composite parent, String text ) {
+  protected static Button createButton( Composite parent, String text ) {
     Button button = new Button( parent, SWT.PUSH );
     button.setText( text );
     button.setLayoutData( createButtonLayoutData( button ) );
