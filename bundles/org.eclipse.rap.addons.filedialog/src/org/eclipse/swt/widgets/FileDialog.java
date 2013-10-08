@@ -281,7 +281,7 @@ public class FileDialog extends Dialog {
     spacer.setLayoutData( createButtonLayoutData( spacer ) );
   }
 
-  protected static Button createButton( Composite parent, String text ) {
+  protected Button createButton( Composite parent, String text ) {
     Button button = new Button( parent, SWT.PUSH );
     button.setText( text );
     button.setLayoutData( createButtonLayoutData( button ) );
