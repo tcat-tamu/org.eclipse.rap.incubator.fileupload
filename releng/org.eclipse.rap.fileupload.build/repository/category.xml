@@ -17,7 +17,7 @@
 
   <feature url="http://eclipse.org/rap"
       id="org.eclipse.rap.fileupload.feature"
-      version="2.3.0.qualifier">
+      version="2.2.0.qualifier">
     <category name="org.eclipse.rap.incubator.category"/>
   </feature>
 
