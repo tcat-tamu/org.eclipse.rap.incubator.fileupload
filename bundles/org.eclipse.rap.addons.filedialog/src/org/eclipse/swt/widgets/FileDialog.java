@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -189,7 +189,9 @@ public class FileDialog extends Dialog {
 
   private void initializeBounds() {
     Point prefSize = shell.computeSize( SWT.DEFAULT, SWT.DEFAULT );
-    prefSize.y += 165; // ensure space for five files
+    if( isMulti() ) {
+      prefSize.y += 165; // ensure space for five files
+    }
     shell.setMinimumSize( prefSize );
     Rectangle parentSize = getParent().getBounds();
     int locationX = ( parentSize.width - prefSize.x ) / 2 + parentSize.x;
@@ -218,7 +220,7 @@ public class FileDialog extends Dialog {
   }
 
   private void createUploadsArea( Composite parent ) {
-    uploadsScroller = new ScrolledComposite( parent, SWT.V_SCROLL );
+    uploadsScroller = new ScrolledComposite( parent, isMulti() ? SWT.V_SCROLL : SWT.NONE );
     uploadsScroller.setLayoutData( createFillData() );
     uploadsScroller.setExpandHorizontal( true );
     uploadsScroller.setExpandVertical( true );
