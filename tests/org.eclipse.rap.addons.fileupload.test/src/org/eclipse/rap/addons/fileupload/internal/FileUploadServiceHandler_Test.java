@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 EclipseSource and others.
+ * Copyright (c) 2011, 2014 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,17 @@
  ******************************************************************************/
 package org.eclipse.rap.addons.fileupload.internal;
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -204,14 +211,26 @@ public class FileUploadServiceHandler_Test {
     assertEquals( "some.txt", uploadedItem.getFileDetails()[ 0 ].getFileName() );
   }
 
-  @Test
-  public void testGetURL() {
-    String head = "rap?servicehandler=org.eclipse.rap.fileupload&token=";
 
-    assertEquals( head, FileUploadServiceHandler.getUrl( "" ) );
-    assertEquals( head + "<>&?", FileUploadServiceHandler.getUrl( "<>&?" ) );
-    assertEquals( head + "testToken", FileUploadServiceHandler.getUrl( "testToken" ) );
-    assertEquals( head + "123456789abcdef", FileUploadServiceHandler.getUrl( "123456789abcdef" ) );
+  @Test
+  public void testGetURL_returnsRelativeUrl() {
+    String url = FileUploadServiceHandler.getUrl( "token" );
+
+    assertThat( url, not( containsString( "/" ) ) );
+  }
+
+  @Test
+  public void testGetURL_includesToken() {
+    String url = FileUploadServiceHandler.getUrl( "foo" );
+
+    assertThat( getQueryParameters( url ), hasItem( "token=foo" ) );
+  }
+
+  @Test
+  public void testGetURL_isServiceHandlerUrl() {
+    String url = FileUploadServiceHandler.getUrl( "foo" );
+
+    assertThat( getQueryParameters( url ), hasItem( startsWith( "servicehandler=" ) ) );
   }
 
   private void fakeUploadRequest( String token ) {
@@ -221,6 +240,12 @@ public class FileUploadServiceHandler_Test {
   private void fakeUploadRequest( String content, String contentType, String fileName ) {
     String token = TestAdapter.getTokenFor( uploadHandler );
     FileUploadTestUtil.fakeUploadRequest( token, content, contentType, fileName );
+  }
+
+  private static List<String> getQueryParameters( String url ) {
+    int queryIndex = url.indexOf( '?' );
+    String queryString = queryIndex == -1 ? "" : url.substring( queryIndex + 1 );
+    return asList( queryString.split( "\\&" ) );
   }
 
   private static int getResponseErrorStatus() {
@@ -236,4 +261,5 @@ public class FileUploadServiceHandler_Test {
     }
     return new String( bytes );
   }
+
 }

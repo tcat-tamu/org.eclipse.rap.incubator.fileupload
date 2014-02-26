@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2002, 2012 EclipseSource and others.
+ * Copyright (c) 2002, 2014 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -57,15 +57,13 @@ public final class FileUploadServiceHandler implements ServiceHandler {
   }
 
   public static String getUrl( String token ) {
-    StringBuffer url = new StringBuffer();
-    url.append( RWT.getServiceManager().getServiceHandlerUrl( SERVICE_HANDLER_ID ) );
-    url.append( '&' );
-    url.append( PARAMETER_TOKEN ).append( '=' ).append( token );
-    int relativeIndex = url.lastIndexOf( "/" );
-    if( relativeIndex > -1 ) {
-      url.delete( 0, relativeIndex + 1 );
-    }
-    return url.toString();
+    String serviceHandlerUrl = RWT.getServiceManager().getServiceHandlerUrl( SERVICE_HANDLER_ID );
+    return new StringBuilder( serviceHandlerUrl )
+      .append( '&' )
+      .append( PARAMETER_TOKEN )
+      .append( '=' )
+      .append( token )
+      .toString();
   }
 
 }
