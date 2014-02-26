@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 EclipseSource and others.
+ * Copyright (c) 2011, 2014 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.rap.addons.fileupload.internal;
 
+import static org.eclipse.rap.rwt.SingletonUtil.getUniqueInstance;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,49 +22,28 @@ import org.eclipse.rap.rwt.RWT;
 
 public final class FileUploadHandlerStore {
 
-  private static final String ATTR_NAME = FileUploadHandlerStore.class.getName() + ".instance";
-
-  private static final Object LOCK = new Object();
-  private final Map< String, FileUploadHandler > handlers;
-  private final Object lock;
-  private boolean registered;
+  private final Map<String, FileUploadHandler> handlers;
 
   private FileUploadHandlerStore() {
-    handlers = new HashMap< String, FileUploadHandler >();
-    lock = new Object();
+    handlers = Collections.synchronizedMap( new HashMap<String, FileUploadHandler>() );
+    RWT.getServiceManager().registerServiceHandler( FileUploadServiceHandler.SERVICE_HANDLER_ID,
+                                                    new FileUploadServiceHandler() );
   }
 
   public static FileUploadHandlerStore getInstance() {
-    FileUploadHandlerStore result;
-    synchronized( LOCK ) {
-      result = ( FileUploadHandlerStore )RWT.getApplicationContext().getAttribute( ATTR_NAME );
-      if( result == null ) {
-        result = new FileUploadHandlerStore();
-        RWT.getApplicationContext().setAttribute( ATTR_NAME, result );
-      }
-    }
-    return result;
+    return getUniqueInstance( FileUploadHandlerStore.class, RWT.getApplicationContext() );
   }
 
   public void registerHandler( String token, FileUploadHandler fileUploadHandler ) {
-    ensureServiceHandler();
-    synchronized( lock ) {
-      handlers.put( token, fileUploadHandler );
-    }
+    handlers.put( token, fileUploadHandler );
   }
 
   public void deregisterHandler( String token ) {
-    synchronized( lock ) {
-      handlers.remove( token );
-    }
+    handlers.remove( token );
   }
 
   public FileUploadHandler getHandler( String token ) {
-    FileUploadHandler result;
-    synchronized( lock ) {
-      result = handlers.get( token );
-    }
-    return result;
+    return handlers.get( token );
   }
 
   public static String createToken() {
@@ -70,13 +52,4 @@ public final class FileUploadHandlerStore {
     return Integer.toHexString( random1 ) + Integer.toHexString( random2 );
   }
 
-  private void ensureServiceHandler() {
-    synchronized( lock ) {
-      if( !registered ) {
-        RWT.getServiceManager().registerServiceHandler( FileUploadServiceHandler.SERVICE_HANDLER_ID,
-                                                        new FileUploadServiceHandler() );
-        registered = true;
-      }
-    }
-  }
 }
