@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 EclipseSource and others.
+ * Copyright (c) 2013, 2014 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,6 +25,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import org.eclipse.rap.rwt.client.ClientFile;
+import org.eclipse.rap.rwt.dnd.ClientFileTransfer;
+import org.eclipse.rap.rwt.internal.client.ClientFileImpl;
 import org.eclipse.rap.rwt.internal.serverpush.ServerPushManager;
 import org.eclipse.rap.rwt.lifecycle.PhaseId;
 import org.eclipse.rap.rwt.testfixture.Fixture;
@@ -32,6 +35,10 @@ import org.eclipse.rap.rwt.widgets.DialogCallback;
 import org.eclipse.rap.rwt.widgets.DialogUtil;
 import org.eclipse.rap.rwt.widgets.FileUpload;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.internal.dnd.DNDEvent;
 import org.eclipse.swt.internal.widgets.FileUploadRunnable;
 import org.eclipse.swt.layout.GridData;
 import org.junit.After;
@@ -39,7 +46,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-@SuppressWarnings( "restriction" )
+@SuppressWarnings( {
+  "restriction", "deprecation"
+} )
 public class FileDialog_Test {
 
   private Display display;
@@ -232,12 +241,49 @@ public class FileDialog_Test {
   }
 
   @Test
+  public void testFileDrop_acceptsClientFileTransfer() {
+    DNDEvent event = new DNDEvent();
+    event.dataType = ClientFileTransfer.getInstance().getSupportedTypes()[ 0 ];
+    event.detail = DND.DROP_MOVE;
+
+    getDropTarget().notifyListeners( DND.DropAccept, event );
+
+    assertEquals( DND.DROP_MOVE, event.detail );
+  }
+
+  @Test
+  public void testFileDrop_rejectsOtherTransfer() {
+    DNDEvent event = new DNDEvent();
+    event.dataType = FileTransfer.getInstance().getSupportedTypes()[ 0 ];
+    event.detail = DND.DROP_MOVE;
+
+    getDropTarget().notifyListeners( DND.DropAccept, event );
+
+    assertEquals( DND.DROP_NONE, event.detail );
+  }
+
+  @Test
+  public void testFileDrop_executesRunnable() {
+    DNDEvent event = new DNDEvent();
+    event.data = new ClientFile[] { new ClientFileImpl( "fileId", "", "", 0 ) };
+
+    getDropTarget().notifyListeners( DND.Drop, event );
+
+    verify( singleThreadExecutor ).execute( any( FileUploadRunnable.class ) );
+  }
+
+  @Test
   public void testDeleteUploadedFiles() throws IOException {
     File uploadedFile = File.createTempFile( "temp-", null );
 
     dialog.deleteUploadedFiles( new String[] { uploadedFile.getAbsolutePath() } );
 
     assertFalse( uploadedFile.exists() );
+  }
+
+  private DropTarget getDropTarget() {
+    Composite dropControl = ( Composite )dialog.shell.getChildren()[ 0 ];
+    return ( DropTarget )dropControl.getData( DND.DROP_TARGET_KEY );
   }
 
   private FileUpload getFileUpload() {

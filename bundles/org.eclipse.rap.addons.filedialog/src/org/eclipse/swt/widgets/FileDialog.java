@@ -24,11 +24,18 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.rap.addons.fileupload.DiskFileUploadReceiver;
 import org.eclipse.rap.addons.fileupload.FileUploadHandler;
+import org.eclipse.rap.rwt.client.ClientFile;
+import org.eclipse.rap.rwt.dnd.ClientFileTransfer;
 import org.eclipse.rap.rwt.service.ServerPushSession;
 import org.eclipse.rap.rwt.widgets.FileUpload;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
@@ -38,6 +45,9 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.internal.widgets.FileUploadRunnable;
 import org.eclipse.swt.internal.widgets.ProgressCollector;
 import org.eclipse.swt.internal.widgets.UploadPanel;
+import org.eclipse.swt.internal.widgets.Uploader;
+import org.eclipse.swt.internal.widgets.UploaderService;
+import org.eclipse.swt.internal.widgets.UploaderWidget;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 
@@ -217,6 +227,7 @@ public class FileDialog extends Dialog {
     dialogArea.setLayout( createGridLayout( 1, 0, 5 ) );
     createUploadsArea( dialogArea );
     createProgressArea( dialogArea );
+    createDropTarget( dialogArea );
   }
 
   private void createUploadsArea( Composite parent ) {
@@ -240,6 +251,45 @@ public class FileDialog extends Dialog {
   private void createProgressArea( Composite parent ) {
     progressCollector = new ProgressCollector( parent );
     progressCollector.setLayoutData( createHorizontalFillData() );
+  }
+
+  private void createDropTarget( Control control ) {
+    DropTarget dropTarget = new DropTarget( control, DND.DROP_MOVE | DND.DROP_COPY );
+    dropTarget.setTransfer( new Transfer[] { ClientFileTransfer.getInstance() } );
+    dropTarget.addDropListener( new DropTargetAdapter() {
+      @Override
+      public void dropAccept( DropTargetEvent event ) {
+        if( !ClientFileTransfer.getInstance().isSupportedType( event.currentDataType ) ) {
+          event.detail = DND.DROP_NONE;
+        }
+      }
+      @Override
+      public void drop( DropTargetEvent event ) {
+        handleFileDrop( ( ClientFile[] )event.data );
+      }
+    } );
+  }
+
+  private void handleFileDrop( ClientFile[] clientFiles ) {
+    placeHolder.dispose();
+    ClientFile[] files = isMulti() ? clientFiles : new ClientFile[] { clientFiles[ 0 ] };
+    UploadPanel uploadPanel = createUploadPanel( getFileNames( files ) );
+    updateScrolledComposite();
+    Uploader uploader = new UploaderService( files );
+    FileUploadHandler handler = new FileUploadHandler( new DiskFileUploadReceiver() );
+    FileUploadRunnable uploadRunnable = new FileUploadRunnable( uploadPanel,
+                                                                progressCollector,
+                                                                uploader,
+                                                                handler );
+    singleThreadExecutor.execute( uploadRunnable );
+  }
+
+  private static String[] getFileNames( ClientFile[] clientFiles ) {
+    String[] fileNames = new String[ clientFiles.length ];
+    for( int i = 0; i < fileNames.length; i++ ) {
+      fileNames[ i ] = clientFiles[ i ].getName();
+    }
+    return fileNames;
   }
 
   private void createButtonsArea( Composite parent ) {
@@ -292,13 +342,14 @@ public class FileDialog extends Dialog {
 
   private void handleFileUploadSelection( FileUpload fileUpload ) {
     placeHolder.dispose();
-    FileUploadHandler handler = new FileUploadHandler( new DiskFileUploadReceiver() );
     UploadPanel uploadPanel = createUploadPanel( fileUpload.getFileNames() );
     updateScrolledComposite();
     updateButtonsArea( fileUpload );
-    FileUploadRunnable uploadRunnable = new FileUploadRunnable( fileUpload,
-                                                                uploadPanel,
+    Uploader uploader = new UploaderWidget( fileUpload );
+    FileUploadHandler handler = new FileUploadHandler( new DiskFileUploadReceiver() );
+    FileUploadRunnable uploadRunnable = new FileUploadRunnable( uploadPanel,
                                                                 progressCollector,
+                                                                uploader,
                                                                 handler );
     singleThreadExecutor.execute( uploadRunnable );
   }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 EclipseSource and others.
+ * Copyright (c) 2013, 2014 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,9 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -33,8 +31,6 @@ import org.eclipse.rap.addons.fileupload.FileUploadHandler;
 import org.eclipse.rap.addons.fileupload.FileUploadListener;
 import org.eclipse.rap.rwt.lifecycle.PhaseId;
 import org.eclipse.rap.rwt.testfixture.Fixture;
-import org.eclipse.rap.rwt.widgets.FileUpload;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.internal.widgets.FileUploadRunnable.State;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -43,14 +39,15 @@ import org.junit.Before;
 import org.junit.Test;
 
 
+@SuppressWarnings( "deprecation" )
 public class FileUploadRunnable_Test {
 
   private Display display;
   private Shell shell;
   private FileUploadRunnable runnable;
-  private FileUpload fileUpload;
   private UploadPanel uploadPanel;
   private ProgressCollector progressCollector;
+  private Uploader uploader;
   private FileUploadHandler handler;
 
   @Before
@@ -59,14 +56,14 @@ public class FileUploadRunnable_Test {
     Fixture.fakePhase( PhaseId.PROCESS_ACTION );
     display = new Display();
     shell = new Shell( display );
-    fileUpload = mock( FileUpload.class );
-    when( fileUpload.getDisplay() ).thenReturn( display );
     uploadPanel = mock( UploadPanel.class );
+    when( uploadPanel.getDisplay() ).thenReturn( display );
     progressCollector = mock( ProgressCollector.class );
     DiskFileUploadReceiver diskFileUploadReceiver = mock( DiskFileUploadReceiver.class );
     when( diskFileUploadReceiver.getTargetFiles() ).thenReturn( new File[ 0 ] );
+    uploader = mock( Uploader.class );
     handler = spy( new FileUploadHandler( diskFileUploadReceiver ) );
-    runnable = new FileUploadRunnable( fileUpload, uploadPanel, progressCollector, handler );
+    runnable = new FileUploadRunnable( uploadPanel, progressCollector, uploader, handler );
   }
 
   @After
@@ -85,21 +82,21 @@ public class FileUploadRunnable_Test {
   }
 
   @Test
-  public void testFileUploadDispose_removesUploadListener() {
-    fileUpload = new FileUpload( shell, SWT.NONE );
-    runnable = new FileUploadRunnable( fileUpload, uploadPanel, progressCollector, handler );
+  public void testUploadPanelDispose_removesUploadListener() {
+    uploadPanel = new UploadPanel( shell, new String[ 0 ] );
+    runnable = new FileUploadRunnable( uploadPanel, progressCollector, uploader, handler );
 
-    fileUpload.dispose();
+    uploadPanel.dispose();
 
     verify( handler ).removeUploadListener( any( FileUploadListener.class ) );
   }
 
   @Test
-  public void testFileUploadDispose_disposesHandler() {
-    fileUpload = new FileUpload( shell, SWT.NONE );
-    runnable = new FileUploadRunnable( fileUpload, uploadPanel, progressCollector, handler );
+  public void testUploadPanelDispose_disposesHandler() {
+    uploadPanel = new UploadPanel( shell, new String[ 0 ] );
+    runnable = new FileUploadRunnable( uploadPanel, progressCollector, uploader, handler );
 
-    fileUpload.dispose();
+    uploadPanel.dispose();
 
     verify( handler ).dispose();
   }
@@ -230,34 +227,43 @@ public class FileUploadRunnable_Test {
   }
 
   @Test
-  public void testRun_callsFileUploadSubmit() {
+  public void testRun_callsUploaderSubmit() {
     sheduleFinishedEvent();
 
     runnable.run();
     runEventsLoop();
 
-    verify( fileUpload ).submit( anyString() );
+    verify( uploader ).submit( anyString() );
   }
 
   @Test
-  public void testRun_disposesMutliFileUpload() {
-    doReturn( Integer.valueOf( SWT.MULTI ) ).when( fileUpload ).getStyle();
+  public void testRun_disposesUploader() {
     sheduleFinishedEvent();
 
     runnable.run();
     runEventsLoop();
 
-    verify( fileUpload ).dispose();
+    verify( uploader ).dispose();
   }
 
   @Test
-  public void testRun_doesNotDisposeSingleFileUpload() {
+  public void testRun_disposeHandler() {
     sheduleFinishedEvent();
 
     runnable.run();
     runEventsLoop();
 
-    verify( fileUpload, never() ).dispose();
+    verify( handler ).dispose();
+  }
+
+  @Test
+  public void testRun_removesUploadListener() {
+    sheduleFinishedEvent();
+
+    runnable.run();
+    runEventsLoop();
+
+    verify( handler ).removeUploadListener( any( FileUploadListener.class ) );
   }
 
   private void sheduleFinishedEvent() {
