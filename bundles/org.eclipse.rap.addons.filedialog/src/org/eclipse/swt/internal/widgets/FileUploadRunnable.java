@@ -142,7 +142,9 @@ public class FileUploadRunnable implements Runnable {
     }
 
     public void uploadFinished( FileUploadEvent event ) {
-      final List<String> targetFileNames = getTargetFileNames();
+      FileUploadHandler uploadHandler = ( FileUploadHandler )event.getSource();
+      DiskFileUploadReceiver receiver = ( DiskFileUploadReceiver )uploadHandler.getReceiver();
+      final List<String> targetFileNames = getTargetFileNames( receiver );
       asyncExec( new Runnable() {
         public void run() {
           handleFinished( targetFileNames );
@@ -160,10 +162,9 @@ public class FileUploadRunnable implements Runnable {
       doNotify();
     }
 
-    private List<String> getTargetFileNames() {
+    private List<String> getTargetFileNames( DiskFileUploadReceiver receiver ) {
       List<String> result = new ArrayList<String>();
-      File[] targetFiles = ( ( DiskFileUploadReceiver )handler.getReceiver() ).getTargetFiles();
-      for( File targetFile : targetFiles ) {
+      for( File targetFile : receiver.getTargetFiles() ) {
         result.add( targetFile.getAbsolutePath() );
       }
       return result;
