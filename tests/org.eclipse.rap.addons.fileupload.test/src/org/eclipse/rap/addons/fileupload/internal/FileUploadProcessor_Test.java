@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 EclipseSource and others.
+ * Copyright (c) 2013, 2014 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,8 @@ package org.eclipse.rap.addons.fileupload.internal;
 import static org.eclipse.rap.addons.fileupload.test.FileUploadTestUtil.fakeUploadRequest;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -30,6 +32,7 @@ import org.eclipse.rap.addons.fileupload.FileUploadHandler;
 import org.eclipse.rap.addons.fileupload.FileUploadReceiver;
 import org.eclipse.rap.addons.fileupload.test.FileUploadTestUtil.FileData;
 import org.eclipse.rap.addons.fileupload.test.TestFileUploadListener;
+import org.eclipse.rap.addons.fileupload.test.TestFileUploadReceiver;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.testfixture.Fixture;
 import org.eclipse.rap.rwt.testfixture.TestResponse;
@@ -37,6 +40,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 
 public class FileUploadProcessor_Test {
@@ -82,7 +87,7 @@ public class FileUploadProcessor_Test {
     FileDetails[] fileDetails = event.getFileDetails();
     assertEquals( "foo.txt", fileDetails[ 0 ].getFileName() );
     assertEquals( "text/plain", fileDetails[ 0 ].getContentType() );
-    assertEquals( 3, fileDetails[ 0 ].getContentLength() );
+    assertEquals( -1, fileDetails[ 0 ].getContentLength() );
     assertEquals( event.getContentLength(), event.getBytesRead() );
   }
 
@@ -94,7 +99,7 @@ public class FileUploadProcessor_Test {
     ArgumentCaptor<FileDetails> captor = ArgumentCaptor.forClass( FileDetails.class );
     verify( receiver ).receive( any( InputStream.class ), captor.capture() );
     FileDetails uploadDetails = captor.getValue();
-    assertEquals( 3, uploadDetails.getContentLength() );
+    assertEquals( -1, uploadDetails.getContentLength() );
     assertEquals( "text/plain", uploadDetails.getContentType() );
     assertEquals( "foo.txt", uploadDetails.getFileName() );
   }
@@ -124,10 +129,10 @@ public class FileUploadProcessor_Test {
     FileDetails[] fileDetails = event.getFileDetails();
     assertEquals( "foo.txt", fileDetails[ 0 ].getFileName() );
     assertEquals( "text/plain", fileDetails[ 0 ].getContentType() );
-    assertEquals( 3, fileDetails[ 0 ].getContentLength() );
+    assertEquals( -1, fileDetails[ 0 ].getContentLength() );
     assertEquals( "bar.png", fileDetails[ 1 ].getFileName() );
     assertEquals( "image/png", fileDetails[ 1 ].getContentType() );
-    assertEquals( 3, fileDetails[ 1 ].getContentLength() );
+    assertEquals( -1, fileDetails[ 1 ].getContentLength() );
     assertEquals( event.getContentLength(), event.getBytesRead() );
   }
 
@@ -141,10 +146,10 @@ public class FileUploadProcessor_Test {
     ArgumentCaptor<FileDetails> captor = ArgumentCaptor.forClass( FileDetails.class );
     verify( receiver, times( 2 ) ).receive( any( InputStream.class ), captor.capture() );
     List<FileDetails> values = captor.getAllValues();
-    assertEquals( 3, values.get( 0 ).getContentLength() );
+    assertEquals( -1, values.get( 0 ).getContentLength() );
     assertEquals( "text/plain", values.get( 0 ).getContentType() );
     assertEquals( "foo.txt", values.get( 0 ).getFileName() );
-    assertEquals( 3, values.get( 1 ).getContentLength() );
+    assertEquals( -1, values.get( 1 ).getContentLength() );
     assertEquals( "image/png", values.get( 1 ).getContentType() );
     assertEquals( "bar.png", values.get( 1 ).getFileName() );
   }
@@ -164,6 +169,7 @@ public class FileUploadProcessor_Test {
   public void testHandleFileUpload_fileExceedsMaxSize() throws IOException {
     uploadHandler.setMaxFileSize( 5 );
     uploadHandler.addUploadListener( testListener );
+    stubReceiveMethod( receiver );
 
     FileData file1 = new FileData( "foo", "text/plain", "foo.txt" );
     FileData file2 = new FileData( "bar bar", "image/png", "bar.png" );
@@ -185,6 +191,16 @@ public class FileUploadProcessor_Test {
 
     assertEquals( "progress.failed.", testListener.getLog() );
     assertEquals( HttpServletResponse.SC_INTERNAL_SERVER_ERROR, getResponseErrorStatus() );
+  }
+
+  private static void stubReceiveMethod( FileUploadReceiver receiver ) throws IOException {
+    Answer answer = new Answer() {
+      public Object answer( InvocationOnMock invocation ) throws Throwable {
+        new TestFileUploadReceiver().receive( ( InputStream )invocation.getArguments()[0], null );
+        return null;
+      }
+    };
+    doAnswer( answer ).when( receiver ).receive( any( InputStream.class ), any( FileDetails.class ) );
   }
 
   private static int getResponseErrorStatus() {

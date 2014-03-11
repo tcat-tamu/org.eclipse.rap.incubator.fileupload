@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 EclipseSource and others.
+ * Copyright (c) 2011, 2014 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,23 +10,12 @@
  ******************************************************************************/
 package org.eclipse.rap.addons.fileupload;
 
-import static org.eclipse.rap.rwt.internal.service.ContextProvider.getApplicationContext;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.rap.addons.fileupload.FileUploadHandler;
-import org.eclipse.rap.addons.fileupload.FileUploadReceiver;
-import org.eclipse.rap.addons.fileupload.FileDetails;
 import org.eclipse.rap.addons.fileupload.internal.FileUploadHandlerStore;
 import org.eclipse.rap.addons.fileupload.internal.FileUploadServiceHandler;
 import org.eclipse.rap.addons.fileupload.test.FileUploadTestUtil;
@@ -40,6 +29,17 @@ import org.eclipse.rap.rwt.testfixture.TestResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.eclipse.rap.rwt.internal.service.ContextProvider.getApplicationContext;
+
+import static org.hamcrest.CoreMatchers.containsString;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 
 @SuppressWarnings( "restriction" )
@@ -77,7 +77,7 @@ public class FileUploadHandler_Test {
 
   @Test
   public void testInitialized() {
-    assertTrue( handler.getUploadUrl().indexOf( handler.getToken() ) != -1 );
+    assertThat( handler.getUploadUrl(), containsString( handler.getToken() ) );
     assertSame( handler, getRegisteredHandler( handler.getToken() ) );
   }
 
@@ -225,7 +225,7 @@ public class FileUploadHandler_Test {
     serviceHandler.service( ContextProvider.getRequest(), ContextProvider.getResponse() );
 
     assertEquals( HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE, getResponseErrorStatus() );
-    assertTrue( getResponseContent().indexOf( "file exceeds its maximum permitted  size" ) != -1 );
+    assertThat( getResponseContent(), containsString( "file exceeds its maximum permitted  size" ) );
   }
 
   @Test
@@ -242,7 +242,7 @@ public class FileUploadHandler_Test {
     serviceHandler.service( ContextProvider.getRequest(), ContextProvider.getResponse() );
 
     assertEquals( HttpServletResponse.SC_INTERNAL_SERVER_ERROR, getResponseErrorStatus() );
-    assertTrue( getResponseContent().indexOf( "the error message" ) != -1 );
+    assertThat( getResponseContent(), containsString( "the error message" ) );
   }
 
   @Test
@@ -278,4 +278,5 @@ public class FileUploadHandler_Test {
     TestResponse response = ( TestResponse )ContextProvider.getResponse();
     return response.getContent();
   }
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 EclipseSource and others.
+ * Copyright (c) 2011, 2014 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,17 +11,15 @@
 package org.eclipse.rap.addons.fileupload.internal;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
-import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.ProgressListener;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.eclipse.rap.addons.fileupload.FileDetails;
 import org.eclipse.rap.addons.fileupload.FileUploadHandler;
@@ -32,68 +30,48 @@ final class FileUploadProcessor {
 
   private final FileUploadHandler handler;
   private final FileUploadTracker tracker;
-  private final CleaningTracker cleaningTracker;
 
   FileUploadProcessor( FileUploadHandler handler ) {
     this.handler = handler;
     tracker = new FileUploadTracker( handler );
-    cleaningTracker = new CleaningTracker();
   }
 
   void handleFileUpload( HttpServletRequest request, HttpServletResponse response )
     throws IOException
   {
     try {
-      List<FileItem> fileItems = readUploadedFileItems( request );
-      if( !fileItems.isEmpty() ) {
-        FileUploadReceiver receiver = handler.getReceiver();
-        for( FileItem fileItem : fileItems ) {
-          String fileName = stripFileName( fileItem.getName() );
-          String contentType = fileItem.getContentType();
-          long contentLength = fileItem.getSize();
-          FileDetails details = new FileDetailsImpl( fileName, contentType, contentLength );
-          receiver.receive( fileItem.getInputStream(), details );
-          tracker.addFile( details );
+      ServletFileUpload upload = createUpload();
+      FileItemIterator iter = upload.getItemIterator( request );
+      while( iter.hasNext() ) {
+        FileItemStream item = iter.next();
+        if( !item.isFormField() ) {
+          receive( item );
         }
-        tracker.handleFinished();
-      } else {
+      }
+      if( tracker.isEmpty() ) {
         String errorMessage = "No file upload data found in request";
         tracker.setException( new Exception( errorMessage ) );
         tracker.handleFailed();
         response.sendError( HttpServletResponse.SC_BAD_REQUEST, errorMessage );
+      } else {
+        tracker.handleFinished();
       }
-    } catch( FileSizeLimitExceededException exception ) {
-      tracker.setException( exception );
-      tracker.handleFailed();
-      response.sendError( HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE, exception.getMessage() );
     } catch( Exception exception ) {
+      Throwable cause = exception.getCause();
+      if( cause instanceof FileSizeLimitExceededException ) {
+        exception = ( Exception )cause;
+      }
       tracker.setException( exception );
       tracker.handleFailed();
-      response.sendError( HttpServletResponse.SC_INTERNAL_SERVER_ERROR, exception.getMessage() );
+      int errorCode = exception instanceof FileSizeLimitExceededException
+                    ? HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE
+                    : HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+      response.sendError( errorCode, exception.getMessage() );
     }
-    cleaningTracker.deleteTemporaryFiles();
-  }
-
-  private List<FileItem> readUploadedFileItems( HttpServletRequest request )
-    throws FileUploadException
-  {
-    List<FileItem> result = new ArrayList<FileItem>();
-    ServletFileUpload upload = createUpload();
-    List uploadedItems = upload.parseRequest( request );
-    for( Object uploadedItem : uploadedItems ) {
-      FileItem fileItem = ( FileItem )uploadedItem;
-      // Don't check for file size == 0 because this would prevent uploading empty files
-      if( !fileItem.isFormField() ) {
-        result.add( fileItem );
-      }
-    }
-    return result;
   }
 
   private ServletFileUpload createUpload() {
-    DiskFileItemFactory factory = new DiskFileItemFactory();
-    factory.setFileCleaningTracker( cleaningTracker );
-    ServletFileUpload upload = new ServletFileUpload( factory );
+    ServletFileUpload upload = new ServletFileUpload();
     upload.setFileSizeMax( handler.getMaxFileSize() );
     upload.setProgressListener( createProgressListener() );
     return upload;
@@ -115,6 +93,20 @@ final class FileUploadProcessor {
       }
     };
     return result;
+  }
+
+  private void receive( FileItemStream item ) throws IOException {
+    InputStream stream = item.openStream();
+    try {
+      String fileName = stripFileName( item.getName() );
+      String contentType = item.getContentType();
+      FileDetails details = new FileDetailsImpl( fileName, contentType, -1 );
+      FileUploadReceiver receiver = handler.getReceiver();
+      receiver.receive( stream, details );
+      tracker.addFile( details );
+    } finally {
+      stream.close();
+    }
   }
 
   private static String stripFileName( String name ) {
