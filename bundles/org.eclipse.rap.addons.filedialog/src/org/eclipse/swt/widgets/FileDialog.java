@@ -160,6 +160,55 @@ public class FileDialog extends Dialog {
   }
 
   /**
+   * Set the initial filename which the dialog will select by default when
+   * opened to the argument, which may be null. The name will be prefixed with
+   * the filter path when one is supplied.
+   *
+   * @param string the file name
+   */
+  public void setFileName( String string ) {
+    // Added for RCP/RAP single-sourcing.
+    // Should this throw since it does nothing, or silently fail?
+  }
+
+  /**
+   * Set the file extensions which the dialog will use to filter the files it
+   * shows to the argument, which may be null.
+   * <p>
+   * The strings are platform specific. For example, on some platforms, an
+   * extension filter string is typically of the form "*.extension", where "*.*"
+   * matches all files. For filters with multiple extensions, use semicolon as a
+   * separator, e.g. "*.jpg;*.png".
+   * </p>
+   *
+   * @param extensions the file extension filter
+   * @see #setFilterNames to specify the user-friendly names corresponding to
+   *      the extensions
+   */
+  public void setFilterExtensions( String[] extensions ) {
+    // Added for RCP/RAP single-sourcing.
+    // Should this throw since it does nothing, or silently fail?
+  }
+
+  /**
+   * Sets the names that describe the filter extensions which the dialog will
+   * use to filter the files it shows to the argument, which may be null.
+   * <p>
+   * Each name is a user-friendly short description shown for its corresponding
+   * filter. The <code>names</code> array must be the same length as the
+   * <code>extensions</code> array.
+   * </p>
+   *
+   * @param names the list of filter names, or null for no filter names
+   * @see #setFilterExtensions
+   */
+  public void setFilterNames( String[] names ) {
+    // Added for RCP/RAP single-sourcing.
+    // Should this throw since it does nothing, or silently fail?
+  }
+
+
+  /**
    * Makes the dialog visible and brings it to the front
    * of the display.
    *
