@@ -207,6 +207,27 @@ public class FileDialog extends Dialog {
     // Should this throw since it does nothing, or silently fail?
   }
 
+  /**
+   * Sets the directory path that the dialog will use
+   * to the argument, which may be null. File names in this
+   * path will appear in the dialog, filtered according
+   * to the filter extensions. If the string is null,
+   * then the operating system's default filter path
+   * will be used.
+   * <p>
+   * Note that the path string is platform dependent.
+   * For convenience, either '/' or '\' can be used
+   * as a path separator.
+   * </p>
+   *
+   * @param string the directory path
+   *
+   * @see #setFilterExtensions
+   */
+  public void setFilterPath(String string){
+    // Added for RCP/RAP single-sourcing.
+    // Should this throw since it does nothing, or silently fail?
+  }
 
   /**
    * Makes the dialog visible and brings it to the front
