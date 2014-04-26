@@ -3,9 +3,11 @@
       id="org.eclipse.rap.fileupload.feature"
       label="%featureName"
       version="2.3.0.qualifier"
-      provider-name="%providerName">
+      provider-name="%providerName"
+      license-feature="org.eclipse.license"
+      license-feature-version="0.0.0">
 
-   <description url="http://www.eclipse.org/rap">
+   <description url="http://eclipse.org/rap/incubator">
       %description
    </description>
 
