@@ -22,10 +22,15 @@
   </parent>
 
   <repositories>
+    <!-- we used to consume the org.apache.commons.[io,fileupload] bundles from Orbit 
+         but right now we need a newer version that we need to consume from our own repository
+         until we can make these bundles available from a regular Orbit build. 
+         These versions are available in our RAP base-platforms/2.3/extra-dependencies 
+         repository that is already part of the build - see parent pom. -->
     <repository>
       <id>orbit-dependencies-repository</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/tools/orbit/downloads/drops/R20130827064939/repository</url>
+      <url>http://download.eclipse.org/tools/orbit/downloads/drops/R20140114142710/repository</url>
     </repository>
   </repositories>
 
