@@ -29,7 +29,7 @@ import org.eclipse.rap.addons.fileupload.FileDetails;
 import org.eclipse.rap.addons.fileupload.FileUploadEvent;
 import org.eclipse.rap.addons.fileupload.FileUploadHandler;
 import org.eclipse.rap.addons.fileupload.FileUploadListener;
-import org.eclipse.rap.rwt.lifecycle.PhaseId;
+import org.eclipse.rap.rwt.internal.lifecycle.PhaseId;
 import org.eclipse.rap.rwt.testfixture.Fixture;
 import org.eclipse.swt.internal.widgets.FileUploadRunnable.State;
 import org.eclipse.swt.widgets.Display;
@@ -39,7 +39,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-@SuppressWarnings( "deprecation" )
+@SuppressWarnings( {
+  "deprecation", "restriction"
+} )
 public class FileUploadRunnable_Test {
 
   private Display display;
