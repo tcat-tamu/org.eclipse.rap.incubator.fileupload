@@ -27,7 +27,7 @@ public class UploaderWidget implements Uploader {
   }
 
   public void dispose() {
-    if( ( fileUpload.getStyle() & SWT.MULTI ) != 0 ) {
+    if( !fileUpload.isDisposed() && ( fileUpload.getStyle() & SWT.MULTI ) != 0 ) {
       fileUpload.dispose();
     }
   }
