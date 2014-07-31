@@ -10,6 +10,15 @@
  ******************************************************************************/
 package org.eclipse.rap.addons.fileupload;
 
+import static org.eclipse.rap.rwt.internal.service.ContextProvider.getApplicationContext;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -29,17 +38,6 @@ import org.eclipse.rap.rwt.testfixture.TestResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.eclipse.rap.rwt.internal.service.ContextProvider.getApplicationContext;
-
-import static org.hamcrest.CoreMatchers.containsString;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 
 @SuppressWarnings( "restriction" )
@@ -225,7 +223,7 @@ public class FileUploadHandler_Test {
     serviceHandler.service( ContextProvider.getRequest(), ContextProvider.getResponse() );
 
     assertEquals( HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE, getResponseErrorStatus() );
-    assertThat( getResponseContent(), containsString( "file exceeds its maximum permitted  size" ) );
+    assertThat( getResponseContent(), containsString( "HTTP ERROR 413" ) );
   }
 
   @Test
