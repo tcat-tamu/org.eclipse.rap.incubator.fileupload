@@ -46,7 +46,6 @@ public class DiskFileUploadReceiver extends FileUploadReceiver {
     try {
       copy( dataStream, outputStream );
     } finally {
-      dataStream.close();
       outputStream.close();
     }
     targetFiles.add( targetFile );
