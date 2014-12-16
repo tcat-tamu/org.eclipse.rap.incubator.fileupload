@@ -13,7 +13,6 @@ package org.eclipse.rap.addons.fileupload.internal;
 import static org.eclipse.rap.addons.fileupload.test.FileUploadTestUtil.fakeUploadRequest;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -34,8 +33,8 @@ import org.eclipse.rap.addons.fileupload.test.FileUploadTestUtil.FileData;
 import org.eclipse.rap.addons.fileupload.test.TestFileUploadListener;
 import org.eclipse.rap.addons.fileupload.test.TestFileUploadReceiver;
 import org.eclipse.rap.rwt.RWT;
-import org.eclipse.rap.rwt.testfixture.Fixture;
-import org.eclipse.rap.rwt.testfixture.TestResponse;
+import org.eclipse.rap.rwt.testfixture.internal.Fixture;
+import org.eclipse.rap.rwt.testfixture.internal.TestResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +43,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 
+@SuppressWarnings( "restriction" )
 public class FileUploadProcessor_Test {
 
   private TestFileUploadListener testListener;

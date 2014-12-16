@@ -30,7 +30,7 @@ import org.eclipse.rap.addons.fileupload.FileUploadEvent;
 import org.eclipse.rap.addons.fileupload.FileUploadHandler;
 import org.eclipse.rap.addons.fileupload.FileUploadListener;
 import org.eclipse.rap.rwt.internal.lifecycle.PhaseId;
-import org.eclipse.rap.rwt.testfixture.Fixture;
+import org.eclipse.rap.rwt.testfixture.internal.Fixture;
 import org.eclipse.swt.internal.widgets.FileUploadRunnable.State;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;

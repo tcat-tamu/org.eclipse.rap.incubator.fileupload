@@ -20,7 +20,7 @@ import org.eclipse.rap.rwt.client.Client;
 import org.eclipse.rap.rwt.client.ClientFile;
 import org.eclipse.rap.rwt.client.service.ClientFileUploader;
 import org.eclipse.rap.rwt.internal.client.ClientFileImpl;
-import org.eclipse.rap.rwt.testfixture.Fixture;
+import org.eclipse.rap.rwt.testfixture.internal.Fixture;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

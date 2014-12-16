@@ -10,17 +10,22 @@
  ******************************************************************************/
 package org.eclipse.rap.addons.fileupload.internal;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.rap.addons.fileupload.FileUploadHandler;
-import org.eclipse.rap.addons.fileupload.internal.FileUploadHandlerStore;
 import org.eclipse.rap.addons.fileupload.test.TestFileUploadReceiver;
-import org.eclipse.rap.rwt.testfixture.Fixture;
+import org.eclipse.rap.rwt.testfixture.internal.Fixture;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 
+@SuppressWarnings( "restriction" )
 public class FileUploadHandlerStore_Test {
 
   private FileUploadHandlerStore handlerStore;

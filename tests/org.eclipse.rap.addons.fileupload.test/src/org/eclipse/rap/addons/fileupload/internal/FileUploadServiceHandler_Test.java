@@ -13,7 +13,6 @@ package org.eclipse.rap.addons.fileupload.internal;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -32,14 +31,15 @@ import org.eclipse.rap.addons.fileupload.test.FileUploadTestUtil;
 import org.eclipse.rap.addons.fileupload.test.TestFileUploadListener;
 import org.eclipse.rap.addons.fileupload.test.TestFileUploadReceiver;
 import org.eclipse.rap.rwt.RWT;
-import org.eclipse.rap.rwt.testfixture.Fixture;
-import org.eclipse.rap.rwt.testfixture.TestRequest;
-import org.eclipse.rap.rwt.testfixture.TestResponse;
+import org.eclipse.rap.rwt.testfixture.internal.Fixture;
+import org.eclipse.rap.rwt.testfixture.internal.TestRequest;
+import org.eclipse.rap.rwt.testfixture.internal.TestResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 
+@SuppressWarnings( "restriction" )
 public class FileUploadServiceHandler_Test {
 
   private FileUploadServiceHandler serviceHandler;
@@ -211,12 +211,11 @@ public class FileUploadServiceHandler_Test {
     assertEquals( "some.txt", uploadedItem.getFileDetails()[ 0 ].getFileName() );
   }
 
-
   @Test
-  public void testGetURL_returnsRelativeUrl() {
+  public void testGetURL_returnsAbsoluteUrl() {
     String url = FileUploadServiceHandler.getUrl( "token" );
 
-    assertThat( url, not( containsString( "/" ) ) );
+    assertThat( url, containsString( "/" ) );
   }
 
   @Test
